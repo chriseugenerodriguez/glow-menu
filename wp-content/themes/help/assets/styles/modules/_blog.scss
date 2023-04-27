@@ -1,0 +1,13 @@
+.page-template-blog {
+    header {
+        position: absolute;
+    }
+    #theme-wrapper {
+        .header-title {
+            @include linear-gradient(45deg, #444, #625F5A);
+            h1 {
+                margin: 0px;
+            }
+        }
+    }
+}

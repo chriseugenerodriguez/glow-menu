@@ -1,0 +1,164 @@
+// - - - - - - - - - - - - - - - - - - -
+// - - settings
+// global maps and variables
+.text-center {
+    text-align: center;
+}
+.text-right {
+    text-align: right;
+}
+.center {
+    margin: 0px auto;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.absolute.left {
+    left: 0px;
+}
+
+.right {
+    float: right !important;
+}
+
+.littlemargintop {
+    margin-top: 50px;
+   
+    @media #{$tablet, $phone} {
+    	margin-top:0px !important;
+    }
+}
+
+.margintop {
+    margin-top: 100px;
+   
+    @media #{$tablet, $phone} {
+    	margin-top:0px !important;
+    }
+}
+
+.largemargintop {
+    margin-top: 200px !important;
+   
+    @media #{$tablet, $phone} {
+    	margin-top:0px !important;
+    }
+}
+
+.nomargin {
+    margin: 0px !important;
+}
+
+.marginbottom {
+    margin-bottom: 100px;
+   
+    @media #{$tablet, $phone} {
+    	margin-bottom:0px !important;
+    }
+}
+
+.littlemarginbottom {
+    margin-bottom: 50px;
+   
+    @media #{$tablet, $phone} {
+    	margin-bottom:0px !important;
+    }
+}
+
+.marginleft {
+    margin-left: 100px;
+   
+    @media #{$tablet, $phone} {
+    	margin-left:0px !important;
+    }
+}
+
+.marginright {
+    margin-right: 100px !important;
+
+    @media #{$tablet, $phone} {
+    	margin-right:0px !important;
+    }
+}
+
+.margintop {
+    margin-top: 100px !important;
+    
+    @media #{$tablet, $phone} {
+    	margin-top:0px !important;
+    }
+}
+
+.paddingtop {
+    padding-top: 85px;
+   
+    @media #{$tablet, $phone} {
+    	padding-top:0px !important;
+    }
+}
+
+.paddingbottom {
+    padding-bottom: 100px;
+   
+    @media #{$tablet, $phone} {
+    	padding-bottom:0px !important;
+    }
+}
+
+.paddingleft {
+    padding-left: 100px;
+   
+    @media #{$tablet, $phone} {
+    	padding-left:0px !important;
+    }
+}
+
+.paddingright {
+    padding-right: 100px;
+   
+    @media #{$tablet, $phone} {
+    	padding-right:0px !important;
+    }
+}
+
+.littlepaddingbottom {
+    padding-bottom: 50px;
+   
+    @media #{$tablet, $phone} {
+    	padding-bottom:0px !important;
+    }
+}
+
+.littlepaddingtop {
+    padding-top: 50px;
+   
+    @media #{$tablet, $phone} {
+    	padding-top:0px !important;
+    }
+}
+
+.littlepaddingleft {
+    padding-left: 50px;
+   
+    @media #{$tablet, $phone} {
+    	padding-left:0px !important;
+    }
+}
+
+.littlepaddingright {
+    padding-right: 50px;
+   
+    @media #{$tablet, $phone} {
+    	padding-right:0px !important;
+    }
+}
+
+.nomargin {
+    margin: 0px;
+}

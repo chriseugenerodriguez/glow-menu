@@ -1,0 +1,28 @@
+@charset 'utf-8';
+
+/* - - css-burrito v1.6 | mit license | github.com/jasonreece/css-burrito*/
+
+
+/* - - - - - - - - - - - - - - - - - - -*/
+
+
+/* - - application.scss*/
+
+
+/* contains an import section for libs, global, and modules, the inbox,*/
+
+
+/* and a shame section for quick fixes and hacks.*/
+
+@import 'libs/reset';
+@import 'libs/normalize';
+@import 'global/utilities';
+@import 'global/settings';
+@import 'global/base';
+@import 'global/layout';
+@import 'global/plugins';
+@import 'global/typography';
+@import 'modules/header';
+@import 'modules/body';
+@import 'modules/footer';
+@import 'modules/plugin';

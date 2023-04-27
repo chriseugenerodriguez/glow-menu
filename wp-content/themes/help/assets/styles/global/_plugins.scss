@@ -1,0 +1,63 @@
+.search-live {
+    margin: 0 auto;
+    position: relative;
+    &:before {
+        position: absolute;
+        top: 15px;
+        left: 16px;
+        @include font-size(16px);
+        font-family: FontAwesome;
+        content: '';
+    }
+    input {
+        box-sizing: inherit;
+        border: 2px solid #ccc;
+        @include border-radius(5px);
+        @include font-size(19px);
+        @include box-shadow(0, 0, 0, 5px, rgba(255, 255, 255, 0.15));
+        display: block;
+        outline: medium none;
+        padding: 0.75em 2.7em;
+        width: 100%;
+        &.blinker {
+            background-size: 25px !important;
+            background-position: 98% center !important;
+            background-image: url('../../dist/images/loading.svg') !important;
+        }
+    }
+    .search-live-results {
+        border: none;
+        background: #fff;
+        @include border-radius(5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
+        margin: 10px 0 0;
+        overflow: auto;
+        padding: 0;
+        position: absolute;
+        z-index: 1;
+        td {
+            display: block;
+            padding: 10px 20px;
+            @include font-size(16px);
+            font-weight: bold;
+            line-height: 18px;
+            &:first-child {
+                 padding: 10px 15px;
+            }
+            a {
+                color: #3d4853;
+            }
+            &:hover {
+                background: #fafafa;
+                a {
+                    color: #3d4853;
+                    span {
+                        &:hover {
+                            text-decoration: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
