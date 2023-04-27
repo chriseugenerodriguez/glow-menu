@@ -1,0 +1,24 @@
+{
+    "host": "ftp.premiumwd.com",
+    "username": "premiu35",
+    "password": "10261988)_P",
+    "protocol": "ftp",
+    "agent": null,
+    "privateKeyPath": null,
+    "passphrase": null,
+    "passive": true,
+    "interactiveAuth": false,
+    "remote_path": "/public_html/glowmenus.com",
+    "uploadOnSave": true,
+    "syncMode": "update",
+    "watcher": {
+        "files": true,
+        "autoUpload": false,
+        "autoDelete": false
+    },
+    "ignore": [
+        "**/.vscode/**",
+        "**/.git/**",
+        "**/.DS_Store"
+    ]
+}

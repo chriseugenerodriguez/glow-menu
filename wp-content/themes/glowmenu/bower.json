@@ -1,0 +1,9 @@
+{
+  "name": "glowmenu",
+  "homepage": "https://glowmenu.co/",
+  "authors": [
+    "Chris Rodriguez <info@glowmenu.co>"
+  ],
+  "license": "MIT",
+  "private": true
+}

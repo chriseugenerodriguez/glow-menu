@@ -1,0 +1,119 @@
+/**
+ * search-live.css
+ *
+ * Copyright (c) "kento" Karim Rahimpur www.itthinx.com
+ *
+ * This code is released under the GNU General Public License.
+ * See COPYRIGHT.txt and LICENSE.txt.
+ *
+ * This code is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * This header and all notices must be kept intact.
+ *
+ * @author itthinx
+ * @package search-live
+ * @since 1.0.0
+ */
+.search-live.floating {
+	position: relative;
+	left: 0;
+	top: 0;
+}
+.search-live.floating .search-live-results {
+	position: absolute;
+	z-index: 10;
+	background: #fff;
+	border: 1px solid #ccc;
+	margin: -1px 0 0 0;
+}
+.search-live.floating .search-live-results:empty {
+	border: none;
+}
+.search-live input[type="text"].search-live-field {
+	width: 98%;
+}
+.search-live .search-live-results {
+	display: none;
+}
+.search-live-form .screen-reader-text {
+	clip: rect(1px, 1px, 1px, 1px);
+	height: 1px;
+	overflow: hidden;
+	position: absolute !important;
+	width: 1px;
+}
+.search-live-form input.blinker {
+	background-image: url( ../images/blinker.gif );
+	background-position: right center;
+	background-repeat: no-repeat;
+}
+.search-live-results .entry,
+.search-live-results .no-results {
+	padding: 1px;
+}
+
+.search-live-results .entry a {
+	text-decoration: none;
+}
+.search-live-results .entry span.title {
+	font: inherit;
+	display: block;
+}
+.search-live-results .entry span.title,
+.search-live-results .entry span.description,
+.search-live-results .entry img.thumbnail {
+	vertical-align: middle;
+}
+.search-live-results .entry span.description {
+	display: block;
+	font-size: 80%;
+}
+.search-live-results .entry img.thumbnail {
+	max-width: none;
+}
+.search-live-results .entry a span.title:hover {
+	text-decoration: underline;
+}
+.search-live-results .entry:hover,
+.search-live-results .entry.active {
+	background-color: #ddd;
+	font-weight: bolder;
+}
+.search-live-results table.search-results {
+	table-layout: auto;
+}
+.search-live-results table.search-results {
+	border: 0;
+	border-collapse: collapse;
+	border-spacing: 0;
+	font-family: inherit;
+	font-size: 100%;
+	font-style: inherit;
+	font-weight: inherit;
+	margin: 0;
+	padding: 0;
+	vertical-align: baseline;
+	width: 100%;
+}
+.search-live-results table.search-results td:last-child {
+	width: 100%;
+}
+.search-live-results table.search-results tr:nth-child(n) td {
+	background-color: inherit;
+}
+.search-live-results table.search-results tr,
+.search-live-results table.search-results tr td,
+.entry-content .search-live-results table.search-results tr td {
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+.search-live-results table.search-results tr td,
+.entry-content .search-live-results table.search-results tr td {
+	padding: 4px;
+	vertical-align: top;
+	text-align: left;
+}

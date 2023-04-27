@@ -1,0 +1,109 @@
+.getstarted {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    @include transform(translate(-50%, -50%));
+    z-index: 11;
+    width: 100%;
+    max-width: 1250px;
+    .close {
+        position: absolute;
+        top: -40px;
+        right: 0px;
+        text-indent: -9999px;
+        border: none;
+        width: 25px;
+        background: transparent;
+        &:before,
+        &:after {
+            position: absolute;
+            left: 15px;
+            content: ' ';
+            height: 100%;
+            width: 2px;
+            background-color: #ccc;
+        }
+        &:before {
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+        &:after {
+            -webkit-transform: rotate(-45deg);
+            -ms-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+        }
+        &:hover:before,
+        &:hover:after {
+            background: #fff;
+        }
+    }
+    .col_6 {
+        @include opacity(1);
+        @include animation(0s ease 0s normal none 1 running none);
+        @include transform(translate(0px, 0px));
+        @include transition-duration(500ms);
+        @include transition-property(opacity);
+        @include transition-timing-function(cubic-bezier(0.33, 0, 0.2, 1));
+        &.bar {
+            background: #625F5A;
+        }
+        &.eve {
+            background: #53438C;
+        }
+        &.par {
+            background: #41A6E4;
+        }
+        &.res {
+            background: #DC003F;
+        }
+        .product-selection {
+            height: auto;
+            left: 0;
+            max-width: none;
+            right: 0;
+            top: auto;
+            padding: 20px;
+            color: #333;
+            h1 {
+                font-size: 10px;
+                margin-bottom: 18px;
+                text-align: center;
+                text-transform: uppercase;
+                div {
+                    font-size: 9px;
+                    margin: 0 auto;
+                    letter-spacing: 0.05em;
+                    line-height: 1em;
+                }
+                strong {
+                    display: block;
+                    font-size: 22px;
+                    margin: 12px auto 19px;
+                    padding-left: 0;
+                    letter-spacing: 0.05em;
+                    line-height: 1em;
+                }
+            }
+            p {
+                font-size: 14px;
+                line-height: 1.75em;
+                margin: auto;
+                width: 50%;
+                @include opacity(0.52);
+            }
+            .button {
+                @include font-size(12px);
+                @include button(#222);
+                @include border-radius(3px);
+                display: block;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin: 24px auto 55px;
+                max-width: 150px;
+                padding: 10px 20px;
+                @include transition(all 333ms cubic-bezier(0.5, 0, 0, 1) 0s);
+            }
+        }
+    }
+}

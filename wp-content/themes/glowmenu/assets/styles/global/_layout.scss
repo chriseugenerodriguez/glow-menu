@@ -1,0 +1,160 @@
+.container {
+    max-width: 1500px;
+}
+
+.container-fluid {
+    max-width:1940px;
+    padding-left: 90px;
+    padding-right: 90px;
+    @media (max-width: $screen-xl-min) { 
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+    @media (max-width: $screen-sm-max) { 
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+.container {
+    clear: both;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    width: auto
+}
+
+
+/*  SECTIONS  */
+
+.section {
+    clear: both;
+    padding: 0px;
+    margin: 0px;
+}
+
+
+/*  COLUMN SETUP  */
+
+.col {
+    display: block;
+    float: left;
+    margin: 1% 0 1% 1.6%;
+    @media #{$tablet, $phone} {
+        margin: 1% 0 1% 0%;
+    }
+}
+
+.col:first-of-type {
+    margin-left: 0;
+}
+
+
+/*  GROUPING  */
+
+.group:before,
+.group:after {
+    content: "";
+    display: table;
+}
+
+.group:after {
+    clear: both;
+}
+
+.group {
+    zoom: 1;
+    /* For IE 6/7 */
+}
+
+
+/*  GRID OF TWELVE  */
+
+.col_12 {
+    width: 100%;
+}
+
+.col_11 {
+    width: 91.53%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+.col_10 {
+    width: 79.06%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+.col_9 {
+    width: 74.6%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+.col_8 {
+    width: 66.13%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+.col_7 {
+    width: 57.66%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+.col_6 {
+    width: 49.2%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+.col_5 {
+    width: 40.73%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+.col_4 {
+    width: 32.26%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+.col_3 {
+    width: 23.8%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+.col_2 {
+    width: 18.7%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+.col_1 {
+    width: 6.866%;
+    @media #{$tablet, $phone} {
+        width: 100%;
+    }
+}
+
+#theme-wrapper {
+    min-height: 100%;
+    left: 0;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}

@@ -1,0 +1,616 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Search Live\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-06 10:51-0300\n"
+"PO-Revision-Date: 2017-01-09 11:32-0300\n"
+"Last-Translator: Henrique Vianna <hvianna@gmail.com>\n"
+"Language-Team: \n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.7.1\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-KeywordsList: __;_e;_x\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../admin/class-search-live-admin.php:91
+#: ../admin/class-search-live-admin.php:92
+#: ../admin/class-search-live-admin.php:399
+msgid "Thumbnails"
+msgstr "Miniaturas"
+
+#: ../admin/class-search-live-admin.php:99
+#: ../admin/class-search-live-admin.php:100
+msgid "Appearance"
+msgstr "Aparência"
+
+#: ../admin/class-search-live-admin.php:129
+msgid "Settings"
+msgstr "Configurações"
+
+#: ../admin/class-search-live-admin.php:130
+#: ../admin/class-search-live-admin.php:149
+msgid "Documentation"
+msgstr "Documentação"
+
+#: ../admin/class-search-live-admin.php:145
+#: ../admin/class-search-live-admin.php:148
+#: ../admin/class-search-live-admin.php:356
+#: ../views/class-search-live-widget.php:50
+msgid "Search Live"
+msgstr "Search Live"
+
+#: ../admin/class-search-live-admin.php:151
+msgid ""
+"Please refer to the <a href=\"http://docs.itthinx.com/document/search-live/"
+"\">Search Live</a> documentation page for more details."
+msgstr ""
+"Por favor consulte a <a href=\"http://docs.itthinx.com/document/search-live/"
+"\">página de documentação do Search Live</a> para mais detalhes."
+
+#: ../admin/class-search-live-admin.php:158
+#: ../admin/class-search-live-admin.php:161
+msgid "Setup"
+msgstr "Configuração"
+
+#: ../admin/class-search-live-admin.php:163
+msgid ""
+"If the option is enabled, the Search Live form replaces the standard "
+"WordPress search form."
+msgstr ""
+"Se a opção estiver ativada, o formulário do Search Live substitui o "
+"formulário de busca padrão do WordPress."
+
+#: ../admin/class-search-live-admin.php:166
+msgid ""
+"You can also place the <code>[search_live]</code> shortcode on a page or use "
+"the <em>Search Live</em> widget in a sidebar."
+msgstr ""
+"Você pode também colocar o shortcode <code>[search_live]</code> em uma "
+"página ou utilizar o widget <em>Search Live</em> na barra lateral."
+
+#: ../admin/class-search-live-admin.php:173
+msgid "Shortcodes"
+msgstr "Shortcodes"
+
+#: ../admin/class-search-live-admin.php:176
+msgid "Search Live on a Page"
+msgstr "Search Live em uma Página"
+
+#: ../admin/class-search-live-admin.php:177
+msgid "Here is how you can place a Search Live field on a page."
+msgstr "Veja como colocar um campo de busca do Search Live em uma página."
+
+#: ../admin/class-search-live-admin.php:178
+msgid ""
+"From your WordPress Dashboard go to <strong>Pages > Add New</strong>. Place "
+"the following shortcode on the page:"
+msgstr ""
+"No Painel do WordPress acesse <strong>Páginas > Adicionar nova</strong>. "
+"Cole o seguinte shortcode no texto da página:"
+
+#: ../admin/class-search-live-admin.php:179
+msgid "<code>[search_live]</code>"
+msgstr "<code>[search_live]</code>"
+
+#: ../admin/class-search-live-admin.php:180
+msgid ""
+"Please make sure that the spelling is correct, all letters must be in lower "
+"case."
+msgstr ""
+"Certifique-se de que a grafia esteja correta, todas as letras devem ser "
+"minúsculas."
+
+#: ../admin/class-search-live-admin.php:181
+msgid "Click <em>Publish</em> to save the page content and publish the page."
+msgstr ""
+"Clique em <em>Publicar</em> para salvar o conteúdo e publicar a página."
+
+#: ../admin/class-search-live-admin.php:182
+msgid ""
+"Now click <em>View Page</em> which will show you the search field on your "
+"newly created page."
+msgstr ""
+"Então clique em <em>Visualizar página</em> para ver o campo de busca em sua "
+"página recém criada."
+
+#: ../admin/class-search-live-admin.php:183
+msgid ""
+"To test the field, at least one post must be published. Start typing a "
+"search keyword, search results will show up below the field after you stop "
+"typing for an instant."
+msgstr ""
+"Para testar o campo, pelo menos um post deve estar publicado. Comece a "
+"digitar uma palavra de busca e os resultados aparecerão abaixo do campo, "
+"assim que você parar de digitar por um instante."
+
+#: ../admin/class-search-live-admin.php:184
+msgid ""
+"To refine the settings used, please refer to the advanced configuration "
+"options and the shortcode attributes described in the documentation."
+msgstr ""
+"Para refinar as configurações utilizadas, consulte as opções avançadas de "
+"configuração e os atributos do shortcode descritos na documentação."
+
+#: ../admin/class-search-live-admin.php:190
+msgid "Widgets"
+msgstr "Widgets"
+
+#: ../admin/class-search-live-admin.php:193
+msgid "Search Live Widget"
+msgstr "Widget do Search Live"
+
+#: ../admin/class-search-live-admin.php:194
+msgid ""
+"To use the widget, go to <strong>Appearance > Widgets</strong> and locate "
+"the <em>Search Live</em> widget in the <em>Available Widgets</em> section."
+msgstr ""
+"Para usar o widget, acesse <strong>Aparência > Widgets</strong> e localize o "
+"widget do <em>Search Live</em> na seção <em>Widgets disponíveis</em>."
+
+#: ../admin/class-search-live-admin.php:195
+msgid ""
+"Click the widget, then click one of the sidebar options that appear below "
+"and then click <em>Add Widget</em>. You can also drag and drop the widget "
+"onto an available sidebar."
+msgstr ""
+"Clique no widget, selecione uma das opções de barra lateral que aparecerão "
+"abaixo e então clique em <em>Adicionar widget</em>. Você pode também "
+"arrastar e soltar o widget em uma das barras laterais."
+
+#: ../admin/class-search-live-admin.php:196
+msgid ""
+"Visit a page on your site where the sidebar appears and type in a keyword "
+"related to one or more of your posts."
+msgstr ""
+"Acesse uma página de seu site onde a barra lateral seja visível e digite uma "
+"palavra relacionada a um de seus posts."
+
+#: ../admin/class-search-live-admin.php:197
+msgid ""
+"To fine-tune the widget, click the widget after placing it in one of your "
+"sidebars and review the available options. Please refer to the documentation "
+"for details on the advanced options."
+msgstr ""
+"Para ajustes finos, clique no widget após adicioná-lo a uma barra lateral e "
+"revise as opções disponíveis. Consulte a documentação para detalhes sobre as "
+"opções avançadas."
+
+#: ../admin/class-search-live-admin.php:198
+msgid ""
+"Note that you can place more than one widget in one or more sidebars and "
+"that each widget can use its individual settings."
+msgstr ""
+"Observe que você pode adicionar mais de um widget em uma ou mais barras "
+"laterais e que cada widget possui configurações individuais."
+
+#: ../admin/class-search-live-admin.php:250
+#: ../admin/class-search-live-admin.php:326
+msgid "Access denied."
+msgstr "Acesso negado."
+
+#: ../admin/class-search-live-admin.php:358
+msgid "General Settings"
+msgstr "Configurações gerais"
+
+#: ../admin/class-search-live-admin.php:360
+msgid "Descriptions"
+msgstr "Descrições"
+
+#: ../admin/class-search-live-admin.php:364
+msgid "Length of descriptions"
+msgstr "Tamanho das descrições"
+
+#: ../admin/class-search-live-admin.php:368
+msgid "words"
+msgstr "palavras"
+
+#: ../admin/class-search-live-admin.php:373
+msgid ""
+"When descriptions are shown, this option determines up to how many words "
+"will be included."
+msgstr ""
+"Quando as descrições estiverem ativadas, essa opção determina quantas "
+"palavras serão incluídas."
+
+#: ../admin/class-search-live-admin.php:375
+msgid ""
+"A description will be derived automatically from the start of a post if the "
+"manual excerpt is empty."
+msgstr ""
+"Uma descrição será gerada automaticamente a partir do início do post se o "
+"resumo manual estiver vazio."
+
+#: ../admin/class-search-live-admin.php:377
+msgid "The length is limited through this option in both cases."
+msgstr "O tamanho é limitado por essa opção em ambos os casos."
+
+#: ../admin/class-search-live-admin.php:380
+msgid "Standard Search"
+msgstr "Busca padrão"
+
+#: ../admin/class-search-live-admin.php:382
+msgid "Search Form"
+msgstr "Formulário de busca"
+
+#: ../admin/class-search-live-admin.php:387
+msgid "Replace the standard WordPress search form"
+msgstr "Substituir o formulário de busca padrão do WordPress"
+
+#: ../admin/class-search-live-admin.php:391
+#, php-format
+msgid ""
+"If enabled and where possible, the %s form replaces the standard WordPress "
+"search form."
+msgstr ""
+"Se ativado, e quando possível, o formulário do %s substituirá o formulário "
+"de busca padrão do WordPress."
+
+#: ../admin/class-search-live-admin.php:402
+#: ../admin/class-search-live-admin.php:461
+msgid ""
+"These settings are related to the <code>[search_live]</code> shortcode, the "
+"<em>Search Live</em> widget and the <em>Search Live</em> API functions."
+msgstr ""
+"Estas configurações referem-se ao shortcode <code>[search_live]</code>, ao "
+"widget do <em>Search Live</em> e às funções da API do <em>Search Live</em>."
+
+#: ../admin/class-search-live-admin.php:405
+msgid "Presentation"
+msgstr "Apresentação"
+
+#: ../admin/class-search-live-admin.php:408
+msgid ""
+"Width and height in pixels used for thumbnails displayed in search results."
+msgstr ""
+"Largura e altura em pixels das miniaturas exibidas nos resultados de busca."
+
+#: ../admin/class-search-live-admin.php:413
+msgid "Width"
+msgstr "Largura"
+
+#: ../admin/class-search-live-admin.php:417
+#: ../admin/class-search-live-admin.php:427
+msgid "px"
+msgstr "px"
+
+#: ../admin/class-search-live-admin.php:423
+msgid "Height"
+msgstr "Altura"
+
+#: ../admin/class-search-live-admin.php:435
+msgid "Crop thumbnails"
+msgstr "Cortar miniaturas"
+
+#: ../admin/class-search-live-admin.php:439
+msgid ""
+"If enabled, the thumbnail images are cropped to match the dimensions "
+"exactly. Otherwise the thumbnails will be adjusted in size while matching "
+"the aspect ratio of the original image."
+msgstr ""
+"Se ativado, as miniaturas serão cortadas nas dimensões exatas. Caso "
+"contrário, o tamanho das miniaturas será ajustado mantendo a proporção da "
+"imagem original."
+
+#: ../admin/class-search-live-admin.php:446
+msgid "Placeholder thumbnails"
+msgstr "Miniaturas padrão"
+
+#: ../admin/class-search-live-admin.php:450
+msgid ""
+"If enabled, posts without a featured image will show a default placeholder "
+"thumbnail image."
+msgstr "Se ativado, posts sem imagem destacada mostrarão uma miniatura padrão."
+
+#: ../admin/class-search-live-admin.php:458
+msgid "CSS"
+msgstr "CSS"
+
+#: ../admin/class-search-live-admin.php:464
+msgid "Standard Stylesheet"
+msgstr "Folha de estilos padrão"
+
+#: ../admin/class-search-live-admin.php:470
+msgid "Use the standard stylesheet"
+msgstr "Utilizar a folha de estilos padrão"
+
+#: ../admin/class-search-live-admin.php:474
+msgid ""
+"If this option is enabled, the standard stylesheet is loaded when the search "
+"is displayed."
+msgstr ""
+"Se essa opção estiver ativada, a folha de estilos padrão será carregada ao "
+"exibir a busca."
+
+#: ../admin/class-search-live-admin.php:477
+msgid "Inline Styles"
+msgstr "Estilos inline"
+
+#: ../admin/class-search-live-admin.php:483
+msgid "Use inline styles"
+msgstr "Utilizar estilos inline"
+
+#: ../admin/class-search-live-admin.php:487
+msgid ""
+"If this option is enabled, the inline styles are used when the search is "
+"displayed."
+msgstr ""
+"Se essa opção estiver ativa, os estilos inline serão utilizados ao exibir a "
+"busca."
+
+#: ../admin/class-search-live-admin.php:492
+msgid "Inline styles"
+msgstr "Estilos inline"
+
+#: ../admin/class-search-live-admin.php:511
+msgid "Save changes"
+msgstr "Salvar alterações"
+
+#: ../admin/class-search-live-admin.php:531
+msgid ""
+"Thank you for using <a href=\"http://www.itthinx.com/plugins/search-live/\" "
+"target=\"_blank\">Search Live</a> by <a href=\"http://www.itthinx.com\" "
+"target=\"_blank\">itthinx</a>."
+msgstr ""
+"Obrigado por usar o <a href=\"http://www.itthinx.com/plugins/search-live/\" "
+"target=\"_blank\">Search Live</a> da <a href=\"http://www.itthinx.com\" "
+"target=\"_blank\">itthinx</a>."
+
+#: ../core/class-search-live-service.php:422
+msgid "Placeholder Image"
+msgstr "Imagem padrão"
+
+#: ../views/class-search-live-shortcodes.php:87
+msgctxt "placeholder"
+msgid "Search &hellip;"
+msgstr "Buscar &hellip;"
+
+#: ../views/class-search-live-shortcodes.php:88
+#: ../views/class-search-live-shortcodes.php:204
+#: ../views/class-search-live-widget.php:411
+msgctxt "label"
+msgid "Search for:"
+msgstr "Pesquisar por:"
+
+#: ../views/class-search-live-shortcodes.php:97
+#: ../views/class-search-live-widget.php:401
+#: ../views/class-search-live-widget.php:436
+msgctxt "submit button"
+msgid "Search"
+msgstr "Buscar"
+
+#: ../views/class-search-live-widget.php:68
+msgid "The Search Live Widget"
+msgstr "Widget do Search Live"
+
+#: ../views/class-search-live-widget.php:221
+msgid "The widget title."
+msgstr "Título do widget."
+
+#: ../views/class-search-live-widget.php:222
+#: ../views/class-search-live-widget.php:283
+msgid "Title"
+msgstr "Título"
+
+#: ../views/class-search-live-widget.php:227
+msgid "Search Results"
+msgstr "Resultados de busca"
+
+#: ../views/class-search-live-widget.php:231
+msgid "Search results should include matching titles."
+msgstr ""
+"Resultados de busca devem incluir correspondências encontradas nos títulos."
+
+#: ../views/class-search-live-widget.php:239
+msgid "Search in titles"
+msgstr "Pesquisar nos títulos"
+
+#: ../views/class-search-live-widget.php:245
+msgid "Search results should include matches in excerpts."
+msgstr ""
+"Resultados de busca devem incluir correspondências encontradas nos resumos."
+
+#: ../views/class-search-live-widget.php:253
+msgid "Search in excerpts"
+msgstr "Pesquisar nos resumos"
+
+#: ../views/class-search-live-widget.php:259
+msgid "Search results should include matches in contents."
+msgstr ""
+"Resultados de busca devem incluir correspondências encontradas no conteúdo."
+
+#: ../views/class-search-live-widget.php:267
+msgid "Search in contents"
+msgstr "Pesquisar no conteúdo"
+
+#: ../views/class-search-live-widget.php:273
+msgid "Order the results by the chosen property."
+msgstr "Ordenar os resultados pelo campo selecionado"
+
+#: ../views/class-search-live-widget.php:274
+msgid "Order by ..."
+msgstr "Ordenar por..."
+
+#: ../views/class-search-live-widget.php:282
+msgid "Date"
+msgstr "Data"
+
+#: ../views/class-search-live-widget.php:284
+msgid "ID"
+msgstr "ID"
+
+#: ../views/class-search-live-widget.php:285
+msgid "Random"
+msgstr "Aleatório"
+
+#: ../views/class-search-live-widget.php:299
+msgid "Ascending"
+msgstr "Crescente"
+
+#: ../views/class-search-live-widget.php:305
+msgid "Descending"
+msgstr "Decrescente"
+
+#: ../views/class-search-live-widget.php:312
+msgid "Limit the maximum number of results shown."
+msgstr "Limitar o número máximo de resultados exibidos."
+
+#: ../views/class-search-live-widget.php:313
+msgid "Limit"
+msgstr "Limite"
+
+#: ../views/class-search-live-widget.php:321
+msgid "Show a thumbnail for each result."
+msgstr "Exibir uma miniatura para cada resultado."
+
+#: ../views/class-search-live-widget.php:329
+msgid "Show thumbnails"
+msgstr "Exibir miniaturas"
+
+#: ../views/class-search-live-widget.php:335
+msgid "Show short descriptions."
+msgstr "Exibir descrições curtas."
+
+#: ../views/class-search-live-widget.php:343
+msgid "Show descriptions"
+msgstr "Exibir descrições"
+
+#: ../views/class-search-live-widget.php:347
+msgid "Search Form and UI Interaction"
+msgstr "Formulário de busca e interação com o usuário"
+
+#: ../views/class-search-live-widget.php:352
+#, php-format
+msgid ""
+"The delay until the search starts after the user stops typing (in "
+"milliseconds, minimum %d)."
+msgstr ""
+"Tempo após o usuário parar de digitar até iniciar a busca (em milissegundos, "
+"mínimo %d)."
+
+#: ../views/class-search-live-widget.php:353
+msgid "Delay"
+msgstr "Atraso"
+
+#: ../views/class-search-live-widget.php:357
+msgid "ms"
+msgstr "ms"
+
+#: ../views/class-search-live-widget.php:364
+msgid "The minimum number of characters required to start a search."
+msgstr "Número mínimo de caracteres necessário para iniciar a busca."
+
+#: ../views/class-search-live-widget.php:365
+msgid "Characters"
+msgstr "Caracteres"
+
+#: ../views/class-search-live-widget.php:374
+msgid ""
+"If the Enter key is not inhibited, a normal search is requested when the "
+"visitor presses the Enter key in the search field."
+msgstr ""
+"Se a tecla Enter não estiver inibida, uma busca normal será realizada quando "
+"o usuário pressionar Enter no campo de busca."
+
+#: ../views/class-search-live-widget.php:382
+msgid "Inhibit form submission via the <em>Enter</em> key"
+msgstr "Inibir envio do formulário por meio da tecla <em>Enter</em>"
+
+#: ../views/class-search-live-widget.php:388
+msgid ""
+"If enabled, the visitor can use the cursor keys to navigate through the "
+"search results and visit a search result link by pressing the Enter key."
+msgstr ""
+"Se ativado, o usuário pode usar as teclas de setas para navegar pelos "
+"resultados da busca e acessar o link de um resultado pressionando a tecla "
+"Enter."
+
+#: ../views/class-search-live-widget.php:396
+msgid "Navigable results"
+msgstr "Resultados navegáveis"
+
+#: ../views/class-search-live-widget.php:403
+msgid "The placeholder text for the search field."
+msgstr "Texto do placeholder do campo de busca."
+
+#: ../views/class-search-live-widget.php:404
+msgid "Placeholder"
+msgstr "Placeholder"
+
+#: ../views/class-search-live-widget.php:413
+msgid "The tooltip of the search field."
+msgstr "Texto da tooltip do campo de busca."
+
+#: ../views/class-search-live-widget.php:414
+msgid "Tooltip"
+msgstr "Tooltip"
+
+#: ../views/class-search-live-widget.php:423
+msgid "Show a submit button along with the search field."
+msgstr "Exibir um botão de envio junto ao campo de busca."
+
+#: ../views/class-search-live-widget.php:431
+msgid "Submit button"
+msgstr "Botão de envio"
+
+#: ../views/class-search-live-widget.php:438
+msgid "The text shown on the submit button."
+msgstr "Texto exibido no botão de envio."
+
+#: ../views/class-search-live-widget.php:439
+msgid "Submit button label"
+msgstr "Texto do botão de envio"
+
+#: ../views/class-search-live-widget.php:448
+msgid "Show/hide search results when the search input field gains/loses focus."
+msgstr ""
+"Exibir/ocultar resultados da busca quando o campo de busca entra/sai de foco."
+
+#: ../views/class-search-live-widget.php:456
+msgid "Dynamic focus"
+msgstr "Foco dinâmico"
+
+#: ../views/class-search-live-widget.php:463
+msgid "Search results are shown floating below the search field."
+msgstr ""
+"Os resultados da busca são exibidos flutuando abaixo do campo de busca."
+
+#: ../views/class-search-live-widget.php:471
+msgid "Floating results"
+msgstr "Resultados flutuantes"
+
+#: ../views/class-search-live-widget.php:478
+msgid "The text shown when no search results are obtained."
+msgstr "Texto exibido quando a busca não obtém nenhum resultado."
+
+#: ../views/class-search-live-widget.php:479
+msgid "No results"
+msgstr "Sem resultados"
+
+#: ../views/class-search-live-widget.php:488
+msgid ""
+"Automatically adjust the width of the results to match that of the search "
+"field."
+msgstr ""
+"Ajusta automaticamente a largura dos resultados para igualar à do campo de "
+"busca."
+
+#: ../views/class-search-live-widget.php:496
+msgid "Auto-adjust results width"
+msgstr "Auto-ajustar largura dos resultados"
+
+#: ../views/class-search-live-widget.php:503
+msgid "Filter search results based on the current language."
+msgstr "Filtrar resultados de busca com base no idioma atual."
+
+#: ../views/class-search-live-widget.php:511
+msgid "WPML Language Filter"
+msgstr "Filtro de idioma WPML"

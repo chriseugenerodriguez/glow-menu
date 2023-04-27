@@ -1,0 +1,5 @@
+.fileUpload{position: relative;overflow: hidden;}
+.fileUpload input.upload {position: absolute;top: -10px;right: 0;margin: 0;padding: 0;font-size: 20px;cursor: pointer;opacity: 0;filter: alpha(opacity=0);width:111px;}
+.fancy-product-designer_page_fpd_product_builder .ui-dialog{z-index: 10}
+.ui-dialog[aria-describedby="dialogPSD"] .ui-dialog-titlebar-close span{margin:-8px 0 0 -8px}
+.ui-dialog[aria-describedby="dialogPSD"] .ui-dialog-titlebar-close::before {display: none;}

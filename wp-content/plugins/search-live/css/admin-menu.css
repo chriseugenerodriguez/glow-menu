@@ -1,0 +1,6 @@
+li#toplevel_page_search-live .wp-menu-image {
+	background-image: url( ../images/search-live.png );
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 62%;
+}
