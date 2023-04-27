@@ -1,0 +1,16 @@
+09-18-2016 @ 08:08:26 - customers request: Array
+(
+    [email] => info@glowmenu.co
+    [description] => glowio
+)
+
+09-18-2016 @ 08:08:26 - customers/cus_9DREhrjtTr2hh8/sources request: Array
+(
+    [source] => tok_18v0LdICIRqGgoufzAafGXcJ
+)
+
+09-18-2016 @ 08:08:26 - customers/cus_9DREhrjtTr2hh8 request: Array
+(
+    [default_source] => card_18v0LdICIRqGgoufkHYeW3mO
+)
+
