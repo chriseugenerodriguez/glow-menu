@@ -11,7 +11,7 @@
         "gulp": "^3.9.1"
     },
     "devDependencies": {
-        "browser-sync": "^2.17",
+        "browser-sync": "^2.29",
         "gulp-bump": "^2.5",
         "gulp-concat": "^2.6.0",
         "gulp-dependencies": "^0.1.1",
