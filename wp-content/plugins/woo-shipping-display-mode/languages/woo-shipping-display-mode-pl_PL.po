@@ -1,0 +1,274 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Shipping Method Display Style for WooCommerce\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-10-11 18:29+0530\n"
+"PO-Revision-Date: 2022-10-14 11:50+0000\n"
+"Last-Translator: \n"
+"Language-Team: Polish\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10 >= 2 && n%10<=4 "
+"&&(n%100<10||n%100 >= 20)? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.5.3; wp-5.8.1\n"
+"X-Domain: woo-shipping-display-mode\n"
+"X-Poedit-KeywordsList: esc_html_e;esc_html;esc_attr_e;esc_attr;__;_e\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SearchPath-0: .\n"
+"Language: pl_PL"
+
+#. Number of days
+#: includes/class-woo-shipping-display-mode-user-feedback.php:114
+#, php-format
+msgid "%s days"
+msgstr "%s dni"
+
+#. Number of hours
+#: includes/class-woo-shipping-display-mode-user-feedback.php:123
+#, php-format
+msgid "%s hours"
+msgstr "%s godzin"
+
+#. Number of minutes
+#: includes/class-woo-shipping-display-mode-user-feedback.php:132
+#, php-format
+msgid "%s minutes"
+msgstr "%s minut"
+
+#. Number of seconds
+#: includes/class-woo-shipping-display-mode-user-feedback.php:141
+#, php-format
+msgid "%s seconds"
+msgstr "%s sekund"
+
+#. Number of weeks
+#: includes/class-woo-shipping-display-mode-user-feedback.php:105
+#, php-format
+msgid "%s weeks"
+msgstr "%s tygodni"
+
+#: admin/class-woo-shipping-display-mode-admin.php:165
+#, php-format
+msgid ""
+"%s WooCommerce shipping method display style plugin provides a configuration "
+"to display shipping methods as Radio button or select box on the checkout "
+"page."
+msgstr ""
+"%s Wtyczka stylu wyświetlania metody wysyłki WooCommerce zapewnia "
+"konfigurację wyświetlania metod wysyłki jako przycisku opcji lub pola wyboru "
+"na stronie kasy."
+
+#. 1. Name
+#: includes/class-woo-shipping-display-mode-user-feedback.php:276
+msgid "%s WordPress Plugin"
+msgstr "%s Wtyczka WordPress"
+
+#. Number of years
+#: includes/class-woo-shipping-display-mode-user-feedback.php:96
+#, php-format
+msgid "%s years"
+msgstr "%s lat"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:117
+msgid ""
+"<b>Note: </b>Checked to override the file (\"<b>your-"
+"theme/woocommerce/cart/cart-shipping.php</b>\"), first check cart page "
+"design has not changed."
+msgstr ""
+"<b>Uwaga: </b>zaznaczone, aby nadpisać plik („<b>your-"
+"theme/woocommerce/cart/cart-shipping.php</b>”), projekt strony pierwszego "
+"koszyka kontrolnego nie uległ zmianie."
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:125
+#, php-format
+msgid ""
+"<p><span>Note: </span>If there is only one shipping method available in your "
+"cart then it will showcase shipping method as title without radio button or "
+"dropdown. <a href=\"%1$s\" target=\"_blank\">Click Here</a> for detail."
+"</span><p>"
+msgstr ""
+"<p><span>Uwaga: </span>Jeśli w koszyku dostępna jest tylko jedna metoda "
+"wysyłki, zostanie ona wyświetlona jako tytuł bez przycisku opcji lub menu "
+"rozwijanego. <a href=\"%1$s\" target=\"_blank\">Kliknij tutaj</a>, aby "
+"uzyskać szczegółowe informacje.</span><p>"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:116
+msgid "a day"
+msgstr "dzień"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:134
+msgid "a minute"
+msgstr "minutę"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:143
+msgid "a second"
+msgstr "sekunda"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:107
+msgid "a week"
+msgstr "tydzień"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:98
+msgid "a year"
+msgstr "rok"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:125
+msgid "an hour"
+msgstr "godzina"
+
+#. 1. Name
+#: includes/class-woo-shipping-display-mode-user-feedback.php:280
+msgid "Are you enjoying %s Plugin?"
+msgstr "Czy podoba Ci się wtyczka %s ?"
+
+#: woocommerce/cart/cart-shipping.php:78
+msgid "Change address"
+msgstr "Zmiana adresu"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:112
+msgid "Customised theme is enabled"
+msgstr "Dostosowany motyw jest włączony"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:103
+msgid "Display shipping methods in a dropdown"
+msgstr "Wyświetl metody wysyłki w menu rozwijanym"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:94
+msgid "Display shipping methods with \"radio\" buttons"
+msgstr "Wyświetl metody wysyłki za pomocą przycisków \"radiowych\""
+
+#: woocommerce/cart/cart-shipping.php:93
+msgid "Enter a different address"
+msgstr "Wpisz inny adres"
+
+#: woocommerce/cart/cart-shipping.php:87
+msgid "Enter your address to view shipping options."
+msgstr "Wprowadź swój adres, aby wyświetlić opcje wysyłki."
+
+#: admin/class-woo-shipping-display-mode-admin.php:202
+msgid "Go to Woocommerce Shipping Method Display Style Settings"
+msgstr "Przejdź do ustawień stylu wyświetlania metody wysyłki Woocommerce"
+
+#. URI of the plugin
+msgid "https://wordpress.org/plugins/woo-shipping-display-mode/"
+msgstr "https://wordpress.org/plugins/woo-shipping-display-mode/"
+
+#. Author URI of the plugin
+msgid "https://www.thedotstore.com/"
+msgstr "https://www.thedotstore.com/"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:290
+msgid "Leave a Review"
+msgstr "Zostaw recenzję"
+
+#. $s shipping destination.
+#: woocommerce/cart/cart-shipping.php:92
+msgid "No shipping options were found for %s."
+msgstr "Nie znaleziono opcji wysyłki dla %s."
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:292
+msgid "No thanks / I already have"
+msgstr "Nie, dziękuję / już mam"
+
+#: admin/class-woo-shipping-display-mode-admin.php:227
+msgid "option for default shipping method."
+msgstr "opcja domyślnej metody wysyłki."
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:83
+msgid "Select Display Mode"
+msgstr "Wybierz tryb wyświetlania"
+
+#: admin/class-woo-shipping-display-mode-admin.php:227
+msgid "Select shipping mode"
+msgstr "Wybierz tryb wysyłki"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:56
+#: admin/partials/woo-shipping-display-mode-admin-display.php:78
+msgid "Shipping Method Display Mode"
+msgstr "Tryb wyświetlania metody wysyłki"
+
+#. Name of the plugin
+#: includes/class-woo-shipping-display-mode-user-feedback.php:321
+msgid "Shipping Method Display Style for WooCommerce"
+msgstr "Styl wyświetlania metody wysyłki dla WooCommerce"
+
+#: admin/class-woo-shipping-display-mode-admin.php:222
+msgid ""
+"Shipping Method Display Style for WooCommerce plugin provides you an "
+"interface in WooCommerce setting section from admin side. As you know "
+"WooCommerce has removed choose shipping display mode option from 2.5.1 "
+"version. So, this plugin provides these features, admin can choose shipping "
+"display modes like radio option or select option for shipping display mode."
+msgstr ""
+"Styl wyświetlania metody wysyłki dla wtyczki WooCommerce zapewnia interfejs "
+"w sekcji ustawień WooCommerce od strony administratora. Jak wiesz, "
+"WooCommerce usunął opcję wyboru trybu wyświetlania wysyłki z wersji 2.5.1. "
+"Tak więc ta wtyczka zapewnia te funkcje, administrator może wybrać tryby "
+"wyświetlania wysyłki, takie jak opcja radiowa lub wybrać opcję trybu "
+"wyświetlania wysyłki."
+
+#: woocommerce/cart/cart-shipping.php:80
+msgid "Shipping options will be updated during checkout."
+msgstr "Opcje wysyłki zostaną zaktualizowane podczas realizacji transakcji."
+
+#. $s shipping destination.
+#: woocommerce/cart/cart-shipping.php:77
+msgid "Shipping to %s."
+msgstr "Wysyłka do %s."
+
+#: admin/class-woo-shipping-display-mode-admin.php:250
+msgid "Support"
+msgstr "Wspierać się"
+
+#. Author of the plugin
+msgid "theDotstore"
+msgstr "theDotstore"
+
+#: woocommerce/cart/cart-shipping.php:89
+msgid ""
+"There are no shipping options available. Please ensure that your address has "
+"been entered correctly, or contact us if you need any help."
+msgstr ""
+"Brak dostępnych opcji wysyłki. Upewnij się, że Twój adres został wpisany "
+"poprawnie lub skontaktuj się z nami, jeśli potrzebujesz pomocy."
+
+#: admin/class-woo-shipping-display-mode-admin.php:224
+msgid ""
+"This Plugin is useful when you are using 2.5.2 or higher version of "
+"Woocommerce and you have to use more than 20 or 30 or more then that "
+"Shipping Method at that time you do not have forced to display all shipping "
+"method only using radio button, but you have also chosen a select option for "
+"display shipping mode and by choosing select option shipping method is "
+"displayed in the drop down box so you can avoid lengthy listing of shipping "
+"method."
+msgstr ""
+"Ta wtyczka jest przydatna, gdy używasz 2.5.2 lub wyższej wersji Woocommerce "
+"i musisz użyć więcej niż 20 lub 30 lub więcej niż ta metoda wysyłki w tym "
+"czasie, nie musisz wyświetlać wszystkich metod wysyłki tylko za pomocą "
+"przycisku radiowego, ale wybrałeś również opcję wyboru dla wyświetlania "
+"trybu wysyłki i wybierając opcję wybierz metodę wysyłki jest wyświetlana w "
+"polu rozwijanym, dzięki czemu możesz uniknąć długiej listy metod wysyłki."
+
+#. Description of the plugin
+msgid ""
+"This plugin provides a configuration to display shipping methods as Radio "
+"button or select box on the checkout page."
+msgstr ""
+"Ta wtyczka zapewnia konfigurację wyświetlania metod wysyłki jako przycisku "
+"opcji lub pola wyboru na stronie kasy."
+
+#: admin/class-woo-shipping-display-mode-admin.php:226
+msgid "We have added"
+msgstr "Dodaliśmy"
+
+#. 1. Name, 2. Time
+#: includes/class-woo-shipping-display-mode-user-feedback.php:283
+#, php-format
+msgid ""
+"You have been using %1$s for %2$s now. Mind leaving a review to let us know "
+"what you think? We'd really appreciate it!"
+msgstr ""
+"Korzystasz teraz z %1$s przez %2$s. Możesz zostawić recenzję, aby dać nam "
+"znać, co myślisz? Naprawdę docenilibyśmy to!"

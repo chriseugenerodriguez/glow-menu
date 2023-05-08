@@ -1,0 +1,277 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Shipping Method Display Style for WooCommerce\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-10-11 18:29+0530\n"
+"PO-Revision-Date: 2022-10-14 11:53+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish (Spain)\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.5.3; wp-5.8.1\n"
+"X-Domain: woo-shipping-display-mode\n"
+"X-Poedit-KeywordsList: esc_html_e;esc_html;esc_attr_e;esc_attr;__;_e\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SearchPath-0: .\n"
+"Language: es_ES"
+
+#. Number of days
+#: includes/class-woo-shipping-display-mode-user-feedback.php:114
+#, php-format
+msgid "%s days"
+msgstr "%s días"
+
+#. Number of hours
+#: includes/class-woo-shipping-display-mode-user-feedback.php:123
+#, php-format
+msgid "%s hours"
+msgstr "%s horas"
+
+#. Number of minutes
+#: includes/class-woo-shipping-display-mode-user-feedback.php:132
+#, php-format
+msgid "%s minutes"
+msgstr "%s minutos"
+
+#. Number of seconds
+#: includes/class-woo-shipping-display-mode-user-feedback.php:141
+#, php-format
+msgid "%s seconds"
+msgstr "%s segundos"
+
+#. Number of weeks
+#: includes/class-woo-shipping-display-mode-user-feedback.php:105
+#, php-format
+msgid "%s weeks"
+msgstr "%s semanas"
+
+#: admin/class-woo-shipping-display-mode-admin.php:165
+#, php-format
+msgid ""
+"%s WooCommerce shipping method display style plugin provides a configuration "
+"to display shipping methods as Radio button or select box on the checkout "
+"page."
+msgstr ""
+"%s El complemento de estilo de visualización del método de envío de "
+"WooCommerce proporciona una configuración para mostrar los métodos de envío "
+"como botón de opción o cuadro de selección en la página de pago."
+
+#. 1. Name
+#: includes/class-woo-shipping-display-mode-user-feedback.php:276
+msgid "%s WordPress Plugin"
+msgstr "%s Complemento de WordPress"
+
+#. Number of years
+#: includes/class-woo-shipping-display-mode-user-feedback.php:96
+#, php-format
+msgid "%s years"
+msgstr "%s años"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:117
+msgid ""
+"<b>Note: </b>Checked to override the file (\"<b>your-"
+"theme/woocommerce/cart/cart-shipping.php</b>\"), first check cart page "
+"design has not changed."
+msgstr ""
+"<b>Nota: </b>Marcado para anular el archivo (\"<b>your-"
+"theme/woocommerce/cart/cart-shipping.php</b>\"), el primer diseño de la "
+"página del carrito de verificación no ha cambiado."
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:125
+#, php-format
+msgid ""
+"<p><span>Note: </span>If there is only one shipping method available in your "
+"cart then it will showcase shipping method as title without radio button or "
+"dropdown. <a href=\"%1$s\" target=\"_blank\">Click Here</a> for detail."
+"</span><p>"
+msgstr ""
+"<p> <span> Nota: </span> Si solo hay un método de envío disponible en su "
+"carrito, se mostrará el método de envío como título sin botón de opción ni "
+"menú desplegable. <a href=\"%1$s\" target=\"_blank\"> Haga clic aquí </a> "
+"para obtener más detalles. </span> <p>"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:116
+msgid "a day"
+msgstr "un día"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:134
+msgid "a minute"
+msgstr "un minuto"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:143
+msgid "a second"
+msgstr "Un segundo"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:107
+msgid "a week"
+msgstr "una semana"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:98
+msgid "a year"
+msgstr "un año"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:125
+msgid "an hour"
+msgstr "una hora"
+
+#. 1. Name
+#: includes/class-woo-shipping-display-mode-user-feedback.php:280
+msgid "Are you enjoying %s Plugin?"
+msgstr "¿Estás disfrutando del complemento %s ?"
+
+#: woocommerce/cart/cart-shipping.php:78
+msgid "Change address"
+msgstr "Cambiar dirección"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:112
+msgid "Customised theme is enabled"
+msgstr "El tema personalizado está habilitado"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:103
+msgid "Display shipping methods in a dropdown"
+msgstr "Mostrar métodos de envío en un menú desplegable"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:94
+msgid "Display shipping methods with \"radio\" buttons"
+msgstr "Mostrar métodos de envío con botones de \"radio\""
+
+#: woocommerce/cart/cart-shipping.php:93
+msgid "Enter a different address"
+msgstr "Introduce una dirección diferente"
+
+#: woocommerce/cart/cart-shipping.php:87
+msgid "Enter your address to view shipping options."
+msgstr "Ingrese su dirección para ver las opciones de envío."
+
+#: admin/class-woo-shipping-display-mode-admin.php:202
+msgid "Go to Woocommerce Shipping Method Display Style Settings"
+msgstr ""
+"Vaya a la configuración de estilo de visualización del método de envío de "
+"Woocommerce"
+
+#. URI of the plugin
+msgid "https://wordpress.org/plugins/woo-shipping-display-mode/"
+msgstr "https://wordpress.org/plugins/woo-shipping-display-mode/"
+
+#. Author URI of the plugin
+msgid "https://www.thedotstore.com/"
+msgstr "https://www.thedotstore.com/"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:290
+msgid "Leave a Review"
+msgstr "Dejar un comentario"
+
+#. $s shipping destination.
+#: woocommerce/cart/cart-shipping.php:92
+msgid "No shipping options were found for %s."
+msgstr "No se encontraron opciones de envío para %s."
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:292
+msgid "No thanks / I already have"
+msgstr "No gracias / Ya tengo"
+
+#: admin/class-woo-shipping-display-mode-admin.php:227
+msgid "option for default shipping method."
+msgstr "opción para el método de envío predeterminado."
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:83
+msgid "Select Display Mode"
+msgstr "Seleccione el modo de visualización"
+
+#: admin/class-woo-shipping-display-mode-admin.php:227
+msgid "Select shipping mode"
+msgstr "Seleccionar modo de envío"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:56
+#: admin/partials/woo-shipping-display-mode-admin-display.php:78
+msgid "Shipping Method Display Mode"
+msgstr "Modo de visualización del método de envío"
+
+#. Name of the plugin
+#: includes/class-woo-shipping-display-mode-user-feedback.php:321
+msgid "Shipping Method Display Style for WooCommerce"
+msgstr "Estilo de visualización del método de envío para WooCommerce"
+
+#: admin/class-woo-shipping-display-mode-admin.php:222
+msgid ""
+"Shipping Method Display Style for WooCommerce plugin provides you an "
+"interface in WooCommerce setting section from admin side. As you know "
+"WooCommerce has removed choose shipping display mode option from 2.5.1 "
+"version. So, this plugin provides these features, admin can choose shipping "
+"display modes like radio option or select option for shipping display mode."
+msgstr ""
+"El estilo de visualización del método de envío para el complemento "
+"WooCommerce le proporciona una interfaz en la sección de configuración de "
+"WooCommerce desde el lado del administrador. Como sabe, WooCommerce ha "
+"eliminado la opción de modo de visualización de envío de la versión 2.5.1. "
+"Por lo tanto, este complemento proporciona estas funciones, el administrador "
+"puede elegir los modos de visualización de envío como la opción de radio o "
+"seleccionar la opción para el modo de visualización de envío."
+
+#: woocommerce/cart/cart-shipping.php:80
+msgid "Shipping options will be updated during checkout."
+msgstr "Las opciones de envío se actualizarán durante el pago."
+
+#. $s shipping destination.
+#: woocommerce/cart/cart-shipping.php:77
+msgid "Shipping to %s."
+msgstr "Envío a %s."
+
+#: admin/class-woo-shipping-display-mode-admin.php:250
+msgid "Support"
+msgstr "Apoyo"
+
+#. Author of the plugin
+msgid "theDotstore"
+msgstr "theDotstore"
+
+#: woocommerce/cart/cart-shipping.php:89
+msgid ""
+"There are no shipping options available. Please ensure that your address has "
+"been entered correctly, or contact us if you need any help."
+msgstr ""
+"No hay opciones de envío disponibles. Asegúrese de que su dirección haya "
+"sido ingresada correctamente o contáctenos si necesita ayuda."
+
+#: admin/class-woo-shipping-display-mode-admin.php:224
+msgid ""
+"This Plugin is useful when you are using 2.5.2 or higher version of "
+"Woocommerce and you have to use more than 20 or 30 or more then that "
+"Shipping Method at that time you do not have forced to display all shipping "
+"method only using radio button, but you have also chosen a select option for "
+"display shipping mode and by choosing select option shipping method is "
+"displayed in the drop down box so you can avoid lengthy listing of shipping "
+"method."
+msgstr ""
+"Este complemento es útil cuando está usando la versión 2.5.2 o superior de "
+"Woocommerce y tiene que usar más de 20 o 30 o más de ese método de envío en "
+"ese momento no tiene que mostrar todo el método de envío solo usando el "
+"botón de radio, pero también ha elegido una opción de selección para mostrar "
+"el modo de envío y, al elegir la opción de selección, el método de envío se "
+"muestra en el cuadro desplegable para evitar una lista larga de métodos de "
+"envío."
+
+#. Description of the plugin
+msgid ""
+"This plugin provides a configuration to display shipping methods as Radio "
+"button or select box on the checkout page."
+msgstr ""
+"Este complemento proporciona una configuración para mostrar los métodos de "
+"envío como un botón de opción o un cuadro de selección en la página de pago."
+
+#: admin/class-woo-shipping-display-mode-admin.php:226
+msgid "We have added"
+msgstr "Nosotros hemos agregado"
+
+#. 1. Name, 2. Time
+#: includes/class-woo-shipping-display-mode-user-feedback.php:283
+#, php-format
+msgid ""
+"You have been using %1$s for %2$s now. Mind leaving a review to let us know "
+"what you think? We'd really appreciate it!"
+msgstr ""
+"Has estado usando %1$s durante %2$s ahora. ¿Le importaría dejar una reseña "
+"para hacernos saber lo que piensa? ¡Realmente lo apreciaríamos!"
