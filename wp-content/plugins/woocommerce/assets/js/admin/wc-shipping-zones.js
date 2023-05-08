@@ -81,6 +81,10 @@
 					$( window ).on( 'beforeunload', { view: this }, this.unloadConfirmation );
 					$( document.body ).on( 'click', '.wc-shipping-zone-add', { view: this }, this.onAddNewRow );
 				},
+				onAddNewRow: function() {
+					var $link = $( this );
+					window.location.href = $link.attr( 'href' );
+				},
 				block: function() {
 					$( this.el ).block({
 						message: null,
@@ -102,9 +106,11 @@
 
 					if ( _.size( zones ) ) {
 						// Sort zones
-						zones = _.sortBy( zones, function( zone ) {
-							return parseInt( zone.zone_order, 10 );
-						} );
+						zones = _( zones )
+							.chain()
+							.sortBy( function ( zone ) { return parseInt( zone.zone_id, 10 ); } )
+							.sortBy( function ( zone ) { return parseInt( zone.zone_order, 10 ); } )
+							.value();
 
 						// Populate $tbody with the current zones
 						$.each( zones, function( id, rowData ) {
@@ -159,7 +165,9 @@
 								class_name = 'method_enabled';
 							}
 
-							$method_list.append( '<li class="wc-shipping-zone-method ' + class_name + '">' + shipping_method.title + '</li>' );
+							$method_list.append(
+								'<li class="wc-shipping-zone-method ' + class_name + '">' + shipping_method.title + '</li>'
+							);
 						} );
 					} else {
 						$method_list.append( '<li class="wc-shipping-zone-method">' + data.strings.no_shipping_methods_offered + '</li>' );

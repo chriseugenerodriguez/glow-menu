@@ -69,7 +69,7 @@ class Gens_RAF {
 	public function __construct() {
 
 		$this->gens_raf = 'gens-raf';
-		$this->version = '1.1.1';
+		$this->version = '1.2.4';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -84,7 +84,6 @@ class Gens_RAF {
 	 * Include the following files that make up the plugin:
 	 *
 	 * - Gens_RAF_Loader. Orchestrates the hooks of the plugin.
-	 * - Gens_RAF_i18n. Defines internationalization functionality.
 	 * - Gens_RAF_Admin. Defines all hooks for the dashboard.
 	 * - Gens_RAF_Public. Defines all hooks for the public side of the site.
 	 *
@@ -101,12 +100,6 @@ class Gens_RAF {
 		 * core plugin.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-gens-raf-loader.php';
-
-		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-gens-raf-i18n.php';
 
 		/**
 		 * The class responsible for site wide notifications. Run only on PHP 5.3+
@@ -130,21 +123,13 @@ class Gens_RAF {
 	}
 
 	/**
-	 * Define the locale for this plugin for internationalization.
+	 * Load Localisation files.
 	 *
-	 * Uses the Gens_RAF_i18n class in order to set the domain and to register the hook
-	 * with WordPress.
-	 *
-	 * @since    1.0.0
-	 * @access   private
+	 * @since  1.1.6
 	 */
-	private function set_locale() {
-
-		$plugin_i18n = new Gens_RAF_i18n();
-		$plugin_i18n->set_domain( $this->get_gens_raf() );
-
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
+	public function set_locale()
+	{
+		load_plugin_textdomain( 'gens-raf', false, basename( dirname( __FILE__ ) ) . '/languages' );
 	}
 
 	/**
@@ -156,14 +141,10 @@ class Gens_RAF {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Gens_RAF_Admin( $this->get_gens_raf(), $this->get_version() );
 
-		//Run if Woo Is Not Activated
-		if ( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
-			$this->loader->add_action( 'admin_notices', $plugin_admin, 'no_woo_admin_notice' );
-		} else {
-			$this->loader->add_filter( 'woocommerce_get_settings_pages', $plugin_admin, 'add_settings_page' );
-		}
+		$plugin_admin = new Gens_RAF_Admin( $this->get_gens_raf(), $this->get_version() );
+		
+		$this->loader->add_filter( 'woocommerce_get_settings_pages', $plugin_admin, 'add_settings_page' );
 
 		$this->loader->add_filter( 'plugin_action_links_refer-a-friend-for-woocommerce-by-wpgens/gens-raf.php', $plugin_admin, 'add_settings_link' );
 		$this->loader->add_filter( 'plugin_action_links_refer-a-friend-for-woocommerce-by-wpgens/gens-raf.php', $plugin_admin, 'docs_link' );

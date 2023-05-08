@@ -6,9 +6,11 @@
  *
  * @author      WooThemes
  * @category    Admin
- * @package     WooCommerce/Admin/Meta Boxes
+ * @package     WooCommerce\Admin\Meta Boxes
  * @version     2.1.0
  */
+
+use Automattic\WooCommerce\Utilities\OrderUtil;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -22,32 +24,32 @@ class WC_Meta_Box_Order_Items {
 	/**
 	 * Output the metabox.
 	 *
-	 * @param WP_Post $post
+	 * @param WP_Post|WC_Order $post Post or order object.
 	 */
 	public static function output( $post ) {
 		global $post, $thepostid, $theorder;
 
-		if ( ! is_int( $thepostid ) ) {
+		OrderUtil::init_theorder_object( $post );
+		if ( ! is_int( $thepostid ) && ( $post instanceof WP_Post ) ) {
 			$thepostid = $post->ID;
 		}
 
-		if ( ! is_object( $theorder ) ) {
-			$theorder = wc_get_order( $thepostid );
-		}
-
 		$order = $theorder;
-		$data  = get_post_meta( $post->ID );
+		$data  = ( $post instanceof WP_Post ) ? get_post_meta( $post->ID ) : array();
 
-		include( 'views/html-order-items.php' );
+		include __DIR__ . '/views/html-order-items.php';
 	}
 
 	/**
 	 * Save meta box data.
 	 *
 	 * @param int $post_id
-	 * @param WP_Post $post
 	 */
-	public static function save( $post_id, $post ) {
+	public static function save( $post_id ) {
+		/**
+		 * This $_POST variable's data has been validated and escaped
+		 * inside `wc_save_order_items()` function.
+		 */
 		wc_save_order_items( $post_id, $_POST );
 	}
 }

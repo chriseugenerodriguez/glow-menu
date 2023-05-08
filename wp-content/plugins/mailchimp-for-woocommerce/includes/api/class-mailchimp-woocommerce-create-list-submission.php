@@ -4,159 +4,161 @@
  * Created by Vextras.
  *
  * Name: Ryan Hungate
- * Email: ryan@mailchimp.com
+ * Email: ryan@vextras.com
  * Date: 7/8/16
  * Time: 4:16 PM
  */
-class MailChimp_WooCommerce_CreateListSubmission
-{
-    /**
-     * @var array
-     */
-    protected $props = array();
+class MailChimp_WooCommerce_CreateListSubmission {
 
-    /**
-     * @param $name
-     * @return $this
-     */
-    public function setName($name)
-    {
-        $this->props['name'] = $name;
+	/**
+	 * @var array
+	 */
+	protected $props = array();
 
-        return $this;
-    }
+	/**
+	 * @param $name
+	 * @return $this
+	 */
+	public function setName( $name ) {
+		$this->props['name'] = $name;
 
-    /**
-     * @param $bool
-     * @return $this
-     */
-    public function setUseArchiveBar($bool)
-    {
-        $this->props['use_archive_bar'] = (bool) $bool;
+		return $this;
+	}
 
-        return $this;
-    }
+	/**
+	 * @param $bool
+	 * @return $this
+	 */
+	public function setUseArchiveBar( $bool ) {
+		$this->props['use_archive_bar'] = (bool) $bool;
 
-    /**
-     * @param $reminder
-     * @return $this
-     */
-    public function setPermissionReminder($reminder)
-    {
-        $this->props['permission_reminder'] = $reminder;
+		return $this;
+	}
 
-        return $this;
-    }
+	/**
+	 * @param $reminder
+	 * @return $this
+	 */
+	public function setPermissionReminder( $reminder ) {
+		$this->props['permission_reminder'] = $reminder;
 
-    /**
-     * @param $email
-     * @return $this
-     */
-    public function setNotifyOnSubscribe($email)
-    {
-        $this->props['notify_on_subscribe'] = $email;
+		return $this;
+	}
 
-        return $this;
-    }
+	/**
+	 * @param $email
+	 * @return $this
+	 */
+	public function setNotifyOnSubscribe( $email ) {
+		$this->props['notify_on_subscribe'] = $email;
 
-    /**
-     * @param string $email
-     * @return $this
-     */
-    public function setNotifyOnUnSubscribe($email)
-    {
-        $this->props['notify_on_unsubscribe'] = $email;
+		return $this;
+	}
 
-        return $this;
-    }
+	/**
+	 * @param $email
+	 *
+	 * @return $this
+	 */
+	public function setNotifyOnUnSubscribe( $email ) {
+		$this->props['notify_on_unsubscribe'] = $email;
 
-    /**
-     * @param $bool
-     * @return $this
-     */
-    public function setEmailTypeOption($bool)
-    {
-        $this->props['email_type_option'] = (bool) $bool;
+		return $this;
+	}
 
-        return $this;
-    }
+	/**
+	 * @param $bool
+	 * @return $this
+	 */
+	public function setEmailTypeOption( $bool ) {
+		$this->props['email_type_option'] = (bool) $bool;
 
-    /**
-     * @param bool $public
-     * @return $this
-     */
-    public function setVisibility($public = true)
-    {
-        $this->props['visibility'] = $public ? 'pub' : 'prv';
+		return $this;
+	}
 
-        return $this;
-    }
+	/**
+	 * @param bool $public
+	 * @return $this
+	 */
+	public function setVisibility( $public = true ) {
+		$this->props['visibility'] = $public ? 'pub' : 'prv';
 
-    /**
-     * @param $name
-     * @param $email
-     * @param $subject
-     * @param string $language
-     * @return $this
-     */
-    public function setCampaignDefaults($name, $email, $subject, $language = 'en')
-    {
-        $this->props['campaign_defaults'] = array(
-            'from_name' => $name,
-            'from_email' => $email,
-            'subject' => $subject,
-            'language' => $language,
-        );
+		return $this;
+	}
 
-        return $this;
-    }
+	/**
+	 * @param false $doi
+	 *
+	 * @return $this
+	 */
+	public function setDoi( $doi = false ) {
+		$this->props['double_optin'] = (bool) $doi;
 
-    /**
-     * @param MailChimp_WooCommerce_Address $address
-     * @return $this
-     */
-    public function setContact(MailChimp_WooCommerce_Address $address)
-    {
-        $data = array();
+		return $this;
+	}
 
-        if (($company = $address->getCompany()) && !empty($company)) {
-            $data['company'] = $company;
-        }
+	/**
+	 * @param $name
+	 * @param $email
+	 * @param $subject
+	 * @param string  $language
+	 * @return $this
+	 */
+	public function setCampaignDefaults( $name, $email, $subject, $language = 'en' ) {
+		$this->props['campaign_defaults'] = array(
+			'from_name'  => $name,
+			'from_email' => $email,
+			'subject'    => $subject,
+			'language'   => $language,
+		);
 
-        if (($street = $address->getAddress1()) && !empty($address)) {
-            $data['address1'] = $street;
-        }
+		return $this;
+	}
 
-        if (($city = $address->getCity()) && !empty($city)) {
-            $data['city'] = $city;
-        }
+	/**
+	 * @param MailChimp_WooCommerce_Address $address
+	 * @return $this
+	 */
+	public function setContact( MailChimp_WooCommerce_Address $address ) {
+		$data = array();
 
-        if (($state = $address->getProvince()) && !empty($state)) {
-            $data['state'] = $state;
-        }
+		if ( ( $company = $address->getCompany() ) && ! empty( $company ) ) {
+			$data['company'] = $company;
+		}
 
-        if (($zip = $address->getPostalCode()) && !empty($zip)) {
-            $data['zip'] = $zip;
-        }
+		if ( ( $street = $address->getAddress1() ) && ! empty( $address ) ) {
+			$data['address1'] = $street;
+		}
 
-        if (($country = $address->getCountry()) && !empty($country)) {
-            $data['country'] = $country;
-        }
+		if ( ( $city = $address->getCity() ) && ! empty( $city ) ) {
+			$data['city'] = $city;
+		}
 
-        if (($phone = $address->getPhone()) && !empty($phone)) {
-            $data['phone'] = $phone;
-        }
+		if ( ( $state = $address->getProvince() ) && ! empty( $state ) ) {
+			$data['state'] = $state;
+		}
 
-        $this->props['contact'] = $data;
+		if ( ( $zip = $address->getPostalCode() ) && ! empty( $zip ) ) {
+			$data['zip'] = $zip;
+		}
 
-        return $this;
-    }
+		if ( ( $country = $address->getCountry() ) && ! empty( $country ) ) {
+			$data['country'] = $country;
+		}
 
-    /**
-     * @return array
-     */
-    public function getSubmission()
-    {
-        return $this->props;
-    }
+		if ( ( $phone = $address->getPhone() ) && ! empty( $phone ) ) {
+			$data['phone'] = $phone;
+		}
+
+		$this->props['contact'] = $data;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getSubmission() {
+		return $this->props;
+	}
 }

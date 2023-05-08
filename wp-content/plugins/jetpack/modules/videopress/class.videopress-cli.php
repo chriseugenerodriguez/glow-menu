@@ -1,4 +1,9 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName
+/**
+ * VideoPress CLI
+ *
+ * @package automattic/jetpack
+ */
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 
@@ -17,11 +22,13 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 		 *
 		 * wp videopress import kUJmAcSf
 		 *
+		 * @param array $args CLI arguments.
 		 */
 		public function import( $args ) {
-			$guid = $args[0];
+			$guid          = $args[0];
 			$attachment_id = create_local_media_library_for_videopress_guid( $guid );
 			if ( $attachment_id && ! is_wp_error( $attachment_id ) ) {
+				/* translators: %d: attachment id */
 				WP_CLI::success( sprintf( __( 'The video has been imported as Attachment ID %d', 'jetpack' ), $attachment_id ) );
 			} else {
 				WP_CLI::error( __( 'An error has been encountered.', 'jetpack' ) );
@@ -38,6 +45,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 		public function cleanup_videos() {
 			$num_cleaned = videopress_cleanup_media_library();
 
+			/* translators: %d: number of videos cleaned */
 			WP_CLI::success( sprintf( _n( 'Cleaned up %d video.', 'Cleaned up a total of %d videos.', $num_cleaned, 'jetpack' ), $num_cleaned ) );
 		}
 
@@ -51,22 +59,22 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 		public function list_crons() {
 
 			$scheduler = VideoPress_Scheduler::init();
-			$crons = $scheduler->get_crons();
+			$crons     = $scheduler->get_crons();
 
 			$schedules = wp_get_schedules();
-
 
 			if ( count( $crons ) === 0 ) {
 				WP_CLI::success( __( 'Found no available cron jobs.', 'jetpack' ) );
 
 			} else {
+				/* translators: %d is the number of crons */
 				WP_CLI::success( sprintf( _n( 'Found %d available cron job.', 'Found %d available cron jobs.', count( $crons ), 'jetpack' ), count( $crons ) ) );
 			}
 
 			foreach ( $crons as $cron_name => $cron ) {
-				$interval = isset( $schedules[ $cron['interval'] ]['display'] ) ? $schedules[ $cron['interval'] ]['display'] : $cron['interval'];
+				$interval  = isset( $schedules[ $cron['interval'] ]['display'] ) ? $schedules[ $cron['interval'] ]['display'] : $cron['interval'];
 				$runs_next = $scheduler->check_cron( $cron_name );
-				$status = $runs_next ? sprintf( 'Scheduled - Runs Next at %s GMT', gmdate( 'Y-m-d H:i:s', $runs_next ) ) : 'Not Scheduled';
+				$status    = $runs_next ? sprintf( 'Scheduled - Runs Next at %s GMT', gmdate( 'Y-m-d H:i:s', $runs_next ) ) : 'Not Scheduled';
 
 				WP_CLI::log( 'Name: ' . $cron_name );
 				WP_CLI::log( 'Method: ' . $cron['method'] );
@@ -85,6 +93,8 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 		 * ## EXAMPLES
 		 *
 		 * wp videopress cron_status cleanup
+		 *
+		 * @param array $args CLI args.
 		 */
 		public function cron_status( $args ) {
 
@@ -95,7 +105,8 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$scheduler = VideoPress_Scheduler::init();
 
 			if ( ! $scheduler->is_cron_valid( $args[0] ) ) {
-				return WP_CLI::error( sprintf( __( 'There is no cron named %s.', 'jetpack' ), $args[0] ) );
+				/* translators: name of a cron job */
+				WP_CLI::error( sprintf( __( 'There is no cron named %s.', 'jetpack' ), $args[0] ) );
 			}
 
 			$time = $scheduler->check_cron( $args[0] );
@@ -104,6 +115,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 				WP_CLI::success( __( 'The cron is not scheduled to run.', 'jetpack' ) );
 
 			} else {
+				/* translators: date/time */
 				WP_CLI::success( sprintf( __( 'Cron will run at: %s GMT', 'jetpack' ), gmdate( 'Y-m-d H:i:s', $time ) ) );
 			}
 		}
@@ -118,6 +130,8 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 		 * ## EXAMPLES
 		 *
 		 * wp videopress activate_cron cleanup
+		 *
+		 * @param array $args CLI args.
 		 */
 		public function activate_cron( $args ) {
 
@@ -128,11 +142,13 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$scheduler = VideoPress_Scheduler::init();
 
 			if ( ! $scheduler->is_cron_valid( $args[0] ) ) {
-				return WP_CLI::error( sprintf( __( 'There is no cron named %s.', 'jetpack' ), $args[0] ) );
+				/* translators: name of a cron job */
+				WP_CLI::error( sprintf( __( 'There is no cron named %s.', 'jetpack' ), $args[0] ) );
 			}
 
 			$scheduler->activate_cron( $args[0] );
 
+			/* translators: name of a cron job */
 			WP_CLI::success( sprintf( __( 'The cron named `%s` was scheduled.', 'jetpack' ), $args[0] ) );
 		}
 
@@ -146,6 +162,8 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 		 * ## EXAMPLES
 		 *
 		 * wp videopress deactivate_cron cleanup
+		 *
+		 * @param array $args CLI args.
 		 */
 		public function deactivate_cron( $args ) {
 
@@ -156,11 +174,13 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$scheduler = VideoPress_Scheduler::init();
 
 			if ( ! $scheduler->is_cron_valid( $args[0] ) ) {
-				return WP_CLI::error( sprintf( __( 'There is no cron named %s.', 'jetpack' ), $args[0] ) );
+				/* translators: name of a cron job */
+				WP_CLI::error( sprintf( __( 'There is no cron named %s.', 'jetpack' ), $args[0] ) );
 			}
 
 			$scheduler->deactivate_cron( $args[0] );
 
+			/* translators: name of a cron job */
 			WP_CLI::success( sprintf( __( 'The cron named `%s` was removed from the schedule.', 'jetpack' ), $args[0] ) );
 		}
 	}

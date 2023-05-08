@@ -10,7 +10,7 @@ jQuery(function( $ ) {
 	var prev_data_index = null;
 	var prev_series_index = null;
 
-	$( '.chart-placeholder' ).bind( 'plothover', function ( event, pos, item ) {
+	$( '.chart-placeholder' ).on( 'plothover', function ( event, pos, item ) {
 		if ( item ) {
 			if ( prev_data_index !== item.dataIndex || prev_series_index !== item.seriesIndex ) {
 				prev_data_index   = item.dataIndex;
@@ -111,14 +111,13 @@ jQuery(function( $ ) {
 		dateFormat: 'yy-mm-dd',
 		numberOfMonths: 1,
 		minDate: '-20Y',
-		maxDate: '+0D',
+		maxDate: '+1D',
 		showButtonPanel: true,
 		showOn: 'focus',
 		buttonImageOnly: true,
-		onSelect: function( selectedDate ) {
+		onSelect: function() {
 			var option = $( this ).is( '.from' ) ? 'minDate' : 'maxDate',
-				instance = $( this ).data( 'datepicker' ),
-				date = $.datepicker.parseDate( instance.settings.dateFormat || $.datepicker._defaults.dateFormat, selectedDate, instance.settings );
+				date   = $( this ).datepicker( 'getDate' );
 
 			dates.not( this ).datepicker( 'option', option, date );
 		}
@@ -131,7 +130,7 @@ jQuery(function( $ ) {
 	}
 
 	// Export
-	$( '.export_csv' ).click( function() {
+	$( '.export_csv' ).on( 'click', function() {
 		var exclude_series = $( this ).data( 'exclude_series' ) || '';
 		exclude_series    = exclude_series.toString();
 		exclude_series    = exclude_series.split( ',' );
@@ -139,7 +138,7 @@ jQuery(function( $ ) {
 		var groupby       = $( this ) .data( 'groupby' );
 		var index_type    = $( this ).data( 'index_type' );
 		var export_format = $( this ).data( 'export' );
-		var csv_data      = 'data:application/csv;charset=utf-8,';
+		var csv_data      = '';
 		var s, series_data, d;
 
 		if ( 'table' === export_format ) {
@@ -223,7 +222,13 @@ jQuery(function( $ ) {
 					csv_data += '"' + index + '",';
 				} else {
 					if ( groupby === 'day' ) {
-						csv_data += '"' + date.getUTCFullYear() + '-' + parseInt( date.getUTCMonth() + 1, 10 ) + '-' + date.getUTCDate() + '",';
+						csv_data += '"' +
+							date.getUTCFullYear() +
+							'-' +
+							parseInt( date.getUTCMonth() + 1, 10 ) +
+							'-' +
+							date.getUTCDate() +
+							'",';
 					} else {
 						csv_data += '"' + date.getUTCFullYear() + '-' + parseInt( date.getUTCMonth() + 1, 10 ) + '",';
 					}
@@ -244,8 +249,9 @@ jQuery(function( $ ) {
 			} );
 		}
 
+		csv_data = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent( csv_data );
 		// Set data as href and return
-		$( this ).attr( 'href', encodeURI( csv_data ) );
+		$( this ).attr( 'href', csv_data );
 		return true;
 	});
 });

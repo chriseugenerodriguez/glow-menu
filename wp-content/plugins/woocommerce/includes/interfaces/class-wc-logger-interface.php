@@ -1,16 +1,17 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+/**
+ * Logger Interface
+ *
+ * @version 3.0.0
+ * @package WooCommerce\Interface
+ */
 
 /**
  * WC Logger Interface
  *
  * Functions that must be defined to correctly fulfill logger API.
  *
- * @version        1.0.0
- * @category       Interface
- * @author         WooThemes
+ * @version 3.0.0
  */
 interface WC_Logger_Interface {
 
@@ -20,9 +21,9 @@ interface WC_Logger_Interface {
 	 * This is not the preferred method for adding log messages. Please use log() or any one of
 	 * the level methods (debug(), info(), etc.). This method may be deprecated in the future.
 	 *
-	 * @param string $handle
-	 * @param string $message
-	 * @param string $level
+	 * @param string $handle File handle.
+	 * @param string $message Log message.
+	 * @param string $level Log level.
 	 *
 	 * @return bool True if log was added, otherwise false.
 	 */
@@ -41,7 +42,7 @@ interface WC_Logger_Interface {
 	 *     'info': Informational messages.
 	 *     'debug': Debug-level messages.
 	 * @param string $message Log message.
-	 * @param array $context Optional. Additional information for log handlers.
+	 * @param array  $context Optional. Additional information for log handlers.
 	 */
 	public function log( $level, $message, $context = array() );
 
@@ -51,7 +52,7 @@ interface WC_Logger_Interface {
 	 * System is unusable.
 	 *
 	 * @param string $message Log message.
-	 * @param array $context Optional. Additional information for log handlers.
+	 * @param array  $context Optional. Additional information for log handlers.
 	 */
 	public function emergency( $message, $context = array() );
 
@@ -62,7 +63,7 @@ interface WC_Logger_Interface {
 	 * Example: Entire website down, database unavailable, etc.
 	 *
 	 * @param string $message Log message.
-	 * @param array $context Optional. Additional information for log handlers.
+	 * @param array  $context Optional. Additional information for log handlers.
 	 */
 	public function alert( $message, $context = array() );
 
@@ -73,7 +74,7 @@ interface WC_Logger_Interface {
 	 * Example: Application component unavailable, unexpected exception.
 	 *
 	 * @param string $message Log message.
-	 * @param array $context Optional. Additional information for log handlers.
+	 * @param array  $context Optional. Additional information for log handlers.
 	 */
 	public function critical( $message, $context = array() );
 
@@ -84,7 +85,7 @@ interface WC_Logger_Interface {
 	 * and monitored.
 	 *
 	 * @param string $message Log message.
-	 * @param array $context Optional. Additional information for log handlers.
+	 * @param array  $context Optional. Additional information for log handlers.
 	 */
 	public function error( $message, $context = array() );
 
@@ -97,7 +98,7 @@ interface WC_Logger_Interface {
 	 * necessarily wrong.
 	 *
 	 * @param string $message Log message.
-	 * @param array $context Optional. Additional information for log handlers.
+	 * @param array  $context Optional. Additional information for log handlers.
 	 */
 	public function warning( $message, $context = array() );
 
@@ -107,7 +108,7 @@ interface WC_Logger_Interface {
 	 * Normal but significant events.
 	 *
 	 * @param string $message Log message.
-	 * @param array $context Optional. Additional information for log handlers.
+	 * @param array  $context Optional. Additional information for log handlers.
 	 */
 	public function notice( $message, $context = array() );
 
@@ -118,7 +119,7 @@ interface WC_Logger_Interface {
 	 * Example: User logs in, SQL logs.
 	 *
 	 * @param string $message Log message.
-	 * @param array $context Optional. Additional information for log handlers.
+	 * @param array  $context Optional. Additional information for log handlers.
 	 */
 	public function info( $message, $context = array() );
 
@@ -128,7 +129,7 @@ interface WC_Logger_Interface {
 	 * Detailed debug information.
 	 *
 	 * @param string $message Log message.
-	 * @param array $context Optional. Additional information for log handlers.
+	 * @param array  $context Optional. Additional information for log handlers.
 	 */
 	public function debug( $message, $context = array() );
 }

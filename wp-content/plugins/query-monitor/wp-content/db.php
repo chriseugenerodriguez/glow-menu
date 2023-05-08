@@ -1,31 +1,37 @@
 <?php
-/*
-Plugin Name: Query Monitor Database Class
+/**
+ * Plugin Name: Query Monitor Database Class (Drop-in)
+ * Description: Database drop-in for Query Monitor, the developer tools panel for WordPress.
+ * Version:     3.12.2
+ * Plugin URI:  https://querymonitor.com/
+ * Author:      John Blackbourn
+ * Author URI:  https://querymonitor.com/
+ *
+ * *********************************************************************
+ *
+ * Ensure this file is symlinked to your wp-content directory to provide
+ * additional database query information in Query Monitor's output.
+ *
+ * @see https://github.com/johnbillion/query-monitor/wiki/db.php-Symlink
+ *
+ * *********************************************************************
+ *
+ * @package query-monitor
+ */
 
-*********************************************************************
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-Ensure this file is symlinked to your wp-content directory to provide
-additional database query information in Query Monitor's output.
+if ( ! defined( 'DB_USER' ) ) {
+	return;
+}
 
-*********************************************************************
+if ( defined( 'QM_DISABLED' ) && QM_DISABLED ) {
+	return;
+}
 
-Copyright 2009-2016 John Blackbourn
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
-
-defined( 'ABSPATH' ) or die();
-
-if ( defined( 'QM_DISABLED' ) and QM_DISABLED ) {
+if ( defined( 'WP_INSTALLING' ) && WP_INSTALLING ) {
 	return;
 }
 
@@ -40,82 +46,33 @@ if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
 	return;
 }
 
-# No autoloaders for us. See https://github.com/johnbillion/query-monitor/issues/7
+// This must be required before vendor/autoload.php so QM can serve its own message about PHP compatibility.
 $qm_dir = dirname( dirname( __FILE__ ) );
-if ( ! is_readable( $backtrace = "{$qm_dir}/classes/Backtrace.php" ) ) {
+$qm_php = "{$qm_dir}/classes/PHP.php";
+
+if ( ! is_readable( $qm_php ) ) {
 	return;
 }
-require_once $backtrace;
+require_once $qm_php;
 
-if ( !defined( 'SAVEQUERIES' ) ) {
+if ( ! QM_PHP::version_met() ) {
+	return;
+}
+
+if ( ! file_exists( "{$qm_dir}/vendor/autoload.php" ) ) {
+	add_action( 'all_admin_notices', 'QM_PHP::vendor_nope' );
+	return;
+}
+
+require_once "{$qm_dir}/vendor/autoload.php";
+
+if ( ! class_exists( 'QM_Backtrace' ) ) {
+	return;
+}
+
+if ( ! defined( 'SAVEQUERIES' ) ) {
 	define( 'SAVEQUERIES', true );
 }
 
-class QM_DB extends wpdb {
-
-	public $qm_php_vars = array(
-		'max_execution_time'  => null,
-		'memory_limit'        => null,
-		'upload_max_filesize' => null,
-		'post_max_size'       => null,
-		'display_errors'      => null,
-		'log_errors'          => null,
-	);
-
-	/**
-	 * Class constructor
-	 */
-	function __construct( $dbuser, $dbpassword, $dbname, $dbhost ) {
-
-		foreach ( $this->qm_php_vars as $setting => &$val ) {
-			$val = ini_get( $setting );
-		}
-
-		parent::__construct( $dbuser, $dbpassword, $dbname, $dbhost );
-
-	}
-
-	/**
-	 * Perform a MySQL database query, using current database connection.
-	 *
-	 * @see wpdb::query()
-	 *
-	 * @param string $query Database query
-	 * @return int|false Number of rows affected/selected or false on error
-	 */
-	function query( $query ) {
-		if ( ! $this->ready ) {
-			if ( isset( $this->check_current_query ) ) {
-				// This property was introduced in WP 4.2
-				$this->check_current_query = true;
-			}
-			return false;
-		}
-
-		if ( $this->show_errors ) {
-			$this->hide_errors();
-		}
-
-		$result = parent::query( $query );
-
-		if ( ! SAVEQUERIES ) {
-			return $result;
-		}
-
-		$i = $this->num_queries - 1;
-		$this->queries[$i]['trace'] = new QM_Backtrace( array(
-			'ignore_items' => 1,
-		) );
-
-		if ( $this->last_error ) {
-			$this->queries[$i]['result'] = new WP_Error( 'qmdb', $this->last_error );
-		} else {
-			$this->queries[$i]['result'] = $result;
-		}
-
-		return $result;
-	}
-
-}
-
+// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 $wpdb = new QM_DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );

@@ -107,7 +107,7 @@ class WPGens_Settings_RAF extends WC_Settings_Page {
 						'type' 			=> 'textarea',
 						'class'         => 'input-text wide-input',
 						'desc'			=> __( 'Text that will appear in email that is sent to user once they get the code. Use {{code}} to add coupon code.HTML allowed.', 'gens-raf'),
-						'default' 		=> 'You referred someone! Here is your coupone code reward: {{code}} .'
+						'default' 		=> 'You referred someone! Here is your coupon code reward: {{code}} .'
 					),
 					array(
 						'id'		=> '',

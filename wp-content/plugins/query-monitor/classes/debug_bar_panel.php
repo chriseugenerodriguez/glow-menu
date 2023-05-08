@@ -1,24 +1,25 @@
-<?php
-/*
-Copyright 2009-2016 John Blackbourn
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
+<?php declare(strict_types = 1);
+/**
+ * Mock 'Debug Bar' panel class.
+ *
+ * @package query-monitor
+ */
 
 abstract class Debug_Bar_Panel {
 
+	/**
+	 * @var string
+	 */
 	public $_title = '';
+
+	/**
+	 * @var bool
+	 */
 	public $_visible = true;
 
+	/**
+	 * @param string $title
+	 */
 	public function __construct( $title = '' ) {
 		$this->title( $title );
 
@@ -27,30 +28,47 @@ abstract class Debug_Bar_Panel {
 			return;
 		}
 
-		# @TODO convert to QM classes
 		add_filter( 'debug_bar_classes', array( $this, 'debug_bar_classes' ) );
 	}
 
 	/**
 	 * Initializes the panel.
+	 *
+	 * @return false|void
 	 */
 	public function init() {}
 
+	/**
+	 * @return void
+	 */
 	public function prerender() {}
 
 	/**
 	 * Renders the panel.
+	 *
+	 * @return void
 	 */
 	public function render() {}
 
+	/**
+	 * @return bool
+	 */
 	public function is_visible() {
 		return $this->_visible;
 	}
 
+	/**
+	 * @param bool $visible
+	 * @return void
+	 */
 	public function set_visible( $visible ) {
 		$this->_visible = $visible;
 	}
 
+	/**
+	 * @param string|null $title
+	 * @return string|void
+	 */
 	public function title( $title = null ) {
 		if ( ! isset( $title ) ) {
 			return $this->_title;
@@ -58,12 +76,20 @@ abstract class Debug_Bar_Panel {
 		$this->_title = $title;
 	}
 
+	/**
+	 * @param array<int, string> $classes
+	 * @return array<int, string>
+	 */
 	public function debug_bar_classes( $classes ) {
 		return $classes;
 	}
 
+	/**
+	 * @param string $title
+	 * @return void
+	 */
 	public function Debug_Bar_Panel( $title = '' ) {
-		Debug_Bar_Panel::__construct( $title );
+		self::__construct( $title );
 	}
 
 }

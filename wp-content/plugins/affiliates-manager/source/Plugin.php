@@ -103,6 +103,39 @@ class WPAM_Plugin {
 
         //set up base actions
         add_action('init', array($this, 'onInit'));
+        
+        add_action('wp_enqueue_scripts', array($this, 'load_shortcode_specific_scripts'));
+
+        add_action('wp_head', array($this, 'handle_wp_head_hook'));
+
+        //actions & filters
+        add_action('template_redirect', array($this, 'onTemplateRedirect'));
+        add_action('admin_menu', array($this, 'onAdminMenu'));
+        add_action('current_screen', array($this, 'onCurrentScreen'));
+
+        add_action('wp_ajax_wpam-ajax_request', array($this, 'onAjaxRequest'));
+
+        add_filter('pre_user_email', array($this, 'filterUserEmail'));
+
+        add_action('profile_update', array($this, 'update_affiliate_email'), 10, 2);
+        //set the locale for money format & paypal
+        /*
+          $this->locale = WPAM_LOCALE_OVERRIDE ? WPAM_LOCALE_OVERRIDE : get_locale();
+          $this->setloc = $this->setMonetaryLocale( $this->locale );
+          //loading provided locale didn't work, choose default
+          if ( ! $this->setloc && setlocale( LC_MONETARY, 0 ) == 'C')
+          setlocale( LC_MONETARY, '' );
+         */
+        add_action('admin_notices', array($this, 'showAdminMessages'));
+
+        if (!is_admin()) {
+            add_filter('widget_text', 'do_shortcode');
+        }
+
+        add_shortcode('AffiliatesRegister', array($this->publicPages[self::PAGE_NAME_REGISTER], 'doShortcode'));
+        add_shortcode('AffiliatesHome', array($this->publicPages[self::PAGE_NAME_HOME], 'doShortcode'));
+        add_shortcode('AffiliatesLogin', array($this, 'doLoginShortcode'));
+        add_action('save_post', array($this, 'onSavePage'), 10, 2);
 
         //handle CSV download
         add_action('admin_init', array($this, 'handle_csv_download'));
@@ -120,6 +153,7 @@ class WPAM_Plugin {
         add_action('woocommerce_order_status_processing', array($this, 'WooCommerceProcessTransaction')); //Executes when a status changes to processing
         add_action('woocommerce_checkout_order_processed', array($this, 'WooCommerceProcessTransaction'));
         add_action('woocommerce_order_status_refunded', array($this, 'WooCommerceRefundTransaction'));  //Executes when a status changes to refunded
+        add_action('woocommerce_order_status_cancelled', array($this, 'WooCommerceRefundTransaction'));  //Executes when a status changes to cancelled
         //Exchange integration
         add_filter('it_exchange_add_transaction', array($this, 'onExchangeCheckout'), 10, 7);
 
@@ -133,6 +167,8 @@ class WPAM_Plugin {
 
         //Jigoshop integration
         add_action('jigoshop_new_order', array($this, 'jigoshopNewOrder'));
+        //Simple Membership registration integration
+        add_action('swpm_front_end_registration_complete_user_data', array($this, 'wpam_swpm_after_registration_callback'));
         /*         * * End integration hooks ** */
     }
 
@@ -213,52 +249,20 @@ class WPAM_Plugin {
     }
 
     public function onInit() {
-
-        add_action('wp_enqueue_scripts', array($this, 'load_shortcode_specific_scripts'));
-
-        add_action('wp_head', array($this, 'handle_wp_head_hook'));
-
-        //actions & filters
-        add_action('template_redirect', array($this, 'onTemplateRedirect'));
-        add_action('admin_menu', array($this, 'onAdminMenu'));
-        add_action('current_screen', array($this, 'onCurrentScreen'));
-
-        add_action('wp_ajax_wpam-ajax_request', array($this, 'onAjaxRequest'));
-
-        add_filter('pre_user_email', array($this, 'filterUserEmail'));
-
-        //set the locale for money format & paypal
-        /*
-          $this->locale = WPAM_LOCALE_OVERRIDE ? WPAM_LOCALE_OVERRIDE : get_locale();
-          $this->setloc = $this->setMonetaryLocale( $this->locale );
-          //loading provided locale didn't work, choose default
-          if ( ! $this->setloc && setlocale( LC_MONETARY, 0 ) == 'C')
-          setlocale( LC_MONETARY, '' );
-         */
-        add_action('admin_notices', array($this, 'showAdminMessages'));
-
-        if (!is_admin()) {
-            add_filter('widget_text', 'do_shortcode');
-        }
-
-        add_shortcode('AffiliatesRegister', array($this->publicPages[self::PAGE_NAME_REGISTER], 'doShortcode'));
-        add_shortcode('AffiliatesHome', array($this->publicPages[self::PAGE_NAME_HOME], 'doShortcode'));
-        add_shortcode('AffiliatesLogin', array($this, 'doLoginShortcode'));
-        add_action('save_post', array($this, 'onSavePage'), 10, 2);
-        $this->do_page_upgrade_task();
-        /*
-          try	{
-          if ( isset( $_GET[WPAM_PluginConfig::$RefKey] ) ) {
-          $requestTracker = new WPAM_Tracking_RequestTracker();
-          $query_args = $_GET;
-          $requestTracker->handleIncomingReferral($query_args);
-          }
-          } catch (Exception $e) {
-          wp_die("WPAM FAILED: " . $e->getMessage());
-          }
-         */
-        //new affiliate tracking code
+        
+        $this->do_init_task();
+        //$this->do_page_upgrade_task();
         WPAM_Click_Tracking::record_click();
+    }
+    
+    public function do_init_task(){
+        if(is_admin()){
+            if (isset($_GET['page'])) {
+                if ($_GET['page'] == 'wpam-creatives') { //affiliates manager creatives page
+                    wp_enqueue_media();
+                }
+            }
+        }
     }
 
     public function load_shortcode_specific_scripts() {
@@ -277,7 +281,7 @@ class WPAM_Plugin {
 
     public function handle_wp_head_hook() {
         $debug_marker = "<!-- Affiliates Manager plugin v" . WPAM_VERSION . " - https://wpaffiliatemanager.com/ -->";
-        echo "\n${debug_marker}\n";
+        echo "\n{$debug_marker}\n";
     }
 
     public function do_page_upgrade_task() { //doing page upgrade task on init since get_permalink() doesn't work on plugins_loaded
@@ -308,7 +312,7 @@ class WPAM_Plugin {
                 'echo' => false,
                 'redirect' => $home_page_url,
                 'remember' => true,
-                'label_username' => __('Email Address')
+                'label_username' => __('Email Address', 'affiliates-manager')
             );
             $lost_password_link = '<a href="' . wp_lostpassword_url() . '" title="' . __('Password Lost and Found', 'affiliates-manager') . '">' . __('Lost your password?', 'affiliates-manager') . '</a>';
             $form_output = '<div class="wpam-login-form">';
@@ -358,7 +362,7 @@ class WPAM_Plugin {
         echo '<div id="icon-users" class="icon32"></div><h2>' . __('Become an affiliate', 'affiliates-manager') . '</h2>';
         echo '<p>' . __('Are you interested in earning money by directing visitors to our site?', 'affiliates-manager') . '</p>';
         //@TODO check the rules on spaces for l10n
-        echo '<p><a href="' . $this->affiliateRegisterPage->getLink() . '">' . __('Sign up', 'affiliates-manager') . '</a>' . __(' to become an affiliate today!', 'affiliates-manager');
+        echo '<p><a href="' . esc_url($this->affiliateRegisterPage->getLink()) . '">' . __('Sign up', 'affiliates-manager') . '</a>' . __(' to become an affiliate today!', 'affiliates-manager');
         echo '</p></div></div>';
     }
 
@@ -376,6 +380,19 @@ class WPAM_Plugin {
             $custom_field_val = $custom_field_val . '&' . $new_val;
             WPAM_Logger::log_debug('Simple WP Cart Integration - Adding custom field value. New value: ' . $custom_field_val);
         }
+        else{
+            if(get_option(WPAM_PluginConfig::$UseIPReferralTrack) == 1){
+                $user_ip = WPAM_Click_Tracking::get_user_ip();
+                $aff_id = WPAM_Click_Tracking::get_referrer_id_from_ip_address_by_cookie_duration($user_ip);
+                if (!empty($aff_id)){
+                    $name = 'wpam_tracking';
+                    $value = $aff_id;
+                    $new_val = $name . '=' . $value;
+                    $custom_field_val = $custom_field_val . '&' . $new_val;
+                    WPAM_Logger::log_debug('Simple WP Cart Integration - Adding custom field value using a fallback method. New value: ' . $custom_field_val);
+                }
+            }
+        }
         return $custom_field_val;
     }
 
@@ -384,6 +401,11 @@ class WPAM_Plugin {
         WPAM_Logger::log_debug('Simple WP Cart Integration - IPN processed hook fired. Custom field value: ' . $custom_data);
         $custom_values = array();
         parse_str($custom_data, $custom_values);
+        if (!isset($custom_values['wpam_tracking']) || empty($custom_values['wpam_tracking'])) {
+            if (isset($_COOKIE['wpam_id']) && !empty($_COOKIE['wpam_id'])) {    //useful for onsite option such as smart checkout
+                $custom_values['wpam_tracking'] = $_COOKIE['wpam_id'];
+            }
+        }
         if (isset($custom_values['wpam_tracking']) && !empty($custom_values['wpam_tracking'])) {
             $tracking_value = $custom_values['wpam_tracking'];
             WPAM_Logger::log_debug('Simple WP Cart Integration - Tracking data present. Need to track affiliate commission. Tracking value: ' . $tracking_value);
@@ -427,6 +449,17 @@ class WPAM_Plugin {
                 WPAM_Logger::log_debug("WooCommerce Integration - Saving wpam_refkey (" . $wpam_refkey . ") with order. Order ID: " . $order_id);
             }
         }
+        else{
+            if(get_option(WPAM_PluginConfig::$UseIPReferralTrack) == 1){
+                $user_ip = WPAM_Click_Tracking::get_user_ip();
+                $aff_id = WPAM_Click_Tracking::get_referrer_id_from_ip_address_by_cookie_duration($user_ip);
+                if (!empty($aff_id)){
+                    update_post_meta($order_id, '_wpam_id', $aff_id);
+                    $wpam_refkey = get_post_meta($order_id, '_wpam_id', true);
+                    WPAM_Logger::log_debug("WooCommerce Integration - Saving wpam_id (" . $wpam_refkey . ") with order using a fallback method. Order ID: " . $order_id);
+                }
+            }
+        }
     }
 
     public function WooCommerceProcessTransaction($order_id) {
@@ -438,28 +471,44 @@ class WPAM_Plugin {
         }
         WPAM_Logger::log_debug('WooCommerce Integration - Checking if affiliate commission needs to be awarded.');
         $order = new WC_Order($order_id);
-        $recurring_payment_method = get_post_meta($order_id, '_recurring_payment_method', true);
-        if (!empty($recurring_payment_method)) {
-            WPAM_Logger::log_debug("WooCommerce Integration - This is a recurring payment order. Subscription payment method: " . $recurring_payment_method);
-            WPAM_Logger::log_debug("The commission will be calculated via the recurring payemnt api call.");
+        
+        if(function_exists('wcs_order_contains_subscription') && wcs_order_contains_subscription($order, 'parent')){
+            WPAM_Logger::log_debug("WooCommerce Integration - This notification is for a new subscription payment");
+            WPAM_Logger::log_debug("The commission will be calculated via the recurring payemnt api call.", 2);
+            return;
+        }
+        if(function_exists('wcs_order_contains_subscription') && wcs_order_contains_subscription($order, 'renewal')){
+            WPAM_Logger::log_debug("WooCommerce Integration - This notification is for a recurring subscription payment");
+            WPAM_Logger::log_debug("The commission will be calculated via the recurring payemnt api call.", 2);
+            return;
+        }
+        if(function_exists('wcs_order_contains_subscription') && wcs_order_contains_subscription($order, 'resubscribe')){
+            WPAM_Logger::log_debug("WooCommerce Integration - This notification is for a resubscription payment");
+            WPAM_Logger::log_debug("The commission will be calculated via the recurring payemnt api call.", 2);
+            return;
+        }
+        if(function_exists('wcs_order_contains_subscription') && wcs_order_contains_subscription($order, 'switch')){
+            WPAM_Logger::log_debug("WooCommerce Integration - This notification is for a subscription switch");
+            WPAM_Logger::log_debug("The commission will be calculated via the recurring payemnt api call.", 2);
             return;
         }
 
-        $order_status = $order->status;
+        $order_status = $order->get_status();
         WPAM_Logger::log_debug("WooCommerce Integration - Order status: " . $order_status);
         if (strtolower($order_status) != "completed" && strtolower($order_status) != "processing") {
-            WPAM_Logger::log_debug("WooCommerce Integration - Order status for this transaction is not in a 'completed' or 'processing' state. Commission will not be awarded at this stage.");
-            WPAM_Logger::log_debug("WooCommerce Integration - Commission for this transaciton will be awarded when you set the order status to completed or processing.");
+            WPAM_Logger::log_debug("WooCommerce Integration - Order status for this transaction is not in a 'completed' or 'processing' state. Commission will not be awarded at this stage.", 2);
+            WPAM_Logger::log_debug("WooCommerce Integration - Commission for this transaction will be awarded when you set the order status to completed or processing.", 2);
             return;
         }
 
-        $total = $order->order_total;
+        $total = $order->get_total();
         $shipping = $order->get_total_shipping();
         $tax = $order->get_total_tax();
-        WPAM_Logger::log_debug('WooCommerce Integration - Total amount: ' . $total . ', Total shipping: ' . $shipping . ', Total tax: ' . $tax);
-        $purchaseAmount = $total - $shipping - $tax;
-        $buyer_email = $order->billing_email;
-
+        $fees = wpam_get_total_woocommerce_order_fees($order);
+        WPAM_Logger::log_debug('WooCommerce Integration - Total amount: ' . $total . ', Total shipping: ' . $shipping . ', Total tax: ' . $tax . ', Fees: '. $fees);
+        $purchaseAmount = $total - $shipping - $tax - $fees;
+        $buyer_email = $order->get_billing_email();
+        $currency = $order->get_currency();
         $wpam_refkey = get_post_meta($order_id, '_wpam_refkey', true);
         $wpam_id = get_post_meta($order_id, '_wpam_id', true);
         if (!empty($wpam_id)) {
@@ -467,13 +516,24 @@ class WPAM_Plugin {
         }
         $wpam_refkey = apply_filters('wpam_woo_override_refkey', $wpam_refkey, $order);
         if (empty($wpam_refkey)) {
-            WPAM_Logger::log_debug("WooCommerce Integration - could not get wpam_id/wpam_refkey from cookie. This is not an affiliate sale");
+            WPAM_Logger::log_debug("WooCommerce Integration - could not get wpam_id/wpam_refkey from cookie. This is not an affiliate sale", 4);
             return;
         }
 
         $requestTracker = new WPAM_Tracking_RequestTracker();
         WPAM_Logger::log_debug('WooCommerce Integration - awarding commission for order ID: ' . $order_id . ', Purchase amount: ' . $purchaseAmount . ', Affiliate ID: ' . $wpam_refkey . ', Buyer Email: ' . $buyer_email);
-        $requestTracker->handleCheckoutWithRefKey($order_id, $purchaseAmount, $wpam_refkey, $buyer_email);
+        $args = array();
+        $args['txn_id'] = $order_id;
+        $args['amount'] = $purchaseAmount;
+        $args['aff_id'] = $wpam_refkey;
+        if(isset($buyer_email) && !empty($buyer_email)){
+            $args['email'] = $buyer_email;
+        }
+        $args['currency']= $currency;
+        $args['integration'] = 'woocommerce';
+        $args['comm_override'] = '1';
+        WPAM_Commission_Tracking::award_commission($args);
+        //$requestTracker->handleCheckoutWithRefKey($order_id, $purchaseAmount, $wpam_refkey, $buyer_email);
     }
 
     public function WooCommerceRefundTransaction($order_id) {
@@ -511,6 +571,16 @@ class WPAM_Plugin {
             $payment_meta['wpam_refkey'] = $strRefKey;
             WPAM_Logger::log_debug('Easy Digital Downlaods Integration - refkey: ' . $strRefKey);
         }
+        else{
+            if(get_option(WPAM_PluginConfig::$UseIPReferralTrack) == 1){
+                $user_ip = WPAM_Click_Tracking::get_user_ip();
+                $aff_id = WPAM_Click_Tracking::get_referrer_id_from_ip_address_by_cookie_duration($user_ip);
+                if (!empty($aff_id)){
+                    $payment_meta['wpam_refkey'] = $aff_id;
+                    WPAM_Logger::log_debug('Easy Digital Downlaods Integration - adding refkey: ' . $strRefKey.' using a fallback method');
+                }
+            }
+        }
         return $payment_meta;
     }
 
@@ -521,9 +591,28 @@ class WPAM_Plugin {
         if (isset($payment_meta['wpam_refkey']) && !empty($payment_meta['wpam_refkey'])) {
             $strRefKey = $payment_meta['wpam_refkey'];
             WPAM_Logger::log_debug('Easy Digital Downlaods Integration - This purchase was referred by an affiliate, refkey: ' . $strRefKey);
-        } else {
-            WPAM_Logger::log_debug('Easy Digital Downlaods Integration - refkey not found in the payment_meta. This purchase was not referred by an affiliate');
-            return;
+        } else { //checking referral cookie since edd_payment_meta filter seems to be triggering after edd_complete_purchase hook as of version 3.0
+            if (isset($_COOKIE['wpam_id'])) {
+                $strRefKey = $_COOKIE['wpam_id'];
+                WPAM_Logger::log_debug('Easy Digital Downlaods Integration - found refkey: ' . $strRefKey);
+            } else if (isset($_COOKIE[WPAM_PluginConfig::$RefKey])) {
+                $strRefKey = $_COOKIE[WPAM_PluginConfig::$RefKey];
+                WPAM_Logger::log_debug('Easy Digital Downlaods Integration - found refkey: ' . $strRefKey);
+            }
+            else {
+                if(get_option(WPAM_PluginConfig::$UseIPReferralTrack) == 1){
+                    $user_ip = WPAM_Click_Tracking::get_user_ip();
+                    $aff_id = WPAM_Click_Tracking::get_referrer_id_from_ip_address_by_cookie_duration($user_ip);
+                    if (!empty($aff_id)){
+                        $strRefKey = $aff_id;
+                        WPAM_Logger::log_debug('Easy Digital Downlaods Integration - found refkey: ' . $strRefKey.' using a fallback method');
+                    }
+                }
+            }
+            if(empty($strRefKey)){
+                WPAM_Logger::log_debug('Easy Digital Downlaods Integration - refkey not found in the payment_meta. This purchase was not referred by an affiliate');
+                return;
+            }
         }
         $purchaseAmount = edd_get_payment_amount($payment_id);
         $buyer_email = $payment_meta['email'];
@@ -539,6 +628,63 @@ class WPAM_Plugin {
         $requestTracker->handleCheckout($transaction_id, $purchaseAmount, $buyer_email);
 
         return $transaction_id;
+    }
+    
+    public function wpam_swpm_after_registration_callback($member_info) {
+        $create_aff_account = get_option(WPAM_PluginConfig::$AutoAffAccountSWPM);
+        if(!isset($create_aff_account) || empty($create_aff_account)){
+            return;
+        }
+        WPAM_Logger::log_debug('Simple Membership Auto Affiliate Creation - swpm_front_end_registration_complete_user_data action hook triggered');
+        WPAM_Logger::log_debug_array($member_info);
+        if(!isset($member_info['email']) || empty($member_info['email'])){
+            WPAM_Logger::log_debug("Simple Membership Auto Affiliate Creation - Error, email address is missing. Cannot create affiliate record!", 4);
+            return;
+        }
+        $member_email = sanitize_email($member_info['email']);
+        $user_info = get_user_by('email', $member_email); //get_userdata($user_id);
+        if(!$user_info){
+            WPAM_Logger::log_debug("Simple Membership Auto Affiliate Creation - user could not be found for email: ".$member_email.". Cannot create affiliate record!", 4);
+            return;
+        }
+        $fields = array();
+        if(get_option(WPAM_PluginConfig::$AutoAffiliateApproveIsEnabledOption) == 1){
+            $fields['userId'] = $user_info->ID; //only set the user id when auto approval is enabled. Otherwise admin will not be able to approve and the plugin will show ERROR: User already has an account and is already an affiliate
+        }
+        $fields['firstName'] = sanitize_text_field($user_info->first_name);
+        $fields['lastName'] = sanitize_text_field($user_info->last_name);    
+        $fields['email'] = sanitize_email($user_info->user_email);
+
+        $country = sanitize_text_field($member_info['country']);
+        if(isset($country) && !empty($country)){
+            $fields['addressCountry'] = $country; 
+        }
+        $address = sanitize_text_field($member_info['address_street']);
+        if(isset($address) && !empty($address)){
+            $fields['addressLine1'] = $address; 
+        }
+        $city = sanitize_text_field($member_info['address_city']);
+        if(isset($city) && !empty($city)){
+            $fields['addressCity'] = $city; 
+        }
+        $state = sanitize_text_field($member_info['address_state']);
+        if(isset($state) && !empty($state)){
+            if(isset($country) && $country != "US"){
+                $state = "OU";
+            }
+            $fields['addressState'] = $state; 
+        }
+        $zipcode = sanitize_text_field($member_info['address_zipcode']);
+        if(isset($zipcode) && !empty($zipcode)){
+            $fields['addressZipCode'] = $zipcode; 
+        }
+        $phone = sanitize_text_field($member_info['phone']);
+        if(isset($phone) && !empty($phone)){
+            $fields['phoneNumber'] = $phone; 
+        }
+        $userhandler = new WPAM_Util_UserHandler();
+        $userhandler->create_wpam_affiliate_record($fields);
+        WPAM_Logger::log_debug("Simple Membership Auto Affiliate Creation - affiliate record creation complete.");
     }
 
     public function onAdminMenu() {
@@ -597,7 +743,15 @@ class WPAM_Plugin {
         //Add settings submenu page
         $settings_obj = new WPAM_Pages_Admin_SettingsPage();
         add_submenu_page($menu_parent_slug, __('Settings', 'affiliates-manager'), __('Settings', 'affiliates-manager'), WPAM_PluginConfig::$AdminCap, 'wpam-settings', array($settings_obj, 'render_settings_page'));
+        
+        //Add admin functions submenu page
+        include_once(WPAM_BASE_DIRECTORY . "/source/Admin-menu/wpam-admin-functions-menu.php");
+        add_submenu_page($menu_parent_slug, __("Affiliates Manager Admin Functions", 'affiliates-manager'), __("Admin Functions", 'affiliates-manager'), WPAM_PluginConfig::$AdminCap, 'wpam-admin-functions', 'wpam_display_admin_functions_menu');
 
+        //Add manage payouts submenu page
+        include_once(WPAM_BASE_DIRECTORY . "/source/Admin-menu/wpam-manage-payouts-menu.php");
+        add_submenu_page($menu_parent_slug, __("Affiliates Manager Manage Payouts", 'affiliates-manager'), __("Manage Payouts", 'affiliates-manager'), WPAM_PluginConfig::$AdminCap, 'wpam-manage-payouts', 'wpam_display_manage_payouts_menu');
+        
         //Add clicks submenu page
         include_once(WPAM_BASE_DIRECTORY . "/source/Admin-menu/wpam-clicks-menu.php");
         add_submenu_page($menu_parent_slug, __("Affiliates Manager Click Tracking", 'affiliates-manager'), __("Click Tracking", 'affiliates-manager'), WPAM_PluginConfig::$AdminCap, 'wpam-clicktracking', 'wpam_display_clicks_menu');
@@ -670,7 +824,19 @@ class WPAM_Plugin {
         }
         return $email;
     }
-
+    
+    /* update the affiliate email when it's updated in WordPress */
+    public function update_affiliate_email($user_id, $old_user_data) {
+        global $wpdb;
+        $table = WPAM_AFFILIATES_TBL;
+        $user_data = get_user_by('id', $user_id);
+        //WPAM_Logger::log_debug('profile_update hook fired. current email: '.$user_data->user_email.', old email: '.$old_user_data->user_email);
+        if(isset($user_data->user_email) && !empty($user_data->user_email) && $user_data->user_email !== $old_user_data->user_email) {
+            $wpdb->update($table, array('email' => $user_data->user_email), array('userId' => $user_id));
+            //WPAM_Logger::log_debug('email updated');
+        }
+    }
+    
     public function onSavePage($page_id, $page) {
         if ($page->post_type == 'page') {
             if (strpos($page->post_content, WPAM_PluginConfig::$ShortCodeHome) !== false) {
@@ -704,34 +870,32 @@ class WPAM_Plugin {
     public function onAjaxRequest() {
         //die(print_r($_REQUEST, true));
         $jsonHandler = new WPAM_Util_JsonHandler();
+        $request = wpam_sanitize_array($_REQUEST);
         try {
-            switch ($_REQUEST['handler']) {
+            switch ($request['handler']) {
                 case 'approveApplication':
-                    $response = $jsonHandler->approveApplication($_REQUEST['affiliateId'], $_REQUEST['bountyType'], $_REQUEST['bountyAmount']);
+                    $response = $jsonHandler->approveApplication($request['affiliateId'], $request['bountyType'], $request['bountyAmount']);
                     break;
                 case 'declineApplication':
-                    $response = $jsonHandler->declineApplication($_REQUEST['affiliateId']);
+                    $response = $jsonHandler->declineApplication($request['affiliateId']);
                     break;
                 case 'blockApplication':
-                    $response = $jsonHandler->blockApplication($_REQUEST['affiliateId']);
+                    $response = $jsonHandler->blockApplication($request['affiliateId']);
                     break;
                 case 'activateAffiliate':
-                    $response = $jsonHandler->activateApplication($_REQUEST['affiliateId']);
+                    $response = $jsonHandler->activateApplication($request['affiliateId']);
                     break;
                 case 'deactivateAffiliate':
-                    $response = $jsonHandler->deactivateApplication($_REQUEST['affiliateId']);
+                    $response = $jsonHandler->deactivateApplication($request['affiliateId']);
                     break;
                 case 'setCreativeStatus':
-                    $response = $jsonHandler->setCreativeStatus($_REQUEST['creativeId'], $_REQUEST['status']);
+                    $response = $jsonHandler->setCreativeStatus($request['creativeId'], $request['status']);
                     break;
                 case 'addTransaction':
-                    $response = $jsonHandler->addTransaction($_REQUEST['affiliateId'], $_REQUEST['type'], $_REQUEST['amount'], $_REQUEST['description']);
-                    break;
-                case 'getPostImageElement':
-                    $response = $jsonHandler->getPostImageElement($_REQUEST['postId']);
+                    $response = $jsonHandler->addTransaction($request['affiliateId'], $request['type'], $request['amount'], $request['description']);
                     break;
                 case 'deleteCreative':
-                    $response = $jsonHandler->deleteCreative($_REQUEST['creativeId']);
+                    $response = $jsonHandler->deleteCreative($request);
                     break;
                 default: throw new Exception(__('Invalid JSON handler.', 'affiliates-manager'));
             }
@@ -748,6 +912,7 @@ class WPAM_Plugin {
         header("Pragma: no-cache");
         header("Expires: 0");
         $output = fopen('php://output', 'w'); //open output stream
+        $export_keys = $this->escape_csv_data_array($export_keys);
         fputcsv($output, $export_keys); //let's put column names first
         foreach ($items as $item) {
             unset($csv_line);
@@ -756,8 +921,20 @@ class WPAM_Plugin {
                     $csv_line[] = $item[$key];
                 }
             }
+            $csv_line = $this->escape_csv_data_array($csv_line);
             fputcsv($output, $csv_line);
         }
+    }
+    
+    public function escape_csv_data_array($data_array) {
+        $esc_data_arr = array('=', '+', '-', '@');
+        foreach($data_array as $index => $data){
+            if (in_array(mb_substr($data, 0, 1), $esc_data_arr, true)) {
+                $data = "'" . $data;
+                $data_array[$index] = $data;
+            }
+        }
+        return $data_array;
     }
 
     public function handle_csv_download() {
@@ -780,7 +957,9 @@ class WPAM_Plugin {
                 'companyName' => 'Company',
                 'dateCreated' => 'Date Joined',
                 'websiteUrl' => 'Website',
+                'phoneNumber' => 'Phone',
             );
+            $export_keys = apply_filters('wpam_export_columns', $export_keys);
             $this->output_csv($affiliates->items, $export_keys, 'MyAffiliates.csv');
             die();
         }

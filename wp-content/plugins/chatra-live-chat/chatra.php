@@ -1,58 +1,56 @@
 <?php
 /**
- * Plugin Name: Chatra live chat software
- * Description: With Chatra free livechat you can chat with visitors on your website to increase conversion and sales 
+ * Plugin Name: Chatra Live Chat + ChatBot + Cart Saver
+ * Plugin URI: https://chatra.com/help/cms/wordpress/
+ * Description: Chatra allows you to chat with your visitors, view the list of visitors who are currently online on your website and start a conversation manually or via configurable automatic targeted messages.
  * Author: Chatra
- * Version: 1.0.2
+ * Author URI: https://chatra.com
+ * Version: 1.0.11
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: chatra-live-chat
+ * Domain Path: /languages
  */
 
 // Add multilingual support
-load_plugin_textdomain( 'chatra', false, basename( dirname( __FILE__ ) ) . '/languages' );
+add_action('init', 'chatra_plugin_init');
+function chatra_plugin_init()
+{
+    load_plugin_textdomain('chatra-live-chat', false, dirname(plugin_basename(__FILE__)) . '/languages');
+}
 
 // Add settings page and register settings with WordPress
 add_action('admin_menu', 'chatra_setup');
-
-function chatra_setup() {
-  // add_menu_page( 'Chatra Plugin Page', 'Chatra', 'manage_options', 'options-chatra', 'chatra_settings' );
-  add_submenu_page('options-general.php', __( 'Chatra Live Chat Plugin', 'chatra'), __( 'Chatra Live Chat', 'chatra'), 'manage_options', 'options-chatra', 'chatra_settings' );
-
-  register_setting( 'chatra', 'chatra-code' );
+function chatra_setup()
+{
+    add_submenu_page('options-general.php', __('Chatra widget', 'chatra-live-chat'), __('Chatra widget', 'chatra-live-chat'), 'manage_options', 'options-chatra', 'chatra_settings');
+    register_setting('chatra', 'chatra-code');
 }
 
 // Display settings page
-function chatra_settings() {
-  echo "<h2>" . __( 'Chatra Live Chat Setup', 'chatra' ) . "</h2>";
-  if (get_option('chatra-code')) {
-    echo "<p>" . __( 'Seems like everything is OK!<br>
-Check your <a href="', 'chatra') . home_url() . __('">website</a> to see if the live chat widget is present.<br>
-Log in to your <a href="http://app.chatra.io/?utm_source=WP&utm_campaign=WP" target="_blank">Chatra dashboard</a> to chat with your website visitors and manage preferences.<br>', 'chatra');
-  } else {
-    echo "<p>" . __( 'Signup for a free Chatra account at <a href="http://app.chatra.io/?utm_source=WP&utm_campaign=WP" target="_blank">app.chatra.io</a>,<br> then copy and paste Widget code from Setup & Customize section into the form below:
-', 'chatra' ) . "</p>";
-  }
-
-  echo "<form action=\"options.php\" method=\"POST\">";
-
-    // Show success message when code is saved
-    // if (isset($_GET['settings-updated'])) {
-    //   echo "<p><strong style=\"color: green;\">Settings updated successfully.</strong><br><br>";
-    // }
-
-    settings_fields( 'chatra' );
-    do_settings_sections( 'chatra' );
-    echo "<textarea cols=\"80\" rows=\"14\" name=\"chatra-code\">" . esc_attr( get_option('chatra-code') ) . "</textarea>";
+function chatra_settings()
+{
+    echo "<h2>" . __('Chat widget setup', 'chatra-live-chat') . "</h2>";
+    if (get_option('chatra-code')) {
+        echo "<p>";
+        printf(__('Seems like everything is OK! <br>Check your <a href="%s" target="_blank">website</a> to see if the live chat widget is present.<br>Log in to your <a href="%s" target="_blank">Chatra dashboard</a> to chat with your website visitors and manage preferences.', 'chatra-live-chat'), home_url(), 'https://app.chatra.io/?utm_source=WP&utm_campaign=WP');
+        echo "</p>";
+    } else {
+        echo "<p>";
+        printf(__('Signup for a free Chatra account at <a href="%s" target="_blank">app.chatra.io</a>,<br> then copy and paste <a href="%s" target="_blank">Widget code</a> from Chatra dashboard settings into the form below:', 'chatra-live-chat'), 'https://app.chatra.io/?utm_source=WP&utm_campaign=WP', 'https://app.chatra.io/settings/integrations/widget?utm_source=WP&utm_campaign=WP');
+        echo "</p>";
+    }
+    echo "<form action=\"options.php\" method=\"POST\">";
+    settings_fields('chatra');
+    do_settings_sections('chatra');
+    echo "<textarea cols=\"80\" rows=\"14\" name=\"chatra-code\">" . esc_attr(get_option('chatra-code')) . "</textarea>";
     submit_button();
-  echo "</form>";
+    echo "</form>";
 }
-
-
-// add_action('update_option_chatra', 'chatra_options_saved');
-// function chatra_options_saved() {
-//   echo "сохранил!";
-// }
 
 // Add the code to footer
 add_action('wp_footer', 'add_chatra_code');
-function add_chatra_code() {
-  echo get_option( 'chatra-code' );
+function add_chatra_code()
+{
+    echo get_option('chatra-code');
 }

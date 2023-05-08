@@ -1,0 +1,140 @@
+2023-04-30T05:59:24+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-settings.php(453): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-config.php(96): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\glow-menu\wp-load.php(50): require_once('C:\\xampp\\htdocs...')
+#4 C:\xampp\htdocs\glow-menu\wp-admin\admin.php(34): require_once('C:\\xampp\\htdocs...')
+#5 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post\assets\functions\widget.php on line 1972
+
+2023-04-30T05:59:36+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-settings.php(453): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-config.php(96): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\glow-menu\wp-load.php(50): require_once('C:\\xampp\\htdocs...')
+#4 C:\xampp\htdocs\glow-menu\wp-admin\admin.php(34): require_once('C:\\xampp\\htdocs...')
+#5 C:\xampp\htdocs\glow-menu\wp-admin\edit.php(10): require_once('C:\\xampp\\htdocs...')
+#6 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post\assets\functions\widget.php on line 1972
+
+2023-04-30T06:16:56+00:00 CRITICAL Uncaught TypeError: array_merge(): Argument #5 must be of type array, bool given in C:\xampp\htdocs\glow-menu\wp-includes\widgets.php:1342
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-includes\widgets.php(1342): array_merge(Array, Array, Array, Array, false)
+#1 C:\xampp\htdocs\glow-menu\wp-includes\widgets.php(1287): retrieve_widgets(true)
+#2 C:\xampp\htdocs\glow-menu\wp-includes\class-wp-hook.php(310): _wp_sidebars_changed('Twenty Twenty-T...')
+#3 C:\xampp\htdocs\glow-menu\wp-includes\class-wp-hook.php(332): WP_Hook->apply_filters(NULL, Array)
+#4 C:\xampp\htdocs\glow-menu\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#5 C:\xampp\htdocs\glow-menu\wp-includes\theme.php(3401): do_action('after_switch_th...', 'Twenty Twenty-T...', Object(WP_Theme))
+#6 C:\xampp\htdocs\glow-menu\wp-includes\class-wp-hook.php(308): check_theme_switched('')
+#7 C:\xampp\htdocs\glow-menu\wp-includes\class-wp-hook.php(332): WP_Hook->apply_filters(false, Array)
+#8 C:\xampp\htdocs\glow-menu\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#9 C:\xampp\htdocs\glow-menu\wp-settings.php(623): do_action('init')
+#10 C:\xampp\htdocs\glow-menu\wp-config.php(96): require_once('C:\\xampp\\htdocs...')
+#11 C:\xampp\htdocs\glow-menu\wp-load.php(50): require_once('C:\\xampp\\htdocs...')
+#12 C:\xampp\htdocs\glow-menu\wp-admin\admin-ajax.php(22): require_once('C:\\xampp\\htdocs...')
+#13 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-includes\widgets.php on line 1342
+
+2023-04-30T06:20:01+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(2314): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(661): plugin_sandbox_scrape('yuzo-related-po...')
+#3 C:\xampp\htdocs\glow-menu\wp-admin\plugins.php(58): activate_plugin('yuzo-related-po...', 'http://localhos...', false)
+#4 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php on line 1972
+
+2023-04-30T06:20:10+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(2314): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-admin\plugins.php(192): plugin_sandbox_scrape('yuzo-related-po...')
+#3 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php on line 1972
+
+2023-04-30T06:20:10+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(2314): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-admin\plugins.php(192): plugin_sandbox_scrape('yuzo-related-po...')
+#3 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php on line 1972
+
+2023-04-30T06:20:18+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(2314): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(661): plugin_sandbox_scrape('yuzo-related-po...')
+#3 C:\xampp\htdocs\glow-menu\wp-admin\plugins.php(58): activate_plugin('yuzo-related-po...', 'http://localhos...', false)
+#4 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php on line 1972
+
+2023-04-30T06:20:26+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(2314): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-admin\plugins.php(192): plugin_sandbox_scrape('yuzo-related-po...')
+#3 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php on line 1972
+
+2023-04-30T06:20:27+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(2314): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-admin\plugins.php(192): plugin_sandbox_scrape('yuzo-related-po...')
+#3 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php on line 1972
+
+2023-04-30T06:26:18+00:00 CRITICAL Unparenthesized `a ? b : c ? d : e` is not supported. Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)` in C:\xampp\htdocs\glow-menu\wp-content\plugins\woocommerce-tm-extra-product-options\include\class-tm-extra-product-options.php on line 4982
+
+2023-04-30T06:26:28+00:00 CRITICAL Unparenthesized `a ? b : c ? d : e` is not supported. Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)` in C:\xampp\htdocs\glow-menu\wp-content\plugins\woocommerce-tm-extra-product-options\include\class-tm-extra-product-options.php on line 4982
+
+2023-04-30T06:26:30+00:00 CRITICAL Unparenthesized `a ? b : c ? d : e` is not supported. Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)` in C:\xampp\htdocs\glow-menu\wp-content\plugins\woocommerce-tm-extra-product-options\include\class-tm-extra-product-options.php on line 4982
+
+2023-04-30T06:26:41+00:00 CRITICAL Unparenthesized `a ? b : c ? d : e` is not supported. Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)` in C:\xampp\htdocs\glow-menu\wp-content\plugins\woocommerce-tm-extra-product-options\include\class-tm-extra-product-options.php on line 4982
+
+2023-04-30T06:26:51+00:00 CRITICAL Unparenthesized `a ? b : c ? d : e` is not supported. Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)` in C:\xampp\htdocs\glow-menu\wp-content\plugins\woocommerce-tm-extra-product-options\include\class-tm-extra-product-options.php on line 4982
+
+2023-04-30T06:26:51+00:00 CRITICAL Unparenthesized `a ? b : c ? d : e` is not supported. Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)` in C:\xampp\htdocs\glow-menu\wp-content\plugins\woocommerce-tm-extra-product-options\include\class-tm-extra-product-options.php on line 4982
+
+2023-04-30T06:27:04+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(2314): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(661): plugin_sandbox_scrape('yuzo-related-po...')
+#3 C:\xampp\htdocs\glow-menu\wp-admin\plugins.php(58): activate_plugin('yuzo-related-po...', 'http://localhos...', false)
+#4 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php on line 1972
+
+2023-04-30T06:27:12+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(2314): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-admin\plugins.php(192): plugin_sandbox_scrape('yuzo-related-po...')
+#3 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php on line 1972
+
+2023-04-30T06:27:13+00:00 CRITICAL Uncaught Error: Call to undefined function create_function() in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php:1972
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\yuzo_related_post.php(2350): require_once()
+#1 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(2314): include_once('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\glow-menu\wp-admin\plugins.php(192): plugin_sandbox_scrape('yuzo-related-po...')
+#3 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\yuzo-related-post-bk\assets\functions\widget.php on line 1972
+
+2023-04-30T06:29:34+00:00 CRITICAL Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in C:\xampp\htdocs\glow-menu\wp-content\plugins\woothemes-updater\classes\class-woothemes-updater-update-checker.php:254
+Stack trace:
+#0 C:\xampp\htdocs\glow-menu\wp-includes\class-wp-hook.php(310): WooThemes_Updater_Update_Checker->plugin_update_check(Object(stdClass))
+#1 C:\xampp\htdocs\glow-menu\wp-includes\plugin.php(205): WP_Hook->apply_filters(Object(stdClass), Array)
+#2 C:\xampp\htdocs\glow-menu\wp-includes\option.php(2036): apply_filters('pre_set_site_tr...', Object(stdClass), 'update_plugins')
+#3 C:\xampp\htdocs\glow-menu\wp-admin\includes\plugin.php(1027): set_site_transient('update_plugins', Object(stdClass))
+#4 C:\xampp\htdocs\glow-menu\wp-admin\includes\ajax-actions.php(4701): delete_plugins(Array)
+#5 C:\xampp\htdocs\glow-menu\wp-includes\class-wp-hook.php(308): wp_ajax_delete_plugin('')
+#6 C:\xampp\htdocs\glow-menu\wp-includes\class-wp-hook.php(332): WP_Hook->apply_filters('', Array)
+#7 C:\xampp\htdocs\glow-menu\wp-includes\plugin.php(517): WP_Hook->do_action(Array)
+#8 C:\xampp\htdocs\glow-menu\wp-admin\admin-ajax.php(188): do_action('wp_ajax_delete-...')
+#9 {main}
+  thrown in C:\xampp\htdocs\glow-menu\wp-content\plugins\woothemes-updater\classes\class-woothemes-updater-update-checker.php on line 254
+

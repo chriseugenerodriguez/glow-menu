@@ -1,3 +1,12 @@
+<?php
+/**
+ * Jetpack_Flickr_Widget settings form output.
+ *
+ * @package automattic/jetpack
+ */
+
+//phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
+?>
 <p>
 	<label>
 		<?php esc_html_e( 'Title:', 'jetpack' ); ?>
@@ -28,10 +37,21 @@
 </p>
 <p>
 	<small>
-		<?php printf(
-			__( 'Leave the Flickr RSS URL field blank to display <a target="_blank" href="%s">interesting</a> Flickr photos.', 'jetpack' ),
-			'http://www.flickr.com/explore/interesting'
-		); ?>
+		<?php
+		echo sprintf(
+			wp_kses(
+				/* Translators: %s is the URL to an example Flickr RSS feed. */
+				__( 'Leave the Flickr RSS URL field blank to display <a target="_blank" href="%s">interesting</a> Flickr photos.', 'jetpack' ),
+				array(
+					'a' => array(
+						'href'   => array(),
+						'target' => array(),
+					),
+				)
+			),
+			'https://www.flickr.com/explore/interesting'
+		);
+		?>
 	</small>
 </p>
 
@@ -43,14 +63,24 @@
 		<?php for ( $i = 1; $i <= 10; ++$i ) { ?>
 			<option
 				<?php selected( $instance['items'], $i ); ?>
-				value="<?php echo $i; ?>"
+				value="<?php echo esc_attr( $i ); ?>"
 			>
-				<?php echo $i; ?>
+				<?php echo esc_html( $i ); ?>
 			</option>
 		<?php } ?>
 	</select>
 </p>
 
+<p>
+	<label>
+		<input
+			type="checkbox"
+			name="<?php echo esc_attr( $this->get_field_name( 'target' ) ); ?>"
+			<?php checked( $instance['target'] ); ?>
+		/>
+		<?php esc_html_e( 'Open images in new tab?', 'jetpack' ); ?>
+	</label>
+</p>
 <p>
 	<div>
 		<?php esc_html_e( 'What size photos would you like to display?', 'jetpack' ); ?>

@@ -1,28 +1,38 @@
 <?php
+/**
+ * Generic functions using the Photon service.
+ *
+ * Some are used outside of the Photon module being active, so intentionally not within the module.
+ *
+ * @package automattic/jetpack
+ */
+
+use Automattic\Jetpack\Status;
 
 /**
  * Generates a Photon URL.
  *
- * @see http://developer.wordpress.com/docs/photon/
+ * @see https://developer.wordpress.com/docs/photon/
  *
- * @param string $image_url URL to the publicly accessible image you want to manipulate
- * @param array|string $args An array of arguments, i.e. array( 'w' => '300', 'resize' => array( 123, 456 ) ), or in string form (w=123&h=456)
+ * @param string       $image_url URL to the publicly accessible image you want to manipulate.
+ * @param array|string $args An array of arguments, i.e. array( 'w' => '300', 'resize' => array( 123, 456 ) ), or in string form (w=123&h=456).
+ * @param string|null  $scheme URL protocol.
  * @return string The raw final URL. You should run this through esc_url() before displaying it.
  */
 function jetpack_photon_url( $image_url, $args = array(), $scheme = null ) {
 	$image_url = trim( $image_url );
 
-	if ( class_exists( 'Jetpack') ) {
+	if ( ! defined( 'IS_WPCOM' ) || ! IS_WPCOM ) {
 		/**
 		 * Disables Photon URL processing for local development
-	 	 *
-	 	 * @module photon
-	 	 *
-	 	 * @since 4.1.0
-	 	 *
-	 	 * @param bool false Result of Jetpack::is_development_mode.
-	 	 */
-		if ( true === apply_filters( 'jetpack_photon_development_mode', Jetpack::is_development_mode() ) ) {
+		 *
+		 * @module photon
+		 *
+		 * @since 4.1.0
+		 *
+		 * @param bool false Result of Automattic\Jetpack\Status->is_offline_mode().
+		 */
+		if ( true === apply_filters( 'jetpack_photon_development_mode', ( new Status() )->is_offline_mode() ) ) {
 			return $image_url;
 		}
 	}
@@ -68,45 +78,38 @@ function jetpack_photon_url( $image_url, $args = array(), $scheme = null ) {
 	 */
 	$args = apply_filters( 'jetpack_photon_pre_args', $args, $image_url, $scheme );
 
-	if ( empty( $image_url ) )
+	if ( empty( $image_url ) ) {
 		return $image_url;
+	}
 
-	$image_url_parts = @jetpack_photon_parse_url( $image_url );
+	$image_url_parts = wp_parse_url( $image_url );
 
-	// Unable to parse
-	if ( ! is_array( $image_url_parts ) || empty( $image_url_parts['host'] ) || empty( $image_url_parts['path'] ) )
+	// Unable to parse.
+	if ( ! is_array( $image_url_parts ) || empty( $image_url_parts['host'] ) || empty( $image_url_parts['path'] ) ) {
 		return $image_url;
+	}
 
-	if ( is_array( $args ) ){
-		// Convert values that are arrays into strings
+	if ( is_array( $args ) ) {
+		// Convert values that are arrays into strings.
 		foreach ( $args as $arg => $value ) {
 			if ( is_array( $value ) ) {
-				$args[$arg] = implode( ',', $value );
+				$args[ $arg ] = implode( ',', $value );
 			}
 		}
 
-		// Encode values
-		// See http://core.trac.wordpress.org/ticket/17923
+		// Encode values.
+		// See https://core.trac.wordpress.org/ticket/17923 .
 		$args = rawurlencode_deep( $args );
 	}
 
-	/* Don't photon-ize WPCOM hosted images with only the following url args:
-	 *  `w`, `h`, `fit`, `crop`, `zoom`, `strip`, `resize`, `quality`
-	 * These args can just be added to the wpcom-version of the image, and save on latency.
-	 */
-	$is_wpcom_image_with_safe_args = false;
-	$allowed_wpcom_keys = array(
-		'w'       => true,
-		'h'       => true,
-		'fit'     => true,
-		'crop'    => true,
-		'zoom'    => true,
-		'strip'   => true,
-		'resize'  => true,
-		'quality' => true,
-	);
-	if ( wp_endswith( strtolower( $image_url_parts['host'] ), '.files.wordpress.com' ) && ! array_diff_key( $args, $allowed_wpcom_keys ) ) {
-		$is_wpcom_image_with_safe_args = true;
+	// Don't photon-ize WPCOM hosted images -- we can serve them up from wpcom directly.
+	$is_wpcom_image = false;
+	if ( wp_endswith( strtolower( $image_url_parts['host'] ), '.files.wordpress.com' ) ) {
+		$is_wpcom_image = true;
+		if ( isset( $args['ssl'] ) ) {
+			// Do not send the ssl argument to prevent caching issues.
+			unset( $args['ssl'] );
+		}
 	}
 
 	/** This filter is documented below. */
@@ -115,11 +118,11 @@ function jetpack_photon_url( $image_url, $args = array(), $scheme = null ) {
 
 	// You can't run a Photon URL through Photon again because query strings are stripped.
 	// So if the image is already a Photon URL, append the new arguments to the existing URL.
-	// Alternately, if it's a *.files.wordpress.com url, and the arguments are supported, keep the domain.
+	// Alternately, if it's a *.files.wordpress.com url, then keep the domain as is.
 	if (
-		in_array( $image_url_parts['host'], array( 'i0.wp.com', 'i1.wp.com', 'i2.wp.com' ) )
-		|| $image_url_parts['host'] === jetpack_photon_parse_url( $custom_photon_url, PHP_URL_HOST )
-		|| $is_wpcom_image_with_safe_args
+		in_array( $image_url_parts['host'], array( 'i0.wp.com', 'i1.wp.com', 'i2.wp.com' ), true )
+		|| wp_parse_url( $custom_photon_url, PHP_URL_HOST ) === $image_url_parts['host']
+		|| $is_wpcom_image
 	) {
 		$photon_url = add_query_arg( $args, $image_url );
 		return jetpack_photon_url_scheme( $photon_url, $scheme );
@@ -140,18 +143,14 @@ function jetpack_photon_url( $image_url, $args = array(), $scheme = null ) {
 	if ( ! apply_filters( 'jetpack_photon_any_extension_for_domain', false, $image_url_parts['host'] ) ) {
 		// Photon doesn't support query strings so we ignore them and look only at the path.
 		// However some source images are served via PHP so check the no-query-string extension.
-		// For future proofing, this is a blacklist of common issues rather than a whitelist.
+		// For future proofing, this is an excluded list of common issues rather than an allow list.
 		$extension = pathinfo( $image_url_parts['path'], PATHINFO_EXTENSION );
-		if ( empty( $extension ) || in_array( $extension, array( 'php', 'ashx' ) ) )
+		if ( empty( $extension ) || in_array( $extension, array( 'php', 'ashx' ), true ) ) {
 			return $image_url;
+		}
 	}
 
 	$image_host_path = $image_url_parts['host'] . $image_url_parts['path'];
-
-	// Figure out which CDN subdomain to use
-	srand( crc32( $image_host_path ) );
-	$subdomain = rand( 0, 2 );
-	srand();
 
 	/**
 	 * Filters the domain used by the Photon module.
@@ -160,12 +159,12 @@ function jetpack_photon_url( $image_url, $args = array(), $scheme = null ) {
 	 *
 	 * @since 3.4.2
 	 *
-	 * @param string https://i{$subdomain}.wp.com Domain used by Photon. $subdomain is a random number between 0 and 2.
+	 * @param string https://i0.wp.com Domain used by Photon.
 	 * @param string $image_url URL of the image to be photonized.
 	 */
-	$photon_domain = apply_filters( 'jetpack_photon_domain', "https://i{$subdomain}.wp.com", $image_url );
+	$photon_domain = apply_filters( 'jetpack_photon_domain', 'https://i0.wp.com', $image_url );
 	$photon_domain = trailingslashit( esc_url( $photon_domain ) );
-	$photon_url  = $photon_domain . $image_host_path;
+	$photon_url    = $photon_domain . $image_host_path;
 
 	/**
 	 * Add query strings to Photon URL.
@@ -192,12 +191,18 @@ function jetpack_photon_url( $image_url, $args = array(), $scheme = null ) {
 		}
 	}
 
-	if ( isset( $image_url_parts['scheme'] ) && 'https' == $image_url_parts['scheme'] ) {
+	if ( isset( $image_url_parts['scheme'] ) && 'https' === $image_url_parts['scheme'] ) {
 		$photon_url = add_query_arg( array( 'ssl' => 1 ), $photon_url );
 	}
 
 	return jetpack_photon_url_scheme( $photon_url, $scheme );
 }
+
+/**
+ * Add an easy way to photon-ize a URL that is safe to call even if Jetpack isn't active.
+ *
+ * See: https://jetpack.com/2013/07/11/photon-and-themes/
+ */
 add_filter( 'jetpack_photon_url', 'jetpack_photon_url', 10, 3 );
 
 /**
@@ -207,48 +212,68 @@ add_filter( 'jetpack_photon_url', 'jetpack_photon_url', 10, 3 );
  */
 add_filter( 'jetpack_photon_pre_args', 'jetpack_photon_parse_wpcom_query_args', 10, 2 );
 
+/**
+ * Parses WP.com-hosted image args to replicate the crop.
+ *
+ * @param mixed  $args Args set during Photon's processing.
+ * @param string $image_url URL of the image.
+ * @return array|string Args for Photon to use for the URL.
+ */
 function jetpack_photon_parse_wpcom_query_args( $args, $image_url ) {
-	$parsed_url = @parse_url( $image_url );
+	$parsed_url = wp_parse_url( $image_url );
 
-	if ( ! $parsed_url )
+	if ( ! $parsed_url ) {
 		return $args;
+	}
 
-	$image_url_parts = wp_parse_args( $parsed_url, array(
-		'host'  => '',
-		'query' => ''
-	) );
+	$image_url_parts = wp_parse_args(
+		$parsed_url,
+		array(
+			'host'  => '',
+			'query' => '',
+		)
+	);
 
-	if ( '.files.wordpress.com' != substr( $image_url_parts['host'], -20 ) )
+	if ( '.files.wordpress.com' !== substr( $image_url_parts['host'], -20 ) ) {
 		return $args;
+	}
 
-	if ( empty( $image_url_parts['query'] ) )
+	if ( empty( $image_url_parts['query'] ) ) {
 		return $args;
+	}
 
 	$wpcom_args = wp_parse_args( $image_url_parts['query'] );
 
-	if ( empty( $wpcom_args['w'] ) || empty( $wpcom_args['h'] ) )
+	if ( empty( $wpcom_args['w'] ) || empty( $wpcom_args['h'] ) ) {
 		return $args;
+	}
 
-	// Keep the crop by using "resize"
+	// Keep the crop by using "resize".
 	if ( ! empty( $wpcom_args['crop'] ) ) {
 		if ( is_array( $args ) ) {
 			$args = array_merge( array( 'resize' => array( $wpcom_args['w'], $wpcom_args['h'] ) ), $args );
 		} else {
 			$args = 'resize=' . rawurlencode( absint( $wpcom_args['w'] ) . ',' . absint( $wpcom_args['h'] ) ) . '&' . $args;
 		}
+	} elseif ( is_array( $args ) ) {
+		$args = array_merge( array( 'fit' => array( $wpcom_args['w'], $wpcom_args['h'] ) ), $args );
 	} else {
-		if ( is_array( $args ) ) {
-			$args = array_merge( array( 'fit' => array( $wpcom_args['w'], $wpcom_args['h'] ) ), $args );
-		} else {
-			$args = 'fit=' . rawurlencode( absint( $wpcom_args['w'] ) . ',' . absint( $wpcom_args['h'] ) ) . '&' . $args;
-		}
+		$args = 'fit=' . rawurlencode( absint( $wpcom_args['w'] ) . ',' . absint( $wpcom_args['h'] ) ) . '&' . $args;
 	}
 
 	return $args;
 }
 
+/**
+ * Sets the scheme for a URL
+ *
+ * @param string $url URL to set scheme.
+ * @param string $scheme Scheme to use. Accepts http, https, network_path.
+ *
+ * @return string URL.
+ */
 function jetpack_photon_url_scheme( $url, $scheme ) {
-	if ( ! in_array( $scheme, array( 'http', 'https', 'network_path' ) ) ) {
+	if ( ! in_array( $scheme, array( 'http', 'https', 'network_path' ), true ) ) {
 		if ( preg_match( '#^(https?:)?//#', $url ) ) {
 			return $url;
 		}
@@ -256,7 +281,7 @@ function jetpack_photon_url_scheme( $url, $scheme ) {
 		$scheme = 'http';
 	}
 
-	if ( 'network_path' == $scheme ) {
+	if ( 'network_path' === $scheme ) {
 		$scheme_slashes = '//';
 	} else {
 		$scheme_slashes = "$scheme://";
@@ -265,34 +290,31 @@ function jetpack_photon_url_scheme( $url, $scheme ) {
 	return preg_replace( '#^([a-z:]+)?//#i', $scheme_slashes, $url );
 }
 
-/**
- * A wrapper for PHP's parse_url, prepending assumed scheme for network path
- * URLs. PHP versions 5.4.6 and earlier do not correctly parse without scheme.
- *
- * @see http://php.net/manual/en/function.parse-url.php#refsect1-function.parse-url-changelog
- *
- * @param string $url The URL to parse
- * @param integer $component Retrieve specific URL component
- * @return mixed Result of parse_url
- */
-function jetpack_photon_parse_url( $url, $component = -1 ) {
-	if ( 0 === strpos( $url, '//' ) ) {
-		$url = ( is_ssl() ? 'https:' : 'http:' ) . $url;
-	}
-
-	return parse_url( $url, $component );
-}
-
 add_filter( 'jetpack_photon_skip_for_url', 'jetpack_photon_banned_domains', 9, 2 );
+
+/**
+ * Check to skip Photon for a known domain that shouldn't be Photonized.
+ *
+ * @param bool   $skip If the image should be skipped by Photon.
+ * @param string $image_url URL of the image.
+ *
+ * @return bool Should the image be skipped by Photon.
+ */
 function jetpack_photon_banned_domains( $skip, $image_url ) {
 	$banned_host_patterns = array(
 		'/^chart\.googleapis\.com$/',
 		'/^chart\.apis\.google\.com$/',
 		'/^graph\.facebook\.com$/',
-		'/\.fbcdn\.net$/'
+		'/\.fbcdn\.net$/',
+		'/\.paypalobjects\.com$/',
+		'/\.dropbox\.com$/',
+		'/\.cdninstagram\.com$/',
+		'/^(commons|upload)\.wikimedia\.org$/',
+		'/\.wikipedia\.org$/',
+		'/^live\.staticflickr\.com$/',
 	);
 
-	$host = jetpack_photon_parse_url( $image_url, PHP_URL_HOST );
+	$host = wp_parse_url( $image_url, PHP_URL_HOST );
 
 	foreach ( $banned_host_patterns as $banned_host_pattern ) {
 		if ( 1 === preg_match( $banned_host_pattern, $host ) ) {
@@ -302,7 +324,6 @@ function jetpack_photon_banned_domains( $skip, $image_url ) {
 
 	return $skip;
 }
-
 
 /**
  * Jetpack Photon - Support Text Widgets.

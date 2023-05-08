@@ -1,7 +1,12 @@
 <?php
 /**
+ * WPSEO plugin file.
+ *
  * @package WPSEO\Admin
  */
+
+use Yoast\WP\SEO\Helpers\Score_Icon_Helper;
+use Yoast\WP\SEO\Repositories\Indexable_Repository;
 
 /**
  * This class adds columns to the taxonomy table.
@@ -9,9 +14,39 @@
 class WPSEO_Taxonomy_Columns {
 
 	/**
+	 * The SEO analysis.
+	 *
 	 * @var WPSEO_Metabox_Analysis_SEO
 	 */
 	private $analysis_seo;
+
+	/**
+	 * The readability analysis.
+	 *
+	 * @var WPSEO_Metabox_Analysis_Readability
+	 */
+	private $analysis_readability;
+
+	/**
+	 * The current taxonomy.
+	 *
+	 * @var string
+	 */
+	private $taxonomy;
+
+	/**
+	 * Holds the Indexable_Repository.
+	 *
+	 * @var Indexable_Repository
+	 */
+	protected $indexable_repository;
+
+	/**
+	 * Holds the Score_Icon_Helper.
+	 *
+	 * @var Score_Icon_Helper
+	 */
+	protected $score_icon_helper;
 
 	/**
 	 * WPSEO_Taxonomy_Columns constructor.
@@ -21,12 +56,14 @@ class WPSEO_Taxonomy_Columns {
 		$this->taxonomy = $this->get_taxonomy();
 
 		if ( ! empty( $this->taxonomy ) ) {
-			add_filter( 'manage_edit-' . $this->taxonomy . '_columns', array( $this, 'add_columns' ) );
-			add_filter( 'manage_' . $this->taxonomy . '_custom_column', array( $this, 'parse_column' ), 10, 3 );
+			add_filter( 'manage_edit-' . $this->taxonomy . '_columns', [ $this, 'add_columns' ] );
+			add_filter( 'manage_' . $this->taxonomy . '_custom_column', [ $this, 'parse_column' ], 10, 3 );
 		}
 
-		$this->analysis_seo = new WPSEO_Metabox_Analysis_SEO();
+		$this->analysis_seo         = new WPSEO_Metabox_Analysis_SEO();
 		$this->analysis_readability = new WPSEO_Metabox_Analysis_Readability();
+		$this->indexable_repository = YoastSEO()->classes->get( Indexable_Repository::class );
+		$this->score_icon_helper    = YoastSEO()->helpers->score_icon;
 	}
 
 	/**
@@ -37,22 +74,21 @@ class WPSEO_Taxonomy_Columns {
 	 * @return array
 	 */
 	public function add_columns( array $columns ) {
-
-		if ( $this->is_metabox_hidden() === true ) {
+		if ( $this->display_metabox( $this->taxonomy ) === false ) {
 			return $columns;
 		}
 
-		$new_columns = array();
+		$new_columns = [];
 
 		foreach ( $columns as $column_name => $column_value ) {
 			$new_columns[ $column_name ] = $column_value;
 
 			if ( $column_name === 'description' && $this->analysis_seo->is_enabled() ) {
-				$new_columns['wpseo_score'] = __( 'SEO', 'wordpress-seo' );
+				$new_columns['wpseo-score'] = '<span class="yoast-tooltip yoast-tooltip-n yoast-tooltip-alt" data-label="' . esc_attr__( 'SEO score', 'wordpress-seo' ) . '"><span class="yoast-column-seo-score yoast-column-header-has-tooltip"><span class="screen-reader-text">' . __( 'SEO score', 'wordpress-seo' ) . '</span></span></span>';
 			}
 
 			if ( $column_name === 'description' && $this->analysis_readability->is_enabled() ) {
-				$new_columns['wpseo_score_readability'] = __( 'Readability', 'wordpress-seo' );
+				$new_columns['wpseo-score-readability'] = '<span class="yoast-tooltip yoast-tooltip-n yoast-tooltip-alt" data-label="' . esc_attr__( 'Readability score', 'wordpress-seo' ) . '"><span class="yoast-column-readability yoast-column-header-has-tooltip"><span class="screen-reader-text">' . __( 'Readability score', 'wordpress-seo' ) . '</span></span></span>';
 			}
 		}
 
@@ -62,28 +98,45 @@ class WPSEO_Taxonomy_Columns {
 	/**
 	 * Parses the column.
 	 *
-	 * @param string  $content The current content of the column.
-	 * @param string  $column_name The name of the column.
-	 * @param integer $term_id ID of requested taxonomy.
+	 * @param string $content     The current content of the column.
+	 * @param string $column_name The name of the column.
+	 * @param int    $term_id     ID of requested taxonomy.
 	 *
 	 * @return string
 	 */
 	public function parse_column( $content, $column_name, $term_id ) {
 
 		switch ( $column_name ) {
-			case 'wpseo_score':
+			case 'wpseo-score':
 				return $this->get_score_value( $term_id );
 
-				break;
-
-			case 'wpseo_score_readability':
+			case 'wpseo-score-readability':
 				return $this->get_score_readability_value( $term_id );
-				break;
 		}
 
 		return $content;
 	}
 
+	/**
+	 * Retrieves the taxonomy from the $_GET or $_POST variable.
+	 *
+	 * @return string|null The current taxonomy or null when it is not set.
+	 */
+	public function get_current_taxonomy() {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended -- Reason: We are not processing form information.
+		if ( ! empty( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+			if ( isset( $_POST['taxonomy'] ) && is_string( $_POST['taxonomy'] ) ) {
+				return sanitize_text_field( wp_unslash( $_POST['taxonomy'] ) );
+			}
+		}
+		else {
+			if ( isset( $_GET['taxonomy'] ) && is_string( $_GET['taxonomy'] ) ) {
+				return sanitize_text_field( wp_unslash( $_GET['taxonomy'] ) );
+			}
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended
+		return null;
+	}
 
 	/**
 	 * Returns the posted/get taxonomy value if it is set.
@@ -91,44 +144,32 @@ class WPSEO_Taxonomy_Columns {
 	 * @return string|null
 	 */
 	private function get_taxonomy() {
-		if ( defined( 'DOING_AJAX' ) && DOING_AJAX === true ) {
-			return FILTER_INPUT( INPUT_POST, 'taxonomy' );
+		// phpcs:disable WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended -- Reason: We are not processing form information.
+		if ( wp_doing_ajax() ) {
+			if ( isset( $_POST['taxonomy'] ) && is_string( $_POST['taxonomy'] ) ) {
+				return sanitize_text_field( wp_unslash( $_POST['taxonomy'] ) );
+			}
 		}
-
-		return FILTER_INPUT( INPUT_GET, 'taxonomy' );
+		else {
+			if ( isset( $_GET['taxonomy'] ) && is_string( $_GET['taxonomy'] ) ) {
+				return sanitize_text_field( wp_unslash( $_GET['taxonomy'] ) );
+			}
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended
+		return null;
 	}
 
 	/**
 	 * Parses the value for the score column.
 	 *
-	 * @param integer $term_id ID of requested term.
+	 * @param int $term_id ID of requested term.
 	 *
 	 * @return string
 	 */
 	private function get_score_value( $term_id ) {
-		$term = get_term( $term_id, $this->taxonomy );
+		$indexable = $this->indexable_repository->find_by_id_and_type( (int) $term_id, 'term' );
 
-		// When the term isn't indexable.
-		if ( ! $this->is_indexable( $term ) ) {
-			return $this->create_score_icon(
-				new WPSEO_Rank( WPSEO_Rank::NO_INDEX ),
-				__( 'Term is set to noindex.', 'wordpress-seo' )
-			);
-		}
-
-		// When there is a focus key word.
-		if ( $focus_keyword = $this->get_focus_keyword( $term ) ) {
-			$score = (int) WPSEO_Taxonomy_Meta::get_term_meta( $term_id, $this->taxonomy, 'linkdex' );
-			$rank  = WPSEO_Rank::from_numeric_score( $score );
-
-			return $this->create_score_icon( $rank, $rank->get_label() );
-		}
-
-		// Default icon.
-		return $this->create_score_icon(
-			new WPSEO_Rank( WPSEO_Rank::NO_FOCUS ),
-			__( 'Focus keyword not set.', 'wordpress-seo' )
-		);
+		return $this->score_icon_helper->for_seo( $indexable, '', __( 'Term is set to noindex.', 'wordpress-seo' ) );
 	}
 
 	/**
@@ -140,25 +181,8 @@ class WPSEO_Taxonomy_Columns {
 	 */
 	private function get_score_readability_value( $term_id ) {
 		$score = (int) WPSEO_Taxonomy_Meta::get_term_meta( $term_id, $this->taxonomy, 'content_score' );
-		$rank = WPSEO_Rank::from_numeric_score( $score );
 
-		return $this->create_score_icon( $rank );
-	}
-
-	/**
-	 * Creates an icon by the given values.
-	 *
-	 * @param WPSEO_Rank $rank The ranking object.
-	 * @param string     $title Optional. The title to show. Defaults to the rank label.
-	 *
-	 * @return string The HTML for a score icon.
-	 */
-	private function create_score_icon( WPSEO_Rank $rank, $title = '' ) {
-		if ( empty( $title ) ) {
-			$title = $rank->get_label();
-		}
-
-		return '<div aria-hidden="true" title="' . esc_attr( $title ) . '" class="wpseo-score-icon ' . esc_attr( $rank->get_css_class() ) . '"></div><span class="screen-reader-text">' . $title . '</span>';
+		return $this->score_icon_helper->for_readability( $score );
 	}
 
 	/**
@@ -166,84 +190,44 @@ class WPSEO_Taxonomy_Columns {
 	 *
 	 * @param mixed $term The current term.
 	 *
-	 * @return bool
+	 * @return bool Whether the term is indexable.
 	 */
 	private function is_indexable( $term ) {
-		static $options;
-
-		// Saving the options once, because it's static.
-		if ( $options === null ) {
-			$options = WPSEO_Options::get_all();
-		}
-
 		// When the no_index value is not empty and not default, check if its value is index.
 		$no_index = WPSEO_Taxonomy_Meta::get_term_meta( $term->term_id, $this->taxonomy, 'noindex' );
+
+		// Check if the default for taxonomy is empty (this will be index).
 		if ( ! empty( $no_index ) && $no_index !== 'default' ) {
 			return ( $no_index === 'index' );
 		}
 
-		// Check if the default for taxonomy is empty (this will be index).
-		$no_index_key = 'noindex-tax-' . $term->taxonomy;
-		if ( is_object( $term ) && ( isset( $options[ $no_index_key ] ) ) ) {
-			return ( empty( $options[ $no_index_key ] ) );
+		if ( is_object( $term ) ) {
+			$no_index_key = 'noindex-tax-' . $term->taxonomy;
+
+			// If the option is false, this means we want to index it.
+			return WPSEO_Options::get( $no_index_key, false ) === false;
 		}
 
 		return true;
 	}
 
 	/**
-	 * Returns the focus keyword if this is set, otherwise it will give the term name.
+	 * Wraps the WPSEO_Metabox check to determine whether the metabox should be displayed either by
+	 * choice of the admin or because the taxonomy is not public.
 	 *
-	 * @param stdClass|WP_Term $term The current term.
+	 * @since 7.0
 	 *
-	 * @return string
+	 * @param string|null $taxonomy Optional. The taxonomy to test, defaults to the current taxonomy.
+	 *
+	 * @return bool Whether the meta box (and associated columns etc) should be hidden.
 	 */
-	private function get_focus_keyword( $term ) {
-		if ( $focus_keyword = WPSEO_Taxonomy_Meta::get_term_meta( 'focuskw', $term->term_id, $term->taxonomy ) ) {
-			return $focus_keyword;
+	private function display_metabox( $taxonomy = null ) {
+		$current_taxonomy = $this->get_current_taxonomy();
+
+		if ( ! isset( $taxonomy ) && ! empty( $current_taxonomy ) ) {
+			$taxonomy = $current_taxonomy;
 		}
 
-		return $term->name;
-	}
-
-	/**
-	 * Checks if a taxonomy is being added via a POST method. If not, it defaults to a GET request.
-	 *
-	 * @return int
-	 */
-	private function get_taxonomy_input_type() {
-
-		if ( ! empty( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' ) {
-			return INPUT_POST;
-		}
-
-		return INPUT_GET;
-	}
-
-	/**
-	 * Test whether the metabox should be hidden either by choice of the admin
-	 *
-	 * @since 3.1
-	 *
-	 * @param  string $taxonomy (optional) The post type to test, defaults to the current post post_type.
-	 *
-	 * @return  bool        Whether or not the meta box (and associated columns etc) should be hidden
-	 */
-	private function is_metabox_hidden( $taxonomy = null ) {
-		$get_taxonomy_type = filter_input( $this->get_taxonomy_input_type(), 'taxonomy' );
-
-		if ( ! isset( $taxonomy ) && $get_taxonomy_type ) {
-			$taxonomy = sanitize_text_field( $get_taxonomy_type );
-		}
-
-		if ( isset( $taxonomy ) ) {
-			// Don't make static as taxonomies may still be added during the run.
-			$custom_taxonomies = get_taxonomies( array( 'public' => true ), 'names' );
-			$options           = get_option( 'wpseo_titles' );
-
-			return ( ( isset( $options[ 'hideeditbox-tax-' . $taxonomy ] ) && $options[ 'hideeditbox-tax-' . $taxonomy ] === true ) || in_array( $taxonomy, $custom_taxonomies ) === false );
-		}
-
-		return false;
+		return WPSEO_Utils::is_metabox_active( $taxonomy, 'taxonomy' );
 	}
 }

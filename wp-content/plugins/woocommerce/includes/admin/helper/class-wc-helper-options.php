@@ -1,4 +1,10 @@
 <?php
+/**
+ * WooCommerce Admin Helper Options
+ *
+ * @package WooCommerce\Admin\Helper
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -23,12 +29,12 @@ class WC_Helper_Options {
 	 * is not thread-safe, use with caution.
 	 *
 	 * @param string $key The key to update.
-	 * @param mixed $value The new option value.
+	 * @param mixed  $value The new option value.
 	 *
 	 * @return bool True if the option has been updated.
 	 */
 	public static function update( $key, $value ) {
-		$options = get_option( self::$option_name, array() );
+		$options         = get_option( self::$option_name, array() );
 		$options[ $key ] = $value;
 		return update_option( self::$option_name, $options, true );
 	}
@@ -39,13 +45,13 @@ class WC_Helper_Options {
 	 * @see self::update
 	 *
 	 * @param string $key The key to fetch.
-	 * @param mixed $default The default option to return if the key does not exist.
+	 * @param mixed  $default The default option to return if the key does not exist.
 	 *
 	 * @return mixed An option or the default.
 	 */
 	public static function get( $key, $default = false ) {
 		$options = get_option( self::$option_name, array() );
-		if ( array_key_exists( $key, $options ) ) {
+		if ( is_array( $options ) && array_key_exists( $key, $options ) ) {
 			return $options[ $key ];
 		}
 

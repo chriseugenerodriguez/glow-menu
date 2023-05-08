@@ -1,18 +1,13 @@
-<?php
-/*
-Copyright 2009-2016 John Blackbourn
+<?php declare(strict_types = 1);
+/**
+ * Ajax request dispatcher.
+ *
+ * @package query-monitor
+ */
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 class QM_Dispatcher_AJAX extends QM_Dispatcher {
 
@@ -21,22 +16,32 @@ class QM_Dispatcher_AJAX extends QM_Dispatcher {
 	public function __construct( QM_Plugin $qm ) {
 		parent::__construct( $qm );
 
+		// This dispatcher needs to run on a priority lower than 1 so it can output
+		// its headers before wp_ob_end_flush_all() flushes all the output buffers:
+		// https://github.com/WordPress/wordpress-develop/blob/0a3a3c5119897c6d551a42ae9b5dbfa4f576f2c9/src/wp-includes/default-filters.php#L382
 		add_action( 'shutdown', array( $this, 'dispatch' ), 0 );
-
 	}
 
+	/**
+	 * @return void
+	 */
 	public function init() {
 
-		if ( ! $this->user_can_view() ) {
+		if ( ! self::user_can_view() ) {
 			return;
 		}
 
 		if ( QM_Util::is_ajax() ) {
+			// Start an output buffer for Ajax requests so headers can be output at the end:
 			ob_start();
 		}
 
+		parent::init();
 	}
 
+	/**
+	 * @return void
+	 */
 	public function dispatch() {
 
 		if ( ! $this->should_dispatch() ) {
@@ -45,7 +50,6 @@ class QM_Dispatcher_AJAX extends QM_Dispatcher {
 
 		$this->before_output();
 
-		/* @var QM_Output_Headers[] */
 		foreach ( $this->get_outputters( 'headers' ) as $id => $output ) {
 			$output->output();
 		}
@@ -54,15 +58,18 @@ class QM_Dispatcher_AJAX extends QM_Dispatcher {
 
 	}
 
+	/**
+	 * @return void
+	 */
 	protected function before_output() {
-
-		require_once $this->qm->plugin_path( 'output/Headers.php' );
-
-		foreach ( glob( $this->qm->plugin_path( 'output/headers/*.php' ) ) as $file ) {
+		foreach ( (array) glob( $this->qm->plugin_path( 'output/headers/*.php' ) ) as $file ) {
 			require_once $file;
 		}
 	}
 
+	/**
+	 * @return void
+	 */
 	protected function after_output() {
 
 		# flush once, because we're nice
@@ -72,13 +79,16 @@ class QM_Dispatcher_AJAX extends QM_Dispatcher {
 
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function is_active() {
 
 		if ( ! QM_Util::is_ajax() ) {
 			return false;
 		}
 
-		if ( ! $this->user_can_view() ) {
+		if ( ! self::user_can_view() ) {
 			return false;
 		}
 
@@ -104,6 +114,11 @@ class QM_Dispatcher_AJAX extends QM_Dispatcher {
 
 }
 
+/**
+ * @param array<string, QM_Dispatcher> $dispatchers
+ * @param QM_Plugin $qm
+ * @return array<string, QM_Dispatcher>
+ */
 function register_qm_dispatcher_ajax( array $dispatchers, QM_Plugin $qm ) {
 	$dispatchers['ajax'] = new QM_Dispatcher_AJAX( $qm );
 	return $dispatchers;

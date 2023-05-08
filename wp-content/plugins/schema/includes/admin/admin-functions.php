@@ -26,7 +26,6 @@ function schema_wp_after_update_settings() {
 	schema_wp_json_delete_cache();
 }
 
-
 /**
  * Delete Schema KSON-LD cached data in post meta 
  *
@@ -39,7 +38,6 @@ function schema_wp_json_delete_cache() {
 	delete_post_meta_by_key( '_schema_json' );
 	delete_post_meta_by_key( '_schema_json_timestamp' );
 }
-
 
 /**
  * Sanitizes a string key for Schema Settings
@@ -64,7 +62,6 @@ function schema_wp_sanitize_key( $key ) {
 	return apply_filters( 'schema_wp_sanitize_key', $key, $raw_key );
 }
 
-
 /**
  * Convert an object to an associative array.
  *
@@ -86,7 +83,6 @@ function schema_wp_object_to_array( $data ) {
 	return $data;
 }
 
-
 /**
  * Flatten an array
  * 
@@ -103,7 +99,6 @@ function schema_wp_array_flatten($array) {
 	
 	return $return;
 }
-
 
 /**
 * Retrieve a post given its title.
@@ -128,7 +123,6 @@ function schema_wp_get_post_by_title($page_title, $post_type = 'post' , $output 
     return null;
 }
 
-
 /**
  * Recursive array search
  *
@@ -146,79 +140,6 @@ function schema_wp_recursive_array_search( $needle, $haystack ) {
     }
     return false;
 }
-
-
-/**
- * Get Currencies
- *
- * @since 1.0
- * @return array $currencies A list of the available currencies
- */
-function schema_wp_get_currencies() {
-
-	$currencies = array(
-		'USD' => __( 'US Dollars', 'schema-wp' ),
-		'EUR' => __( 'Euros', 'schema-wp' ),
-		'AUD' => __( 'Australian Dollars', 'schema-wp' ),
-		'BDT' => __( 'Bangladeshi Taka', 'schema-wp' ),
-		'BRL' => __( 'Brazilian Real', 'schema-wp' ),
-		'BGN' => __( 'Bulgarian Lev', 'schema-wp' ),
-		'CAD' => __( 'Canadian Dollars', 'schema-wp' ),
-		'CLP' => __( 'Chilean Peso', 'schema-wp' ),
-		'CNY' => __( 'Chinese Yuan', 'schema-wp' ),
-		'COP' => __( 'Colombian Peso', 'schema-wp' ),
-		'HRK' => __( 'Croatia Kuna', 'schema-wp' ),
-		'CZK' => __( 'Czech Koruna', 'schema-wp' ),
-		'DKK' => __( 'Danish Krone', 'schema-wp' ),
-		'DOP' => __( 'Dominican Peso', 'schema-wp' ),
-		'EGP' => __( 'Egyptian Pound', 'schema-wp' ),
-		'HKD' => __( 'Hong Kong Dollar', 'schema-wp' ),
-		'HUF' => __( 'Hungarian Forint', 'schema-wp' ),
-		'ISK' => __( 'Icelandic Krona', 'schema-wp' ),
-		'IDR' => __( 'Indonesia Rupiah', 'schema-wp' ),
-		'INR' => __( 'Indian Rupee', 'schema-wp' ),
-		'ILS' => __( 'Israeli Shekel', 'schema-wp' ),
-		'JPY' => __( 'Japanese Yen', 'schema-wp' ),
-		'KIP' => __( 'Lao Kip', 'schema-wp' ),
-		'MYR' => __( 'Malaysian Ringgits', 'schema-wp' ),
-		'MXN' => __( 'Mexican Peso', 'schema-wp' ),
-		'NPR' => __( 'Nepali Rupee', 'schema-wp' ),
-		'NGN' => __( 'Nigerian Naira', 'schema-wp' ),
-		'NOK' => __( 'Norwegian Krone', 'schema-wp' ),
-		'NZD' => __( 'New Zealand Dollar', 'schema-wp' ),
-		'PYG' => __( 'Paraguayan Guaraní', 'schema-wp' ),
-		'PHP' => __( 'Philippine Pesos', 'schema-wp' ),
-		'PLN' => __( 'Polish Zloty', 'schema-wp' ),
-		'GBP' => __( 'Pounds Sterling', 'schema-wp' ),
-		'RON' => __( 'Romanian Leu', 'schema-wp' ),
-		'RUB' => __( 'Russian Ruble', 'schema-wp' ),
-		'SGD' => __( 'Singapore Dollar', 'schema-wp' ),
-		'ZAR' => __( 'South African Rand', 'schema-wp' ),
-		'KRW' => __( 'South Korean Won', 'schema-wp' ),
-		'SEK' => __( 'Swedish Krona', 'schema-wp' ),
-		'CHF' => __( 'Swiss Franc', 'schema-wp' ),
-		'TWD' => __( 'Taiwan New Dollars', 'schema-wp' ),
-		'THB' => __( 'Thai Baht', 'schema-wp' ),
-		'TRY' => __( 'Turkish Lira', 'schema-wp' ),
-		'AED' => __( 'United Arab Emirates Dirham', 'schema-wp' ),
-		'VND' => __( 'Vietnamese Dong', 'schema-wp' ),
-	);
-
-	return apply_filters( 'schema_wp_currencies', $currencies );
-}
-
-
-/**
- * Get the store's set currency
- *
- * @since 1.0
- * @return string The currency code
- */
-function schema_wp_get_currency() {
-	$currency = schema_wp()->settings->get( 'currency', 'USD' );
-	return apply_filters( 'schema_wp_currency', $currency );
-}
-
 
 /**
  * Get corporate contacts types
@@ -245,3 +166,85 @@ function schema_wp_get_corporate_contacts_types() {
 	return apply_filters( 'schema_wp_corporate_contacts_types', $corporate_contacts_types );
 }
 
+/**
+ * Get post types
+ *
+ * @since 1.6.9.1
+ * @return array $post_types of all registered post types 
+ */
+function schema_wp_get_post_types() {
+
+	$post_types = array();
+	$builtin = array();
+	
+	$builtin['post'] = array(
+		'name' 	=> 'post',
+		'label' => 'Post'
+	);
+	
+	$builtin['page'] = array(
+		'name' 	=> 'page',
+		'label' => 'Page'
+	);
+	
+	// all CPTs.
+	$cpts_obj = get_post_types( array(
+		'public'   => true,
+		'_builtin' => false
+		) , 
+	'objects'); // return post types 'objects'
+	
+	if ( ! empty($cpts_obj) ) {
+		// prepare array
+		foreach ( $cpts_obj as $cpt => $info ) {
+			$cpts[$cpt] = array(
+				'name' 	=> $cpt,
+				'label' => $info->label
+			);
+		}
+		
+		// merge Builtin types and 'important' CPTs to resulting array to use as argument.
+		$post_types = array_merge( $builtin, $cpts );
+	} else {
+		
+		$post_types = $builtin;
+	}
+	
+	// debug
+	//echo'<pre>';print_r($post_types);echo'</pre>';
+
+	return apply_filters( 'schema_wp_post_types', $post_types );
+}
+
+/**
+ * Get the current post type in the WordPress Admin
+ *
+ * @url https://gist.github.com/DomenicF/3ebcf7d53ce3182854716c4d8f1ab2e2
+ * @since 1.6.9.6
+ * @return array $post_types of all registered post types 
+ */
+function schema_wp_get_current_post_type() {
+	global $post, $typenow, $current_screen;
+	//we have a post so we can just get the post type from that
+	if ( $post && $post->post_type ) {
+   		return $post->post_type;
+	}
+	//check the global $typenow - set in admin.php
+	elseif ( $typenow ) {
+		return $typenow;
+	}
+	//check the global $current_screen object - set in sceen.php
+	elseif ( $current_screen && $current_screen->post_type ) {
+		return $current_screen->post_type;
+	}
+	//check the post_type querystring
+	elseif ( isset( $_REQUEST['post_type'] ) ) {
+		return sanitize_key( $_REQUEST['post_type'] );
+	}
+	//lastly check if post ID is in query string
+	elseif ( isset( $_REQUEST['post'] ) ) {
+		return get_post_type( $_REQUEST['post'] );
+	}
+	//we do not know the post type!
+	return null;
+}

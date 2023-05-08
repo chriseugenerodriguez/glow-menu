@@ -18,7 +18,7 @@
  * @since      1.0.0
  * @package    Applyonline
  * @subpackage Applyonline/includes
- * @author     Farhan Noor <farhan.noor@yahoo.com>
+ * @author     Farhan Noor <profiles.wordpress.org/farhannoor>
  */
 class Applyonline_Deactivator {
 
@@ -33,6 +33,6 @@ class Applyonline_Deactivator {
             unregister_post_type('aol_ad');
             unregister_post_type('aol_application');
             flush_rewrite_rules();
+            remove_role('aol_manager');
 	}
-
 }

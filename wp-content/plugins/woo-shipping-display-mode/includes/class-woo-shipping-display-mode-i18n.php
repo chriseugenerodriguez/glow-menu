@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    exit;
+}
 /**
  * Define the internationalization functionality
  *
@@ -37,7 +39,7 @@ class Woo_Shipping_Display_Mode_i18n {
 		load_plugin_textdomain(
 			'woo-shipping-display-mode',
 			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+			dirname( plugin_basename(__FILE__) ) . '/languages/'
 		);
 	}
 }

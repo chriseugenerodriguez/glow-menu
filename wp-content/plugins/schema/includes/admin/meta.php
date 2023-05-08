@@ -13,45 +13,46 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
+
+add_action( 'init', 'schema_wp_post_meta_fields' );
 /**
- * Schema post meta
+ * Create schema post meta fields
+ *
+ * @since 1.7.1
+ */
+function schema_wp_post_meta_fields() {
+
+	$prefix = '_schema_';
+
+/**
+ * Schema Main Type post meta 
  *
  * @since 1.4
  */
-$prefix = '_schema_';
-
-/**
- * Schema main post meta 
- *
- * @since 1.4
- */
- 
-
-$fields_main = array(
+$fields_main = apply_filters( 'schema_wp_types_post_meta_fields', array( 
 	
-	array( // Select box
-		'label'	=> __('Type', 'schema-wp'), // <label>
-		'desc'	=> __('Select Schema type.', 'schema-wp'), // description
+	'schema_types' => array( // Select box
+		'label'	=> __('Schema Markup Type', 'schema-wp'), // <label>
+		'desc'	=> __('Select Schema type which describes your content best', 'schema-wp'), // description
 		'id'	=> $prefix.'type', // field id and name
 		'type'	=> 'select', // type of field
 		'options' => apply_filters( 'schema_wp_types', array ( // array of options
-			'Article' => array ( // array key needs to be the same as the option value
-				'label' => __('Article', 'schema-wp'), // text displayed as the option
-				'value'	=> __('Article', 'schema-wp'), // value stored for the option
+				'Article' => array ( // array key needs to be the same as the option value
+					'label' => __('Article', 'schema-wp'), // text displayed as the option
+					'value'	=> __('Article', 'schema-wp'), // value stored for the option
+				)
 			)
-		)),
+		)
 	), // end of array
 	
-	'post_meta_enabled' => array(
+	'post_meta_box_enabled' => array(
 		'label' => __('Post meta', 'schema-wp'),
-		'tip'	=> __('Enable custom post meta box.', 'schema-wp'),
+		'tip'	=> __('Enable custom post meta box', 'schema-wp'),
 		'desc'	=> __('Enable post meta box?', 'schema-wp'), 
 		'id' 	=> $prefix.'post_meta_box_enabled',
 		'type'	=> 'checkbox'
-	),
-			
-);
-
+	)
+));
 
 /**
  * Schema Article post meta 
@@ -62,7 +63,7 @@ $fields_article = array(
 	
 	array( // Select box
 		'label'	=> __('Article Type', 'schema-wp'), // <label>
-		'desc'	=> __('Select more specific article type.', 'schema-wp'), // description
+		'desc'	=> __('Select more specific article type', 'schema-wp'), // description
 		'tip'	=> __('It is recommended to set type BlogPosting for posts, and leave empty or set to General for page post type', 'schema-wp'),
 		'id'	=> $prefix.'article_type', // field id and name
 		'type'	=> 'select', // type of field
@@ -95,7 +96,6 @@ $fields_article = array(
 	),
 );
 
-
 /**
  * Post Types 
  *
@@ -110,8 +110,6 @@ $fields_post_types = array(
 		'type'	=> 'cpt' // type of field
 	),
 );
-
-
 
 /**
  * Post Meta Keys to Filters - post meta 
@@ -137,7 +135,7 @@ $fields_post_meta_box =  array (
 		'id'	=> $prefix.'post_meta_box', // field id and name
 		'type'	=> 'repeatable_row', // type of field
 		'sanitizer' => array( // array of sanitizers with matching kets to next array
-			'featured' => 'meta_box_santitize_boolean',
+			'featured' => 'schema_wp_meta_box_santitize_boolean',
 			'title' => 'sanitize_text_field',
 			'desc' => 'wp_kses_data'
 		),
@@ -148,6 +146,7 @@ $fields_post_meta_box =  array (
 				'desc'	=> __('This is the filter name', 'schema-wp'), // description
 				'id'	=> 'filter', // field id and name
 				'type'	=> 'select', // type of field
+				'class' => 'schema_type_filter', // css class
 				'selectone'	=> __('Select Filter', 'schema-wp'), // type of field
 				'options' => apply_filters( 'schema_wp_post_meta', array ( // array of options
 					'author_name' => array ( // array key needs to be the same as the option value
@@ -171,7 +170,7 @@ $fields_post_meta_box =  array (
 				'desc'	=> __('Add post meta key name as source', 'schema-wp'),
 				'id' => 'key',
 				'type' => 'text',
-				'size' => 'small',
+				'size' => 'medium',
 				'placeholder' => __('Meta Key Name', 'schema-wp'),
 			),
 			
@@ -216,7 +215,7 @@ $fields_post_meta_box =  array (
 				'desc'	=> __('Field label', 'schema-wp'),
 				'id' 	=> 'label',
 				'type'	=> 'text',
-				'size'	=> 'small',
+				'size'	=> 'medium',
 				'placeholder' => __('Label', 'schema-wp'),
 			),
 			
@@ -239,25 +238,44 @@ $fields_post_meta_box =  array (
 );	
 
 /**
- * Instantiate the class with all variables to create a meta box
- * var $id string meta box id
- * var $title string title
- * var $fields array fields
- * var $page string|array post type to add meta box to
- * var $context string context where to add meta box at (normal, side)
- * var $priority string meta box priority (high, core, default, low) 
- * var $js bool including javascript or not
+ * Schema Premium plugin post meta message 
+ *
+ * @since 1.7.4
  */
-$schema_box = new Schema_Custom_Add_Meta_Box( 'schema', __('Settings', 'schema-wp'), $fields_main, 'schema', 'normal', 'high', true );
-$schema_article_box = new Schema_Custom_Add_Meta_Box( 'schema_article', __('Article', 'schema-wp'), $fields_article, 'schema', 'normal', 'high', true );
-$schema_cpt_box = new Schema_Custom_Add_Meta_Box( 'schema_cpt', __('Post Types', 'schema-wp'), $fields_post_types, 'schema', 'side', 'default', true );
-$schema_post_meta_box = new Schema_Custom_Add_Meta_Box( 'schema_post_meta_box', __('Post Meta', 'schema-wp'), $fields_post_meta_box, 'schema', 'normal', 'default', true );
+$fields_schema_premium_plugin = array(
+	
+	array( // Post Types Select box
+		'label'	=> '', // <label>
+		'desc'	=> '<b>'.__('Want to enable new features?', 'schema-wp').'<br><br>'.__(' <a class="button button-large" target="_blank" href="https://schema.press/downloads/schema-premium/">Get Schema Premium</a>', 'schema-wp').'</b><br><br>'.__('Save 15% off your purchase? Use discount code: <b>SPFREE15</b>', 'schema-wp'),  // description
+		'id'	=> $prefix.'schema_premium', // field id and name
+		'type'	=> 'desc' // type of field
+	),
+);
+
+	/**
+	 * Instantiate the class with all variables to create a meta box
+	 * var $id string meta box id
+	 * var $title string title
+	 * var $fields array fields
+	 * var $page string|array post type to add meta box to
+	 * var $context string context where to add meta box at (normal, side)
+	 * var $priority string meta box priority (high, core, default, low) 
+	 * var $js bool including javascript or not
+	 */
+	$schema_box = new Schema_Custom_Add_Meta_Box( 'schema', __('Schema Settings', 'schema-wp'), $fields_main, 'schema', 'normal', 'high', true );
+	$schema_article_box = new Schema_Custom_Add_Meta_Box( 'schema_article', __('Article', 'schema-wp'), $fields_article, 'schema', 'normal', 'high', true );
+	$schema_cpt_box = new Schema_Custom_Add_Meta_Box( 'schema_cpt', __('Post Types', 'schema-wp'), $fields_post_types, 'schema', 'side', 'default', true );
+	$schema_post_meta_box = new Schema_Custom_Add_Meta_Box( 'schema_post_meta_box', __('Post Meta', 'schema-wp'), $fields_post_meta_box, 'schema', 'normal', 'default', true );
+	$schema_post_meta_box = new Schema_Custom_Add_Meta_Box( 'schema_premium_plugin', __('Go Premium', 'schema-wp'), $fields_schema_premium_plugin, 'schema', 'side', 'default', true );
+}
 
 
 /**
 * Create post meta box
 *
 * Uses class Schema_Custom_Add_Meta_Box
+*
+* @todo this function is not used, make sure it's important before removing it!
 *
 * @since 1.5.7
 * @return true 

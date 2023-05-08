@@ -1,215 +1,239 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"POT-Creation-Date: 2017-01-19 11:46+0530\n"
-"PO-Revision-Date: 2017-01-19 11:47+0530\n"
+"Project-Id-Version: Shipping Method Display Style for WooCommerce\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-10-11 18:29+0530\n"
+"PO-Revision-Date: 2022-10-14 11:44+0000\n"
 "Last-Translator: \n"
-"Language-Team: \n"
-"Language: nl\n"
+"Language-Team: Dutch\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.11\n"
-"X-Poedit-Basepath: ../..\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Poedit-KeywordsList: __;_e\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.5.3; wp-5.8.1\n"
+"X-Domain: woo-shipping-display-mode\n"
+"X-Poedit-KeywordsList: esc_html_e;esc_html;esc_attr_e;esc_attr;__;_e\n"
+"X-Poedit-Basepath: ..\n"
 "X-Poedit-SearchPath-0: .\n"
+"Language: nl_NL"
 
-#: tags/1.0.1/admin/partials/woo-shipping-display-mode-admin-display.php:54
-#: tags/1.0.1/admin/partials/woo-shipping-display-mode-admin-display.php:79
-#: tags/1.0/admin/partials/woo-shipping-display-mode-admin-display.php:54
-#: tags/1.0/admin/partials/woo-shipping-display-mode-admin-display.php:79
-#: tags/1.2.0/admin/partials/woo-shipping-display-mode-admin-display.php:54
-#: tags/1.2.0/admin/partials/woo-shipping-display-mode-admin-display.php:79
-#: tags/1.2.1/admin/partials/woo-shipping-display-mode-admin-display.php:54
-#: tags/1.2.1/admin/partials/woo-shipping-display-mode-admin-display.php:79
-#: tags/1.2.2/admin/partials/woo-shipping-display-mode-admin-display.php:54
-#: tags/1.2.2/admin/partials/woo-shipping-display-mode-admin-display.php:85
-#: tags/1.3/admin/partials/woo-shipping-display-mode-admin-display.php:54
-#: tags/1.3/admin/partials/woo-shipping-display-mode-admin-display.php:85
-#: tags/1.4/admin/partials/woo-shipping-display-mode-admin-display.php:55
-#: tags/1.4/admin/partials/woo-shipping-display-mode-admin-display.php:85
-#: trunk/admin/partials/woo-shipping-display-mode-admin-display.php:55
-#: trunk/admin/partials/woo-shipping-display-mode-admin-display.php:85
-msgid "Woo Shipping Display Mode"
-msgstr "Woo Shipping Display Mode"
-
-#: tags/1.0.1/woocommerce/cart/cart-shipping.php:20
-#: tags/1.0/woocommerce/cart/cart-shipping.php:19
-#: tags/1.2.0/woocommerce/cart/cart-shipping.php:20
-#: tags/1.2.1/woocommerce/cart/cart-shipping.php:20
-#: tags/1.2.2/woocommerce/cart/cart-shipping.php:20
-#: tags/1.3/woocommerce/cart/cart-shipping.php:20
-#: tags/1.4/woocommerce/cart/cart-shipping.php:20
-#: trunk/woocommerce/cart/cart-shipping.php:20
+#. Number of days
+#: includes/class-woo-shipping-display-mode-user-feedback.php:114
 #, php-format
-msgid "Shipping #%d"
-msgstr "Verzending #% d"
+msgid "%s days"
+msgstr "%s dagen"
 
-#: tags/1.0.1/woocommerce/cart/cart-shipping.php:22
-#: tags/1.0.1/woocommerce/cart/cart-shipping.php:97
-#: tags/1.0/woocommerce/cart/cart-shipping.php:21
-#: tags/1.0/woocommerce/cart/cart-shipping.php:96
-#: tags/1.2.0/woocommerce/cart/cart-shipping.php:22
-#: tags/1.2.0/woocommerce/cart/cart-shipping.php:98
-#: tags/1.2.1/woocommerce/cart/cart-shipping.php:22
-#: tags/1.2.1/woocommerce/cart/cart-shipping.php:98
-#: tags/1.2.2/woocommerce/cart/cart-shipping.php:22
-#: tags/1.2.2/woocommerce/cart/cart-shipping.php:98
-#: tags/1.3/woocommerce/cart/cart-shipping.php:22
-#: tags/1.3/woocommerce/cart/cart-shipping.php:98
-#: tags/1.4/woocommerce/cart/cart-shipping.php:22
-#: tags/1.4/woocommerce/cart/cart-shipping.php:98
-#: trunk/woocommerce/cart/cart-shipping.php:22
-#: trunk/woocommerce/cart/cart-shipping.php:98
-msgid "Shipping"
-msgstr "Verzenden"
+#. Number of hours
+#: includes/class-woo-shipping-display-mode-user-feedback.php:123
+#, php-format
+msgid "%s hours"
+msgstr "%s uur"
 
-#: tags/1.0.1/woocommerce/cart/cart-shipping.php:59
-#: tags/1.0/woocommerce/cart/cart-shipping.php:58
-#: tags/1.2.0/woocommerce/cart/cart-shipping.php:60
-#: tags/1.2.1/woocommerce/cart/cart-shipping.php:60
-#: tags/1.2.2/woocommerce/cart/cart-shipping.php:60
-#: tags/1.3/woocommerce/cart/cart-shipping.php:60
-#: tags/1.4/woocommerce/cart/cart-shipping.php:60
-#: trunk/woocommerce/cart/cart-shipping.php:60
-msgid "Please use the shipping calculator to see available shipping methods."
-msgstr ""
-"Maak gebruik van de scheepvaart rekenmachine om de beschikbare "
-"verzendmethoden te zien."
+#. Number of minutes
+#: includes/class-woo-shipping-display-mode-user-feedback.php:132
+#, php-format
+msgid "%s minutes"
+msgstr "%s minuten"
 
-#: tags/1.0.1/woocommerce/cart/cart-shipping.php:63
-#: tags/1.0/woocommerce/cart/cart-shipping.php:62
-#: tags/1.2.0/woocommerce/cart/cart-shipping.php:64
-#: tags/1.2.1/woocommerce/cart/cart-shipping.php:64
-#: tags/1.2.2/woocommerce/cart/cart-shipping.php:64
-#: tags/1.3/woocommerce/cart/cart-shipping.php:64
-#: tags/1.4/woocommerce/cart/cart-shipping.php:64
-#: trunk/woocommerce/cart/cart-shipping.php:64
-msgid ""
-"Please continue to the checkout and enter your full address to see if there "
-"are any available shipping methods."
-msgstr ""
-"Ga verder naar de kassa en geef uw volledige adres om te zien of er nog "
-"beschikbare verzendmethoden."
+#. Number of seconds
+#: includes/class-woo-shipping-display-mode-user-feedback.php:141
+#, php-format
+msgid "%s seconds"
+msgstr "%s seconden"
 
-#: tags/1.0.1/woocommerce/cart/cart-shipping.php:67
-#: tags/1.0/woocommerce/cart/cart-shipping.php:66
-#: tags/1.2.0/woocommerce/cart/cart-shipping.php:68
-#: tags/1.2.1/woocommerce/cart/cart-shipping.php:68
-#: tags/1.2.2/woocommerce/cart/cart-shipping.php:68
-#: tags/1.3/woocommerce/cart/cart-shipping.php:68
-#: tags/1.4/woocommerce/cart/cart-shipping.php:68
-#: trunk/woocommerce/cart/cart-shipping.php:68
-msgid "Please fill in your details to see available shipping methods."
-msgstr ""
-"Gelieve uw gegevens in te vullen om beschikbare verzendmethoden te zien."
+#. Number of weeks
+#: includes/class-woo-shipping-display-mode-user-feedback.php:105
+#, php-format
+msgid "%s weeks"
+msgstr "%s weken"
 
-#: tags/1.0.1/woocommerce/cart/cart-shipping.php:76
-#: tags/1.0.1/woocommerce/cart/cart-shipping.php:82
-#: tags/1.0/woocommerce/cart/cart-shipping.php:75
-#: tags/1.0/woocommerce/cart/cart-shipping.php:81
-#: tags/1.2.0/woocommerce/cart/cart-shipping.php:77
-#: tags/1.2.0/woocommerce/cart/cart-shipping.php:83
-#: tags/1.2.1/woocommerce/cart/cart-shipping.php:77
-#: tags/1.2.1/woocommerce/cart/cart-shipping.php:83
-#: tags/1.2.2/woocommerce/cart/cart-shipping.php:77
-#: tags/1.2.2/woocommerce/cart/cart-shipping.php:83
-#: tags/1.3/woocommerce/cart/cart-shipping.php:77
-#: tags/1.3/woocommerce/cart/cart-shipping.php:83
-#: tags/1.4/woocommerce/cart/cart-shipping.php:77
-#: tags/1.4/woocommerce/cart/cart-shipping.php:83
-#: trunk/woocommerce/cart/cart-shipping.php:77
-#: trunk/woocommerce/cart/cart-shipping.php:83
-msgid ""
-"There are no shipping methods available. Please double check your address, "
-"or contact us if you need any help."
-msgstr ""
-"Er zijn geen scheepvaart methoden beschikbaar. Kijk uw adres, of neem "
-"contact met ons op als u hulp nodig heeft."
-
-#: tags/1.0.1/woocommerce/cart/cart.php:35
-#: tags/1.0.1/woocommerce/cart/cart.php:77
-#: tags/1.0/woocommerce/cart/cart.php:35 tags/1.0/woocommerce/cart/cart.php:77
-msgid "Product"
-msgstr "Artikel"
-
-#: tags/1.0.1/woocommerce/cart/cart.php:36
-#: tags/1.0.1/woocommerce/cart/cart.php:95
-#: tags/1.0/woocommerce/cart/cart.php:36 tags/1.0/woocommerce/cart/cart.php:95
-msgid "Price"
-msgstr "Prijs"
-
-#: tags/1.0.1/woocommerce/cart/cart.php:37
-#: tags/1.0.1/woocommerce/cart/cart.php:101
-#: tags/1.0/woocommerce/cart/cart.php:37 tags/1.0/woocommerce/cart/cart.php:101
-msgid "Quantity"
-msgstr "Hoeveelheid"
-
-#: tags/1.0.1/woocommerce/cart/cart.php:38
-#: tags/1.0.1/woocommerce/cart/cart.php:118
-#: tags/1.0/woocommerce/cart/cart.php:38 tags/1.0/woocommerce/cart/cart.php:118
-msgid "Total"
-msgstr "Totaal"
-
-#: tags/1.0.1/woocommerce/cart/cart.php:58
-#: tags/1.0/woocommerce/cart/cart.php:58
-msgid "Remove this item"
-msgstr "Verwijder item"
-
-#: tags/1.0.1/woocommerce/cart/cart.php:136
-#: tags/1.0/woocommerce/cart/cart.php:136
-msgid "Coupon"
-msgstr "Coupon"
-
-#: tags/1.3/admin/class-woo-shipping-display-mode-admin.php:170
-#: tags/1.3/admin/class-woo-shipping-display-mode-admin.php:422
-#: tags/1.4/admin/class-woo-shipping-display-mode-admin.php:170
-#: tags/1.4/admin/class-woo-shipping-display-mode-admin.php:422
-#: trunk/admin/class-woo-shipping-display-mode-admin.php:170
-#: trunk/admin/class-woo-shipping-display-mode-admin.php:422
-msgid "Welcome to Woocommerce Shipping Method Display Style"
-msgstr "Welkom op WooCommerce Verzendmethode Weergavestijl"
-
-#: tags/1.3/admin/class-woo-shipping-display-mode-admin.php:175
-#: tags/1.4/admin/class-woo-shipping-display-mode-admin.php:175
-#: trunk/admin/class-woo-shipping-display-mode-admin.php:175
+#: admin/class-woo-shipping-display-mode-admin.php:165
 #, php-format
 msgid ""
 "%s WooCommerce shipping method display style plugin provides a configuration "
 "to display shipping methods as Radio button or select box on the checkout "
 "page."
 msgstr ""
-"WooCommerce verzendmethode weergavestijl plugin biedt een configuratie voor "
-"de scheepvaart methoden als Radio knop of select box op de kassa pagina weer "
-"te geven."
+"%s WooCommerce verzendmethode weergavestijl plug-in biedt een configuratie "
+"om verzendmethoden weer te geven als keuzerondje of selectievak op de "
+"afrekenpagina."
 
-#: tags/1.3/admin/class-woo-shipping-display-mode-admin.php:203
-#: tags/1.4/admin/class-woo-shipping-display-mode-admin.php:203
-#: trunk/admin/class-woo-shipping-display-mode-admin.php:203
-msgid "Go to Woocommerce Shipping Method Display Style Settings"
-msgstr "Ga naar WooCommerce Verzendmethode Weergave Stijlinstellingen"
+#. 1. Name
+#: includes/class-woo-shipping-display-mode-user-feedback.php:276
+msgid "%s WordPress Plugin"
+msgstr "%s WordPress-plug-in"
 
-#: tags/1.3/admin/class-woo-shipping-display-mode-admin.php:227
-#: tags/1.4/admin/class-woo-shipping-display-mode-admin.php:227
-#: trunk/admin/class-woo-shipping-display-mode-admin.php:227
+#. Number of years
+#: includes/class-woo-shipping-display-mode-user-feedback.php:96
+#, php-format
+msgid "%s years"
+msgstr "%s jaar"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:117
 msgid ""
-"WooCommerce Shipping Method Display Style plugin provides you an interface "
-"in WooCommerce setting section from admin side. As you know WooCommerce has "
-"removed choose shipping display mode option from 2.5.1 version. So, this "
-"plugin provides these features, admin can choose shipping display modes like "
-"radio option or select option for shipping display mode."
+"<b>Note: </b>Checked to override the file (\"<b>your-"
+"theme/woocommerce/cart/cart-shipping.php</b>\"), first check cart page "
+"design has not changed."
 msgstr ""
-"WooCommerce Verzendmethode display Style plugin geeft u een interface in "
-"WooCommerce instelling deel uit admin kant. Zoals u weet WooCommerce heeft "
-"verwijderd kiest voor de scheepvaart weergavemodus optie 2.5.1 versie. Dus, "
-"deze plugin biedt deze functies, kan admin kiezen voor de scheepvaart "
-"display modes zoals radio optie of kies optie voor de scheepvaart "
-"weergavemodus."
+"<b>Opmerking: </b>Aangevinkt om het bestand te overschrijven (\"<b>your-"
+"theme/woocommerce/cart/cart-shipping.php</b>\"), controleer eerst of het "
+"ontwerp van de winkelwagenpagina niet is gewijzigd."
 
-#: tags/1.3/admin/class-woo-shipping-display-mode-admin.php:229
-#: tags/1.4/admin/class-woo-shipping-display-mode-admin.php:229
-#: trunk/admin/class-woo-shipping-display-mode-admin.php:229
+#: admin/partials/woo-shipping-display-mode-admin-display.php:125
+#, php-format
+msgid ""
+"<p><span>Note: </span>If there is only one shipping method available in your "
+"cart then it will showcase shipping method as title without radio button or "
+"dropdown. <a href=\"%1$s\" target=\"_blank\">Click Here</a> for detail."
+"</span><p>"
+msgstr ""
+"<p><span>Opmerking: </span>Als er slechts één verzendmethode beschikbaar is "
+"in uw winkelwagentje, wordt de verzendmethode als titel weergegeven zonder "
+"keuzerondje of vervolgkeuzelijst. <a href=\"%1$s\" target=\"_blank\">Klik "
+"hier</a> voor details.</span><p>"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:116
+msgid "a day"
+msgstr "een dag"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:134
+msgid "a minute"
+msgstr "een minuut"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:143
+msgid "a second"
+msgstr "een seconde"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:107
+msgid "a week"
+msgstr "een week"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:98
+msgid "a year"
+msgstr "een jaar"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:125
+msgid "an hour"
+msgstr "een uur"
+
+#. 1. Name
+#: includes/class-woo-shipping-display-mode-user-feedback.php:280
+msgid "Are you enjoying %s Plugin?"
+msgstr "Geniet je van %s Plugin?"
+
+#: woocommerce/cart/cart-shipping.php:78
+msgid "Change address"
+msgstr "Adres wijzigen"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:112
+msgid "Customised theme is enabled"
+msgstr "Aangepast thema is ingeschakeld"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:103
+msgid "Display shipping methods in a dropdown"
+msgstr "Verzendmethoden weergeven in een vervolgkeuzelijst"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:94
+msgid "Display shipping methods with \"radio\" buttons"
+msgstr "Verzendmethoden weergeven met \"radio\"-knoppen"
+
+#: woocommerce/cart/cart-shipping.php:93
+msgid "Enter a different address"
+msgstr "Voer een ander adres in"
+
+#: woocommerce/cart/cart-shipping.php:87
+msgid "Enter your address to view shipping options."
+msgstr "Voer uw adres in om de verzendopties te bekijken."
+
+#: admin/class-woo-shipping-display-mode-admin.php:202
+msgid "Go to Woocommerce Shipping Method Display Style Settings"
+msgstr "Ga naar Woocommerce Verzendmethode Weergavestijl Instellingen"
+
+#. URI of the plugin
+msgid "https://wordpress.org/plugins/woo-shipping-display-mode/"
+msgstr "https://wordpress.org/plugins/woo-shipping-display-mode/"
+
+#. Author URI of the plugin
+msgid "https://www.thedotstore.com/"
+msgstr "https://www.thedotstore.com/"
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:290
+msgid "Leave a Review"
+msgstr "Laat een beoordeling achter"
+
+#. $s shipping destination.
+#: woocommerce/cart/cart-shipping.php:92
+msgid "No shipping options were found for %s."
+msgstr "Er zijn geen verzendopties gevonden voor %s."
+
+#: includes/class-woo-shipping-display-mode-user-feedback.php:292
+msgid "No thanks / I already have"
+msgstr "Nee bedankt / heb ik al"
+
+#: admin/class-woo-shipping-display-mode-admin.php:227
+msgid "option for default shipping method."
+msgstr "optie voor standaard verzendmethode."
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:83
+msgid "Select Display Mode"
+msgstr "Selecteer weergavemodus"
+
+#: admin/class-woo-shipping-display-mode-admin.php:227
+msgid "Select shipping mode"
+msgstr "Selecteer verzendmodus"
+
+#: admin/partials/woo-shipping-display-mode-admin-display.php:56
+#: admin/partials/woo-shipping-display-mode-admin-display.php:78
+msgid "Shipping Method Display Mode"
+msgstr "Verzendmethode Weergavemodus"
+
+#. Name of the plugin
+#: includes/class-woo-shipping-display-mode-user-feedback.php:321
+msgid "Shipping Method Display Style for WooCommerce"
+msgstr "Verzendmethode Weergavestijl voor WooCommerce"
+
+#: admin/class-woo-shipping-display-mode-admin.php:222
+msgid ""
+"Shipping Method Display Style for WooCommerce plugin provides you an "
+"interface in WooCommerce setting section from admin side. As you know "
+"WooCommerce has removed choose shipping display mode option from 2.5.1 "
+"version. So, this plugin provides these features, admin can choose shipping "
+"display modes like radio option or select option for shipping display mode."
+msgstr ""
+"Verzendmethode Weergavestijl voor WooCommerce-plug-in biedt u een interface "
+"in het WooCommerce-instellingengedeelte van beheerderszijde. Zoals u weet, "
+"heeft WooCommerce de optie voor weergavemodus voor verzending van 2.5.1-"
+"versie verwijderd. Deze plug-in biedt dus deze functies, de beheerder kan "
+"weergavemodi voor verzending kiezen, zoals de radio-optie of de optie voor "
+"de weergavemodus voor verzending selecteren."
+
+#: woocommerce/cart/cart-shipping.php:80
+msgid "Shipping options will be updated during checkout."
+msgstr "Verzendopties worden bijgewerkt tijdens het afrekenen."
+
+#. $s shipping destination.
+#: woocommerce/cart/cart-shipping.php:77
+msgid "Shipping to %s."
+msgstr "Verzending naar %s."
+
+#: admin/class-woo-shipping-display-mode-admin.php:250
+msgid "Support"
+msgstr "Steun"
+
+#. Author of the plugin
+msgid "theDotstore"
+msgstr "theDotstore"
+
+#: woocommerce/cart/cart-shipping.php:89
+msgid ""
+"There are no shipping options available. Please ensure that your address has "
+"been entered correctly, or contact us if you need any help."
+msgstr ""
+"Er zijn geen verzendopties beschikbaar. Zorg ervoor dat uw adres correct is "
+"ingevoerd, of neem contact met ons op als u hulp nodig heeft."
+
+#: admin/class-woo-shipping-display-mode-admin.php:224
 msgid ""
 "This Plugin is useful when you are using 2.5.2 or higher version of "
 "Woocommerce and you have to use more than 20 or 30 or more then that "
@@ -219,26 +243,33 @@ msgid ""
 "displayed in the drop down box so you can avoid lengthy listing of shipping "
 "method."
 msgstr ""
-"Deze plugin is handig wanneer u gebruik maakt van 2.5.2 of hoger versie van "
-"WooCommerce en je moet meer dan 20 of 30 of meer dan dat Verzendmethode "
-"gebruiken op dat moment je niet gedwongen om alle scheepvaart methode weer "
-"alleen met behulp van radio-knop, maar je hebt ook gekozen voor een select "
-"optie voor weergave wijze van verzending en door te kiezen voor selecteer "
-"optie verzendmethode wordt weergegeven in de keuzelijst, zodat je lange "
-"lijst van de scheepvaart methode kan voorkomen."
+"Deze plug-in is handig wanneer u 2.5.2 of hogere versie van Woocommerce "
+"gebruikt en u meer dan 20 of 30 of meer dan die verzendmethode moet "
+"gebruiken op dat moment hoeft u niet gedwongen te worden om alle "
+"verzendmethoden alleen weer te geven met behulp van een keuzerondje, maar u "
+"hebt ook een geselecteerde optie gekozen voor het weergeven van de "
+"verzendmodus en door de verzendmethode te selecteren, wordt de "
+"verzendmethode weergegeven in de vervolgkeuzelijst, zodat u een lange lijst "
+"met verzendmethodes kunt vermijden."
 
-#: tags/1.3/admin/class-woo-shipping-display-mode-admin.php:423
-#: tags/1.4/admin/class-woo-shipping-display-mode-admin.php:423
-#: trunk/admin/class-woo-shipping-display-mode-admin.php:423
+#. Description of the plugin
 msgid ""
-"WooCommerce shipping method display style plugin provides a configuration to "
-"display shipping methods as Radio button or select box on the checkout page."
+"This plugin provides a configuration to display shipping methods as Radio "
+"button or select box on the checkout page."
 msgstr ""
-"WooCommerce verzendmethode weergavestijl plugin biedt een configuratie voor "
-"de scheepvaart methoden als Radio knop of select box op de kassa pagina weer "
-"te geven."
+"Deze plug-in biedt een configuratie om verzendmethoden weer te geven als "
+"keuzerondje of selectievak op de afrekenpagina."
 
-#: tags/1.4/woocommerce/cart/cart-shipping.php:37
-#: trunk/woocommerce/cart/cart-shipping.php:37
-msgid "Select Shipping Method"
-msgstr "Selecteer Verzendmethode"
+#: admin/class-woo-shipping-display-mode-admin.php:226
+msgid "We have added"
+msgstr "We hebben toegevoegd"
+
+#. 1. Name, 2. Time
+#: includes/class-woo-shipping-display-mode-user-feedback.php:283
+#, php-format
+msgid ""
+"You have been using %1$s for %2$s now. Mind leaving a review to let us know "
+"what you think? We'd really appreciate it!"
+msgstr ""
+"Je gebruikt nu %1$s voor %2$s. Wilt u een recensie achterlaten om ons te "
+"laten weten wat u ervan vindt? We zouden het erg op prijs stellen!"

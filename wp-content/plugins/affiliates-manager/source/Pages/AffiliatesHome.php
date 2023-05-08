@@ -16,6 +16,9 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 	
 	public function processRequest($request)
 	{
+                if(is_array($request)){
+                    $request = wpam_sanitize_array($request);
+                }
 		$db = new WPAM_Data_DataAccess();
 
 		if (is_user_logged_in())
@@ -27,17 +30,21 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 				$affiliate = $db->getAffiliateRepository()->loadByUserId($currentUser->ID);
 				if ($affiliate->isApproved() || $affiliate->isActive())
 				{
+                                        $home_page_id = get_option(WPAM_PluginConfig::$HomePageId);
+                                        $home_page_url = get_permalink($home_page_id);
+                                        $logout_url = wp_logout_url($home_page_url);
 					$response = $this->doAffiliateControlPanel($affiliate, $request);
 					$response->viewData['navigation'] = array(
 						array( __( 'Overview', 'affiliates-manager' ), $this->getLink(array('sub' => 'overview'))),
 						array( __( 'Sales', 'affiliates-manager' ), $this->getLink(array('sub' => 'sales'))),
 						array( __( 'Payment History', 'affiliates-manager' ), $this->getLink(array('sub' => 'payments'))),
 						array( __( 'Creatives', 'affiliates-manager' ), $this->getLink(array('sub' => 'creatives'))),
-						array( __( 'Edit Profile', 'affiliates-manager' ), $this->getLink(array('sub' => 'profile'))),
+						array( __( 'Edit Profile', 'affiliates-manager' ), $this->getLink(array('sub' => 'profile')))                                           
 					);
-
-					if (get_option (WPAM_PluginConfig::$AffEnableImpressions))
+					if (get_option (WPAM_PluginConfig::$AffEnableImpressions)){
 						$response->viewData['navigation'][] = array( __( 'Impressions', 'affiliates-manager' ), $this->getLink(array('sub' => 'impressions')));
+                                        }
+                                        $response->viewData['navigation'][] = array( __( 'Log out', 'affiliates-manager' ), $logout_url);
 				}
 				else if ($affiliate->isDeclined())
 				{
@@ -109,6 +116,9 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 
 	public function doAffiliateControlPanel($model, $request)
 	{
+                if(is_array($request)){
+                    $request = wpam_sanitize_array($request);
+                }
 		$user = wp_get_current_user();
 		$db = new WPAM_Data_DataAccess();
 
@@ -141,6 +151,9 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 
 	protected function doHome( $request, $affiliate )
 	{
+                if(is_array($request)){
+                    $request = wpam_sanitize_array($request);
+                }
 		$sub = isset( $request['sub'] ) ? $request['sub'] : '';
 		switch ( $sub )	{
 			case 'overview':  return $this->doOverviewHome( $request, $affiliate );
@@ -179,6 +192,7 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 			$response->viewData['creative'] = $creative;
 
 			$linkBuilder = new WPAM_Tracking_TrackingLinkBuilder($affiliate, $creative);
+                        $response->viewData['sharelink'] = $linkBuilder->getUrl();
 			$response->viewData['htmlPreview'] = $linkBuilder->getHtmlSnippet();
 			$response->viewData['htmlSnippet'] = $linkBuilder->getImpressionHtmlSnippet();
 
@@ -301,16 +315,23 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 		$response->viewData['paymentMethods'] = $affiliateHelper->getPaymentMethods();
 		$response->viewData['paymentMethod'] = isset( $request['ddPaymentMethod'] ) ? $request['ddPaymentMethod'] : $affiliate->paymentMethod;
 		$response->viewData['paypalEmail'] = isset( $request['txtPaypalEmail'] ) ? $request['txtPaypalEmail'] : $affiliate->paypalEmail;
+                $response->viewData['bankDetails'] = isset( $request['txtBankDetails'] ) ? $request['txtBankDetails'] : $affiliate->bankDetails;
 
 		$user = wp_get_current_user();
 		
 		if (isset($request['action']) && $request['action'] == 'saveInfo')
 		{
+                        if(!isset($request['_wpnonce']) || !wp_verify_nonce($request['_wpnonce'], 'wpam_add_affiliate')){
+                            wp_die('Error! Nonce Security Check Failed! Go back to the page and submit again.');
+                        }
 			$validator = new WPAM_Validation_Validator();
-			$validator->addValidator('ddPaymentMethod', new WPAM_Validation_SetValidator(array('check','paypal','manual')));
+			$validator->addValidator('ddPaymentMethod', new WPAM_Validation_SetValidator(array('check','paypal','manual','bank')));
 				
 			if ($request['ddPaymentMethod'] === 'paypal') {
 				$validator->addValidator('txtPaypalEmail', new WPAM_Validation_EmailValidator());
+			}
+                        if ($request['ddPaymentMethod'] === 'bank') {
+				$validator->addValidator('txtBankDetails', new WPAM_Validation_StringValidator(1));
 			}
 			
 			$vr = $affiliateHelper->validateForm($validator, $request, $affiliateFields, TRUE);
@@ -341,7 +362,7 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 			if ($vr->getIsValid()) {
 				//#79 hackery to do the "normal" WP email approval process
 				require_once ABSPATH . 'wp-admin/includes/ms.php';
-				$_POST['email'] = $request['_email'];
+				$_POST['email'] = sanitize_email($request['_email']);
 				$_POST['user_id'] = $user->ID;
 				unset( $request['_email'] );
 				global $errors;
@@ -410,7 +431,7 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 		if ($affiliate->bountyType === 'fixed') {
 			return sprintf( __('%s per sale.', 'affiliates-manager' ), wpam_format_money( $affiliate->bountyAmount, false ) );
 		} else {
-			return sprintf( __( '%s%% of each completed sale, pre-tax', 'affiliates-manager' ), $affiliate->bountyAmount );
+			return sprintf( __( '%s%% of each completed sale, pre-tax', 'affiliates-manager' ), esc_html($affiliate->bountyAmount) );
 		}
 	}
 
@@ -450,13 +471,16 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 		}
 		else if ($request['step'] === 'submit_payment_details')
 		{
+                        if(!isset($request['_wpnonce']) || !wp_verify_nonce($request['_wpnonce'], 'affiliate_cp_submit_payment_details')){
+                            wp_die('Error! Nonce Security Check Failed! Please submit your payment details again.');
+                        }
 			$vr = $this->validateForm($request);
 			if ($vr->getIsValid())
 			{
 				$this->confirmAffiliate($affiliate, $request);
 
 				//Transition affiliate directly to activated without admin review
-		        $db = new WPAM_Data_DataAccess();
+                                $db = new WPAM_Data_DataAccess();
 				$affiliate->activate();
 				$db->getAffiliateRepository()->update($affiliate);
 
@@ -483,6 +507,10 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 		if ($request['ddPaymentMethod'] === 'paypal')
 		{
 			$affiliate->setPaypalPaymentMethod($request['txtPaypalEmail']);
+		}
+                else if ($request['ddPaymentMethod'] === 'bank')
+		{
+			$affiliate->setBankPaymentMethod($request['txtBankDetails']);
 		}
 		else if ($request['ddPaymentMethod'] === 'check')
 		{
@@ -524,7 +552,7 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 	{
 		$validator = new WPAM_Validation_Validator();
 
-		$validator->addValidator('ddPaymentMethod', new WPAM_Validation_SetValidator(array('paypal','check','manual')));
+		$validator->addValidator('ddPaymentMethod', new WPAM_Validation_SetValidator(array('paypal','check','manual','bank')));
 
 		if ($request['ddPaymentMethod'] === 'check')
 		{
@@ -533,6 +561,10 @@ class WPAM_Pages_AffiliatesHome extends WPAM_Pages_PublicPage
 		else if ($request['ddPaymentMethod'] === 'paypal')
 		{
 			$validator->addValidator('txtPaypalEmail', new WPAM_Validation_EmailValidator());
+		}
+                else if ($request['ddPaymentMethod'] === 'bank')
+		{
+			$validator->addValidator('txtBankDetails', new WPAM_Validation_StringValidator(1));
 		}
 
 		return $validator->validate($request);

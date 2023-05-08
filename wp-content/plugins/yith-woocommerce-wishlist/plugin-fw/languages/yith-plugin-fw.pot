@@ -1,994 +1,1217 @@
-# Copyright (C) 2015 YIThemes
-# This file is distributed under the same license as the YITH Plugin Starter package.
-#, fuzzy
+# Copyright (C) 2023 
+# This file is distributed under the same license as the  package.
 msgid ""
 msgstr ""
-"Project-Id-Version: YITH Plugin Starter 1.0.0 Plugin FW\n"
-"Report-Msgid-Bugs-To: Your Inspiration Themes <plugins@yithemes.com>\n"
-"POT-Creation-Date: 2016-07-06 15:16+0200\n"
-"PO-Revision-Date: 2015-05-05 10:38+0100\n"
-"Last-Translator: \n"
-"Language-Team: Your Inspiration Themes <info@yithemes.com>\n"
-"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: YITH <plugins@yithemes.com>\n"
+"POT-Creation-Date: 2023-04-12 13:08:17+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.8\n"
-"X-Poedit-KeywordsList: __;_e;_x:1,2c;_ex:1,2c;_n:1,2;_nx:1,2,4c;_n_noop:1,2;"
-"_nx_noop:1,2,3c;esc_attr__;esc_html__;esc_attr_e;esc_html_e;esc_attr_x:1,2c;"
-"esc_html_x:1,2c\n"
+"PO-Revision-Date: 2023-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: YITH <info@yithemes.com>\n"
+"Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Country: United States\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-Basepath: ..\n"
-"X-Textdomain-Support: yes\n"
+"X-Poedit-KeywordsList: "
+"__;_e;_x:1,2c;_ex:1,2c;_n:1,2;_nx:1,2,4c;_n_noop:1,2;_nx_noop:1,2,3c;esc_"
+"attr__;esc_html__;esc_attr_e;esc_html_e;esc_attr_x:1,2c;esc_html_x:1,2c;\n"
+"X-Poedit-Basepath: ../\n"
 "X-Poedit-SearchPath-0: .\n"
+"X-Poedit-Bookmarks: \n"
+"X-Textdomain-Support: yes\n"
+"X-Generator: grunt-wp-i18n 1.0.3\n"
 
-#: lib/yit-cpt-unlimited.php:460 lib/yit-cpt-unlimited.php:574
-#: lib/yit-cpt-unlimited.php:719 lib/yit-cpt-unlimited.php:1632
-#, php-format
-msgid "Add %s"
+#: includes/class-yit-assets.php:138
+msgid "No file provided."
 msgstr ""
 
-#: lib/yit-cpt-unlimited.php:461 lib/yit-cpt-unlimited.php:575
-#, php-format
-msgid "Add New %s"
+#: includes/class-yit-assets.php:139
+msgid "You cannot drop files here."
 msgstr ""
 
-#: lib/yit-cpt-unlimited.php:462 lib/yit-cpt-unlimited.php:576
-#: lib/yit-cpt-unlimited.php:1267 lib/yit-cpt-unlimited.php:1304
-#, php-format
-msgid "Edit %s"
+#: includes/class-yit-assets.php:161 yit-functions.php:2007
+msgid "Confirm trash"
 msgstr ""
 
-#: lib/yit-cpt-unlimited.php:463 lib/yit-cpt-unlimited.php:577
-#, php-format
-msgid "New %s"
+#: includes/class-yit-assets.php:162
+msgid "Are you sure you want to trash the selected items?"
 msgstr ""
 
-#: lib/yit-cpt-unlimited.php:464 lib/yit-cpt-unlimited.php:578
-#, php-format
-msgid "All %s"
+#: includes/class-yit-assets.php:164 includes/class-yit-assets.php:168
+#: templates/sysinfo/tabs/main.php:46 templates/sysinfo/tabs/main.php:54
+#: yit-functions.php:2009 yit-functions.php:2027
+msgid "No"
 msgstr ""
 
-#: lib/yit-cpt-unlimited.php:465 lib/yit-cpt-unlimited.php:579
-#: lib/yit-cpt-unlimited.php:1251 lib/yit-cpt-unlimited.php:1305
-#, php-format
-msgid "View %s"
+#: includes/class-yit-assets.php:165 yit-functions.php:2025
+#: yit-functions.php:2152
+msgid "Confirm delete"
 msgstr ""
 
-#: lib/yit-cpt-unlimited.php:466 lib/yit-cpt-unlimited.php:580
-#, php-format
-msgid "Search %s"
+#: includes/class-yit-assets.php:166
+msgid "Are you sure you want to delete the selected items?"
 msgstr ""
 
-#: lib/yit-cpt-unlimited.php:467 lib/yit-cpt-unlimited.php:581
-#, php-format
-msgid "No %s found"
+#: includes/class-yit-assets.php:166 yit-functions.php:1941
+#: yit-functions.php:2100
+msgid "This action cannot be undone and you will not be able to recover this data."
 msgstr ""
 
-#: lib/yit-cpt-unlimited.php:468 lib/yit-cpt-unlimited.php:582
-#, php-format
-msgid "No %s found in Trash"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:625
-#, php-format
-msgctxt "taxonomy general name"
-msgid "%s Categories"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:626
-msgctxt "taxonomy singular name"
-msgid "Category"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:627
-msgid "Search Categories"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:628
-msgid "All Categories"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:629
-msgid "Parent Category"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:630
-msgid "Parent Category:"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:631
-msgid "Edit Category"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:632
-msgid "Update Category"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:633
-msgid "Add New Category"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:634
-msgid "New Category Name"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:635
-msgid "Category"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:724
-msgid "Categories"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1042
-#, php-format
-msgid "%s Settings"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1048 lib/yit-cpt-unlimited.php:1196
-#: lib/yit-cpt-unlimited.php:1202 lib/yit-plugin-panel.php:74
-msgid "Settings"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1051
-msgid "Type"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1052
-#, php-format
-msgid "Layout for this %s"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1058
-msgid "Rewrite"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1059
-msgid ""
-"Univocal identification name in the URL for each product (slug from post if empty)"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1064
-msgid "Label in Singular"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1065
-msgid "Set a label in singular (title of portfolio if empty)"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1070
-msgid "Label in Plural"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1071
-msgid "Set a label in plural (title of portfolio if empty)"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1076
-msgid "Taxonomy"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1077
-msgid ""
-"If you want to use categories in the portfolio, set a name for taxonomy. Name "
-"should be a slug (must not contain capital letters nor spaces) and must not be "
-"more than 32 characters long (database structure restriction)."
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1082
-msgid "Taxonomy Rewrite"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1083
-msgid "Set univocal name for each category page URL."
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1088
-msgid "Single layout"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1089
-msgid "Layout for single page of this portfolio"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1130
-msgid "layout settings"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1222 lib/yit-cpt-unlimited.php:1235
-msgid "Quick links"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1475
-#, php-format
-msgid "Show frontend of the %s"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1482 templates/metaboxes/types/customtabs.php:46
-#: templates/metaboxes/types/customtabs.php:90
-msgid "Name"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1631
-#, php-format
-msgid "Add %s from images"
-msgstr ""
-
-#: lib/yit-cpt-unlimited.php:1633
-msgid "Upload multiple files"
-msgstr ""
-
-#: lib/yit-plugin-panel-sidebar.php:421 templates/panel/sidebar/sidebar.php:3
-msgid "Hide sidebar"
-msgstr ""
-
-#: lib/yit-plugin-panel-sidebar.php:422 templates/panel/sidebar/sidebar.php:3
-msgid "Show sidebar"
-msgstr ""
-
-#: lib/yit-plugin-panel-wc.php:374
-msgid "The changes you have made will be lost if you leave this page."
-msgstr ""
-
-#: lib/yit-plugin-panel.php:73
-msgid "Plugin Settings"
-msgstr ""
-
-#: lib/yit-plugin-panel.php:297 lib/yit-plugin-panel.php:300
-msgid "How to install premium version"
-msgstr ""
-
-#: lib/yit-plugin-panel.php:352 lib/yit-plugin-subpanel.php:146
-#: templates/panel/woocommerce/woocommerce-form.php:11
-msgid "Save Changes"
-msgstr ""
-
-#: lib/yit-plugin-panel.php:355 templates/panel/woocommerce/woocommerce-form.php:14
-msgid "If you continue with this action, you will reset all options in this page."
-msgstr ""
-
-#: lib/yit-plugin-panel.php:357 lib/yit-plugin-subpanel.php:151
-msgid "Reset to default"
-msgstr ""
-
-#: lib/yit-plugin-panel.php:357 lib/yit-plugin-subpanel.php:151
-#: templates/panel/woocommerce/woocommerce-form.php:18
+#: includes/class-yit-assets.php:186 includes/class-yit-plugin-subpanel.php:140
+#: templates/panel/panel-content-page.php:14
 msgid "Are you sure?"
 msgstr ""
 
-#: lib/yit-plugin-panel.php:553
+#: includes/class-yit-assets.php:187 includes/class-yit-plugin-subpanel.php:140
+#: templates/panel/panel-content-page.php:14
+msgid "If you continue with this action, you will reset all options in this page."
+msgstr ""
+
+#: includes/class-yit-assets.php:198
+msgid "Clear"
+msgstr ""
+
+#: includes/class-yit-assets.php:199
+msgid "Clear color"
+msgstr ""
+
+#: includes/class-yit-assets.php:200
+msgid "Default"
+msgstr ""
+
+#: includes/class-yit-assets.php:201
+msgid "Select default color"
+msgstr ""
+
+#: includes/class-yit-assets.php:202
+msgid "Select Color"
+msgstr ""
+
+#: includes/class-yit-assets.php:203
+msgid "Color value"
+msgstr ""
+
+#: includes/class-yit-help-desk.php:152
+msgid "There was an error with your request; please try again later."
+msgstr ""
+
+#: includes/class-yit-plugin-panel-woocommerce.php:517
+msgid "Options saved correctly!"
+msgstr ""
+
+#: includes/class-yit-plugin-panel-woocommerce.php:571
+msgid "Options reset correctly!"
+msgstr ""
+
+#: includes/class-yit-plugin-panel-woocommerce.php:625
+msgid "The changes you have made will be lost if you leave this page."
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:90
+msgid "Plugin Settings"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:91
+msgid "Settings"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:557
+#: includes/class-yit-plugin-panel.php:560
+msgid "How to install premium version"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:1132
+msgid "Read the <mark>plugin documentation</mark>"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:1133
+msgid "Learn what you can really do with this powerful tool"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:1143
+msgid "Watch our <mark>\"First Steps\" video</mark>"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:1144
+msgid "See how it works before you start using it"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:1459
 msgid "The element you have entered already exists. Please, enter another name."
 msgstr ""
 
-#: lib/yit-plugin-panel.php:554
+#: includes/class-yit-plugin-panel.php:1460
 msgid "Settings saved"
 msgstr ""
 
-#: lib/yit-plugin-panel.php:555
+#: includes/class-yit-plugin-panel.php:1461
 msgid "Settings reset"
 msgstr ""
 
-#: lib/yit-plugin-panel.php:556
+#: includes/class-yit-plugin-panel.php:1462
 msgid "Element deleted correctly."
 msgstr ""
 
-#: lib/yit-plugin-panel.php:557 lib/yit-plugin-panel.php:558
+#: includes/class-yit-plugin-panel.php:1463
+#: includes/class-yit-plugin-panel.php:1464
 msgid "Element updated correctly."
 msgstr ""
 
-#: lib/yit-plugin-panel.php:559
+#: includes/class-yit-plugin-panel.php:1465
 msgid "Database imported correctly."
 msgstr ""
 
-#: lib/yit-plugin-panel.php:560
+#: includes/class-yit-plugin-panel.php:1466
 msgid "An error has occurred during import. Please try again."
 msgstr ""
 
-#: lib/yit-plugin-panel.php:561
+#: includes/class-yit-plugin-panel.php:1467
 msgid "The added file is not valid."
 msgstr ""
 
-#: lib/yit-plugin-panel.php:562
+#: includes/class-yit-plugin-panel.php:1468
 msgid "Sorry, import is disabled."
 msgstr ""
 
-#: lib/yit-plugin-panel.php:563
+#: includes/class-yit-plugin-panel.php:1469
 msgid "Sorting successful."
 msgstr ""
 
-#: lib/yit-plugin-subpanel.php:149
-msgid ""
-"If you continue with this action, you will reset all the options in this page."
+#: includes/class-yit-plugin-subpanel.php:133
+#: templates/panel/panel-content-page.php:29
+msgid "Save Changes"
 msgstr ""
 
-#: lib/yit-pointers.php:70
+#: includes/class-yit-plugin-subpanel.php:143
+#: templates/panel/panel-content-page.php:38
+msgid "Reset to default"
+msgstr ""
+
+#: includes/class-yit-pointers.php:80
 msgid "Plugins Activated"
 msgstr ""
 
-#: lib/yit-pointers.php:71
+#: includes/class-yit-pointers.php:81
 msgid ""
-"From now on, you can find all plugin options in YIT Plugin menu.\n"
-"                                     For each plugin installed, customization "
-"settings will be available as a new entry in YIT Plugin menu."
+"From now on, you can find all plugin options in YITH menu. Plugin "
+"customization settings will be available as a new entry in YITH menu."
 msgstr ""
 
-#: lib/yit-pointers.php:73 lib/yit-pointers.php:89
-msgid "Discover all our plugins available on:"
+#: includes/class-yit-pointers.php:84 includes/class-yit-pointers.php:100
+#. translators: 1. YITH site link; 2. WordPress site link.
+msgid "Discover all our plugins available on: %1$s and %2$s"
 msgstr ""
 
-#: lib/yit-pointers.php:74 lib/yit-pointers.php:90
-msgid "and"
-msgstr ""
-
-#: lib/yit-pointers.php:84
+#: includes/class-yit-pointers.php:96
 msgid "Plugins Upgraded"
 msgstr ""
 
-#: lib/yit-pointers.php:85
+#: includes/class-yit-pointers.php:97
 msgid ""
-"From now on, you can find all options of your plugins in YIT Plugin menu.\n"
-"                                    Any time one of our plugins is updated, a new "
-"entry will be added to this menu.\n"
-"                                    For example, after the update, plugin options "
-"(such as for YITH WooCommerce Wishlist, YITH WooCommerce Ajax Search, etc.)\n"
-"                                    will be moved from previous location to YIT "
-"Plugin tab."
+"From now on, you can find the option panel of YITH plugins in YITH menu. "
+"Every time one of our plugins is added, a new entry will be added to this "
+"menu. For example, after the update, plugin options (such as for YITH "
+"WooCommerce Wishlist, YITH WooCommerce Ajax Search, etc.) will be moved "
+"from previous location to YITH menu."
 msgstr ""
 
-#: lib/yit-upgrade.php:135
-msgid "There is a new version of %plugin_name% available."
+#: includes/class-yith-bh-onboarding.php:85
+msgid "It is not possible save the options"
 msgstr ""
 
-#: lib/yit-upgrade.php:136
-msgid "View version %latest% details."
+#: includes/class-yith-dashboard.php:35
+msgid "YITH Latest Updates"
 msgstr ""
 
-#: lib/yit-upgrade.php:137
-msgid "Automatic update is unavailable for this plugin,"
+#: includes/class-yith-dashboard.php:36
+msgid "Latest news from YITH Blog"
 msgstr ""
 
-#: lib/yit-upgrade.php:138
-msgid "please <a href=\"%activate_link%\">activate</a> your copy of %plugin_name%."
+#: includes/class-yith-dashboard.php:56
+msgid "RSS Error:"
 msgstr ""
 
-#: lib/yit-upgrade.php:139
-msgid "Update now."
-msgstr ""
-
-#: lib/yit-upgrade.php:240
-msgid "YIThemes Repository"
-msgstr ""
-
-#: lib/yit-upgrade.php:274
-msgid "Invalid URL Provided."
-msgstr ""
-
-#: lib/yit-upgrade.php:287
-msgid "Could not create Temporary file."
-msgstr ""
-
-#: lib/yit-upgrade.php:439
-#, php-format
+#: includes/class-yith-dashboard.php:63
 msgid ""
-"There is a new version of %1$s available. <a href=\"%2$s\" class=\"thickbox yit-"
-"changelog-button\" title=\"%3$s\">View version %4$s details</a>."
+"An error has occurred, which probably means the feed is down. Try again "
+"later."
 msgstr ""
 
-#: lib/yit-upgrade.php:441
-#, php-format
+#: includes/class-yith-post-type-admin.php:286
+#. translators: %s is the name of the post type (example Back to "Membership
+#. Plans").
+msgid "Back to \"%s\""
+msgstr ""
+
+#: includes/class-yith-post-type-admin.php:286
+msgid "Back to the list"
+msgstr ""
+
+#: includes/class-yith-system-status.php:110
+msgid "WordPress Version"
+msgstr ""
+
+#: includes/class-yith-system-status.php:111
+msgid "WooCommerce Version"
+msgstr ""
+
+#: includes/class-yith-system-status.php:112
+msgid "Available Memory"
+msgstr ""
+
+#: includes/class-yith-system-status.php:113
+msgid "PHP Version"
+msgstr ""
+
+#: includes/class-yith-system-status.php:114
+msgid "TLS Version"
+msgstr ""
+
+#: includes/class-yith-system-status.php:115
+msgid "WordPress Cron"
+msgstr ""
+
+#: includes/class-yith-system-status.php:116
+msgid "SimpleXML"
+msgstr ""
+
+#: includes/class-yith-system-status.php:117
+msgid "MultiByte String"
+msgstr ""
+
+#: includes/class-yith-system-status.php:118
+msgid "ImageMagick Version"
+msgstr ""
+
+#: includes/class-yith-system-status.php:119
+msgid "GD Library"
+msgstr ""
+
+#: includes/class-yith-system-status.php:120
+msgid "Iconv Module"
+msgstr ""
+
+#: includes/class-yith-system-status.php:121
+msgid "OPCache Save Comments"
+msgstr ""
+
+#: includes/class-yith-system-status.php:122
+msgid "URL FOpen"
+msgstr ""
+
+#: includes/class-yith-system-status.php:140
+#: includes/class-yith-system-status.php:141
+#: templates/sysinfo/system-information-panel.php:11
+msgid "System Status"
+msgstr ""
+
+#: includes/class-yith-system-status.php:183
+msgid "YITH Plugins"
+msgstr ""
+
+#: includes/class-yith-system-status.php:191
+msgid "WooCommerce"
+msgstr ""
+
+#: includes/class-yith-system-status.php:341
+msgid "Warning!"
+msgstr ""
+
+#: includes/class-yith-system-status.php:345
+#. translators: %1$s open link tag, %2$s open link tag
 msgid ""
-"There is a new version of %1$s available. <a href=\"%2$s\" class=\"thickbox yit-"
-"changelog-button\" title=\"%3$s\">View version %4$s details</a>. <em>You have to "
-"activate the plugin on a single site of the network to benefit from automatic "
-"updates.</em>"
+"The system check has detected some compatibility issues on your "
+"installation.%1$sClick here%2$s to know more"
 msgstr ""
 
-#: lib/yit-upgrade.php:443
-#, php-format
+#: includes/class-yith-system-status.php:495
+msgid "Enabled"
+msgstr ""
+
+#: includes/class-yith-system-status.php:495
+msgid "Disabled"
+msgstr ""
+
+#: includes/class-yith-system-status.php:500
+msgid "N/A"
+msgstr ""
+
+#: includes/class-yith-system-status.php:527
+#. translators: %1$s plugin name, %2$s requirement name
+msgid "%1$s needs %2$s enabled"
+msgstr ""
+
+#: includes/class-yith-system-status.php:530
+#. translators: %1$s plugin name, %2$s required memory amount
+msgid "%1$s needs at least %2$s of available memory"
+msgstr ""
+
+#: includes/class-yith-system-status.php:533
+#. translators: %1$s plugin name, %2$s version number
+msgid "%1$s needs at least %2$s version"
+msgstr ""
+
+#: includes/class-yith-system-status.php:557
 msgid ""
-"There is a new version of %1$s available. <a href=\"%2$s\" class=\"thickbox yit-"
-"changelog-button\" title=\"%3$s\">View version %4$s details</a>. <em>Automatic "
-"update is unavailable for this plugin, please <a href=\"%5$s\" title=\"License "
-"activation\">activate</a> your copy of %6s.</em>"
+"Update it to the latest version in order to benefit of all new features and "
+"security updates."
 msgstr ""
 
-#: lib/yit-upgrade.php:445
-#, php-format
+#: includes/class-yith-system-status.php:561
+#: includes/class-yith-system-status.php:567
+msgid "Contact your hosting company in order to update it."
+msgstr ""
+
+#: includes/class-yith-system-status.php:565
+msgid "Contact your hosting company in order to install it."
+msgstr ""
+
+#: includes/class-yith-system-status.php:572
+#. translators: %1$s code, %2$s file name
+msgid "Remove %1$s from %2$s file"
+msgstr ""
+
+#: includes/class-yith-system-status.php:580
+msgid "Contact your hosting company in order to enable it."
+msgstr ""
+
+#: includes/class-yith-system-status.php:584
+#: includes/class-yith-system-status.php:607
+#. translators: %1$s opening link tag, %2$s closing link tag
 msgid ""
-"There is a new version of %1$s available. <a href=\"%2$s\" class=\"thickbox yit-"
-"changelog-button\" title=\"%3$s\">View version %4$s details</a> or <a href=\"%5$s"
-"\">update now</a>."
+"Read more %1$shere%2$s or contact your hosting company in order to increase "
+"it."
 msgstr ""
 
-#: lib/yit-upgrade.php:517
-msgid "You can't update the plugins for this site."
-msgstr ""
-
-#: lib/yit-upgrade.php:521
-msgid "You do not have sufficient permissions to update the plugins for this site."
-msgstr ""
-
-#: lib/yit-upgrade.php:528
-msgid "Update Plugin"
-msgstr ""
-
-#: licence/lib/yit-licence.php:182
-#, php-format
-msgctxt "%s = field name"
-msgid "%s field cannot be empty"
-msgstr ""
-
-#: licence/lib/yit-licence.php:183
-#, php-format
-msgid "%s and %s fields cannot be empty"
-msgstr ""
-
-#: licence/lib/yit-licence.php:184
-msgid "Unable to contact the remote server, please try again later. Thanks!"
-msgstr ""
-
-#: licence/lib/yit-licence.php:185
-#: licence/templates/panel/activation/activation-panel.php:88
-#: licence/templates/panel/activation/activation-panel.php:166
-#: licence/templates/panel/activation/activation-panel.php:197
-#: templates/metaboxes/types/contactform.php:148
-#: templates/metaboxes/types/contactform.php:340
-msgid "Email"
-msgstr ""
-
-#: licence/lib/yit-licence.php:186
-#: licence/templates/panel/activation/activation-panel.php:89
-#: licence/templates/panel/activation/activation-panel.php:167
-#: licence/templates/panel/activation/activation-panel.php:198
-msgid "License Key"
-msgstr ""
-
-#: licence/lib/yit-licence.php:187
-msgid "Are you sure you want to deactivate the license for current site?"
-msgstr ""
-
-#: licence/lib/yit-licence.php:667
-msgid "Invalid Request"
-msgstr ""
-
-#: licence/lib/yit-licence.php:668
-msgid "Invalid license key"
-msgstr ""
-
-#: licence/lib/yit-licence.php:669
-msgid "Software has been deactivated"
-msgstr ""
-
-#: licence/lib/yit-licence.php:670
-msgid "Maximum number of activations exceeded"
-msgstr ""
-
-#: licence/lib/yit-licence.php:671
-msgid "Invalid instance ID"
-msgstr ""
-
-#: licence/lib/yit-licence.php:672
-msgid "Invalid security key"
-msgstr ""
-
-#: licence/lib/yit-licence.php:673
-msgid "License key has expired"
-msgstr ""
-
-#: licence/lib/yit-licence.php:674
-msgid "License key has been banned"
-msgstr ""
-
-#: licence/lib/yit-licence.php:675
-msgid "Current product is not included in your YITH Club Subscription key"
-msgstr ""
-
-#: licence/lib/yit-licence.php:676
-msgid "Great"
-msgstr ""
-
-#: licence/lib/yit-licence.php:676
-msgid "License successfully activated"
-msgstr ""
-
-#: licence/lib/yit-licence.php:677
-msgid "License key deactivated for website"
-msgstr ""
-
-#: licence/lib/yit-plugin-licence.php:67 licence/lib/yit-plugin-licence.php:68
-#: licence/lib/yit-theme-licence.php:69 licence/lib/yit-theme-licence.php:70
-#: licence/lib/yit-theme-licence.php:109 licence/lib/yit-theme-licence.php:110
-msgid "License Activation"
-msgstr ""
-
-#: licence/lib/yit-theme-licence.php:117 licence/lib/yit-theme-licence.php:118
-#, php-format
-msgid "%s"
-msgstr ""
-
-#: licence/lib/yit-theme-licence.php:159
+#: includes/class-yith-system-status.php:604
+#. translators: %s recommended memory amount
 msgid ""
-"I cannot find the license key for activating the theme I have bought some time "
-"ago. Where can I find it?"
+"For optimal functioning of our plugins, we suggest setting at least %s of "
+"available memory"
 msgstr ""
 
-#: licence/lib/yit-theme-licence.php:163
+#: includes/class-yith-system-status.php:612
+#. translators: %1$s TLS label, %2$s cURL label
 msgid ""
-"If you have purchased one of our products before 27 January 2015, you can benefit "
-"from support and updates (the services offered with the license)\n"
-"                    until 27 January 2016 and you do not have to purchase it again "
-"to get a new license key, because, before this date, your license used to be "
-"activated automatically by our system.\n"
-"                    After 27 January 2016, instead, if you want to benefit from "
-"support and updates you have to buy a new license and activate it through the "
-"license key you will be\n"
-"                    provided with and that you can find in your YIThemes account, "
-"in section \"My licenses\"."
+"The system check cannot determine which %1$s version is installed because "
+"%2$s module is disabled. Ask your hosting company to enable it."
 msgstr ""
 
-#: licence/templates/panel/activation/activation-panel.php:23
-msgid "Yithemes License Activation"
-msgstr ""
-
-#: licence/templates/panel/activation/activation-panel.php:27
+#: includes/class-yith-system-status.php:615
+#. translators: %1$s TLS label
 msgid ""
-"Have you updated your licenses? Have you asked for an extension? Update "
-"information concerning your products."
+"The system check cannot determine which %1$s version is installed due to a "
+"connection issue between your site and our server."
 msgstr ""
 
-#: licence/templates/panel/activation/activation-panel.php:29
-msgid "Update license information"
+#: templates/bh-onboarding/onboarding-tabs.php:63
+msgid "Save"
 msgstr ""
 
-#: licence/templates/panel/activation/activation-panel.php:42
-msgid "Product to activate"
-msgid_plural "Products to activate"
-msgstr[0] ""
-msgstr[1] ""
-
-#: licence/templates/panel/activation/activation-panel.php:61
-msgid "Activate"
+#: templates/fields/ajax-customers.php:41
+msgid "Search for a customer..."
 msgstr ""
 
-#: licence/templates/panel/activation/activation-panel.php:80
-msgid "Activated"
+#: templates/fields/ajax-customers.php:68
+#: templates/fields/ajax-customers.php:79
+#. translators: 1. user display name; 2. user ID; 3. user email.
+msgid "%1$s (#%2$s &ndash; %3$s)"
 msgstr ""
 
-#: licence/templates/panel/activation/activation-panel.php:86
-#: licence/templates/panel/activation/activation-panel.php:164
-#: licence/templates/panel/activation/activation-panel.php:194
-msgid "Product Name"
+#: templates/fields/ajax-orders.php:16
+msgid "Search for an order..."
 msgstr ""
 
-#: licence/templates/panel/activation/activation-panel.php:92
-#: licence/templates/panel/activation/activation-panel.php:201
-msgid "Expires"
+#: templates/fields/ajax-posts.php:41
+msgid "Search for a post..."
 msgstr ""
 
-#: licence/templates/panel/activation/activation-panel.php:95
-msgid "Remaining"
+#: templates/fields/ajax-products.php:16
+msgid "Search for a product..."
 msgstr ""
 
-#: licence/templates/panel/activation/activation-panel.php:97
-msgid "Club Subscription"
+#: templates/fields/ajax-terms.php:41
+msgid "Search for a category..."
 msgstr ""
 
-#: licence/templates/panel/activation/activation-panel.php:101
-msgid "License Actions"
-msgstr ""
-
-#: licence/templates/panel/activation/activation-panel.php:126
-#, php-format
-msgid "%1s out of %2s"
-msgstr ""
-
-#: licence/templates/panel/activation/activation-panel.php:142
-msgid "Deactivate"
-msgstr ""
-
-#: licence/templates/panel/activation/activation-panel.php:147
-#: licence/templates/panel/activation/activation-panel.php:204
-msgid "Renew"
-msgstr ""
-
-#: licence/templates/panel/activation/activation-panel.php:160
-msgid "Banned"
-msgstr ""
-
-#: licence/templates/panel/activation/activation-panel.php:190
-msgid "Expired"
-msgstr ""
-
-#: licence/templates/panel/activation/activation-panel.php:226
-msgid "Order again"
-msgstr ""
-
-#: licence/templates/panel/activation/activation-panel.php:228
-msgid "Renew license"
-msgstr ""
-
-#: templates/metaboxes/types/ajax-products.php:23
-msgid "Search for a product"
-msgstr ""
-
-#: templates/metaboxes/types/categories.php:36
-msgid "No categories."
-msgstr ""
-
-#: templates/metaboxes/types/categories.php:42
-msgid "+ Add New Category"
-msgstr ""
-
-#: templates/metaboxes/types/categories.php:46
-msgid "Add"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:7
-msgid "Text Input"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:8
-msgid "Checkbox"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:9
-msgid "Select"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:10
-msgid "Textarea"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:11
-msgid "Radio Input"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:12
-msgid "Password Field"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:13
-msgid "File Upload"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:47
-msgid "Theme Icon"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:48
-msgid "Custom Icon"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:49
-#: templates/metaboxes/types/responsivesliders.php:24
-msgid "None"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:60
-msgid "Add field"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:69
-#: templates/metaboxes/types/contactform.php:261
-#: templates/metaboxes/types/customtabs.php:37
-#: templates/metaboxes/types/customtabs.php:82
-msgid "Remove"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:70
-#: templates/metaboxes/types/contactform.php:262
-msgid "Click to toggle"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:77
-#: templates/metaboxes/types/contactform.php:269
-msgid "Field Title"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:81
-#: templates/metaboxes/types/contactform.php:273
-msgid "Insert the title for the field."
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:86
-#: templates/metaboxes/types/contactform.php:278
-msgid "Data Name"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:90
-#: templates/metaboxes/types/contactform.php:282
-msgid ""
-"REQUIRED: Field identification name to be entered into email body. <strong>Note:</"
-"strong>Use only lowercase characters and underscores."
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:95
-#: templates/metaboxes/types/contactform.php:287
-msgid "Field Type"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:103
-#: templates/metaboxes/types/contactform.php:295
-msgid "Select the type for this field."
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:108
-#: templates/metaboxes/types/contactform.php:300
-msgid "Checked"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:112
-#: templates/metaboxes/types/contactform.php:304
-msgid "Select this option if you want this field appears as already checked."
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:117
-#: templates/metaboxes/types/contactform.php:309
-msgid "Add options "
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:118
-#: templates/metaboxes/types/contactform.php:310
-msgid "Add option"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:121
-#: templates/metaboxes/types/contactform.php:313
-#: templates/metaboxes/types/contactform.php:436
-msgid "Selected"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:124
-#: templates/metaboxes/types/contactform.php:316
-#: templates/metaboxes/types/contactform.php:436
-msgid "Delete option"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:130
-#: templates/metaboxes/types/contactform.php:322
-msgid "Error Message"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:134
-#: templates/metaboxes/types/contactform.php:326
-msgid "Insert the error message for validation."
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:139
-#: templates/metaboxes/types/contactform.php:331
-msgid "Required"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:143
-#: templates/metaboxes/types/contactform.php:335
-msgid "Select this option if it must be required."
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:152
-#: templates/metaboxes/types/contactform.php:344
-msgid "Select this option if the email must be valid."
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:157
-#: templates/metaboxes/types/contactform.php:349
-msgid "Reply To"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:161
-#: templates/metaboxes/types/contactform.php:353
-msgid "Select this if it is the email you can reply to."
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:166
-#: templates/metaboxes/types/contactform.php:358
-msgid "Class"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:170
-#: templates/metaboxes/types/contactform.php:362
-msgid "Insert additional class(es) (separated by commas) for more personalization."
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:175
-#: templates/metaboxes/types/contactform.php:367
-msgid "Icon"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:203
-#: templates/metaboxes/types/contactform.php:391
-#: templates/metaboxes/types/icon-list.php:69
-#: templates/metaboxes/types/select-icon.php:33
-#: templates/metaboxes/types/upload.php:21 templates/panel/types/upload.php:31
-#: templates/panel/woocommerce/woocommerce-upload.php:40
-msgid "Upload"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:209
-#: templates/metaboxes/types/contactform.php:397
-#: templates/metaboxes/types/icon-list.php:75
-#: templates/metaboxes/types/select-icon.php:39
-msgid "Image preview"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:217
-#: templates/metaboxes/types/contactform.php:405
-msgid "Insert an icon for more personalization."
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:222
-#: templates/metaboxes/types/contactform.php:409
-msgid "Width"
-msgstr ""
-
-#: templates/metaboxes/types/contactform.php:247
-#: templates/metaboxes/types/contactform.php:421
-msgid "Set field length."
-msgstr ""
-
-#: templates/metaboxes/types/customtabs.php:28
+#: templates/fields/customtabs.php:17
 msgid "Close all"
 msgstr ""
 
-#: templates/metaboxes/types/customtabs.php:28
+#: templates/fields/customtabs.php:17
 msgid "Expand all"
 msgstr ""
 
-#: templates/metaboxes/types/customtabs.php:52
-#: templates/metaboxes/types/customtabs.php:95
+#: templates/fields/customtabs.php:25 templates/fields/customtabs.php:68
+msgid "Remove"
+msgstr ""
+
+#: templates/fields/customtabs.php:34 templates/fields/customtabs.php:76
+msgid "Name"
+msgstr ""
+
+#: templates/fields/customtabs.php:40 templates/fields/customtabs.php:81
 msgid "Value"
 msgstr ""
 
-#: templates/metaboxes/types/customtabs.php:53
-#: templates/metaboxes/types/customtabs.php:96
+#: templates/fields/customtabs.php:41 templates/fields/customtabs.php:82
 msgid "Content of the tab. (HTML is supported)"
 msgstr ""
 
-#: templates/metaboxes/types/customtabs.php:65
+#: templates/fields/customtabs.php:52
 msgid "Add custom product tab"
 msgstr ""
 
-#: templates/metaboxes/types/customtabs.php:107
+#: templates/fields/customtabs.php:93
 msgid "Do you want to remove the custom tab?"
 msgstr ""
 
-#: templates/metaboxes/types/icon-list.php:89
-#, php-format
-msgid "(Default: %s <img src=\"%s\"/>)"
+#: templates/fields/date-format.php:65
+msgid "Custom:"
 msgstr ""
 
-#: templates/metaboxes/types/icon-list.php:91
-#, php-format
-msgid "(Default: <i %s></i> )"
+#: templates/fields/date-format.php:70
+msgid "Preview:"
 msgstr ""
 
-#: templates/metaboxes/types/image-gallery.php:40
-#: templates/metaboxes/types/image-gallery.php:45
-#: templates/metaboxes/types/images.php:38 templates/metaboxes/types/images.php:64
+#: templates/fields/file.php:14
+msgid "Drag or upload a file."
+msgstr ""
+
+#: templates/fields/icons.php:78
+msgid "Set Default"
+msgstr ""
+
+#: templates/fields/image-gallery.php:29 templates/fields/image-gallery.php:40
 msgid "Delete image"
 msgstr ""
 
-#: templates/metaboxes/types/image-gallery.php:45
+#: templates/fields/image-gallery.php:37
 msgid "Add Images to Gallery"
 msgstr ""
 
-#: templates/metaboxes/types/image-gallery.php:45
+#: templates/fields/image-gallery.php:38
 msgid "Add to gallery"
 msgstr ""
 
-#: templates/metaboxes/types/image-gallery.php:45
+#: templates/fields/image-gallery.php:39
 msgid "Add images"
 msgstr ""
 
-#: templates/metaboxes/types/image-gallery.php:45
+#: templates/fields/image-gallery.php:41
 msgid "Delete"
 msgstr ""
 
-#: templates/metaboxes/types/images.php:42
-msgid "Upload new images"
+#: templates/fields/media.php:47
+msgid "Upload file"
 msgstr ""
 
-#: templates/metaboxes/types/images.php:75
-msgid "Are you sure you want to remove this image?"
+#: templates/fields/media.php:53
+msgid "Enter URL"
 msgstr ""
 
-#: templates/metaboxes/types/sidebar-layout.php:25
-#: templates/metaboxes/types/sidebars.php:36
+#: templates/fields/media.php:71
+#. translators: %s is the alternative action "Upload a file".
+msgid "Drag or %s"
+msgstr ""
+
+#: templates/fields/media.php:72
+msgid "Upload a file"
+msgstr ""
+
+#: templates/fields/select-buttons.php:19
+msgid "Add All"
+msgstr ""
+
+#: templates/fields/select-buttons.php:20
+msgid "Remove All"
+msgstr ""
+
+#: templates/fields/sidebars.php:20
 msgid "Left sidebar"
 msgstr ""
 
-#: templates/metaboxes/types/sidebar-layout.php:28
-#: templates/metaboxes/types/sidebars.php:42
-#: templates/metaboxes/types/sidebars.php:45
-msgid "No sidebar"
-msgstr ""
-
-#: templates/metaboxes/types/sidebar-layout.php:31
-#: templates/metaboxes/types/sidebars.php:39
+#: templates/fields/sidebars.php:23
 msgid "Right sidebar"
 msgstr ""
 
-#: templates/metaboxes/types/sidebar-layout.php:34
-#: templates/metaboxes/types/sidebars.php:53
-#: templates/metaboxes/types/sidebars.php:64
-msgid "Choose a sidebar"
+#: templates/fields/sidebars.php:26 templates/fields/sidebars.php:29
+msgid "No sidebar"
 msgstr ""
 
-#: templates/metaboxes/types/sidebars.php:51
+#: templates/fields/sidebars.php:39
 msgid "Left Sidebar"
 msgstr ""
 
-#: templates/metaboxes/types/sidebars.php:62
+#: templates/fields/sidebars.php:41 templates/fields/sidebars.php:56
+msgid "Choose a sidebar"
+msgstr ""
+
+#: templates/fields/sidebars.php:54
 msgid "Right Sidebar"
 msgstr ""
 
-#: templates/metaboxes/types/typography.php:42
-msgid "px"
+#: templates/fields/upload.php:34
+#: templates/panel/woocommerce/woocommerce-upload.php:37
+msgid "Upload"
 msgstr ""
 
-#: templates/metaboxes/types/typography.php:43
-msgid "em"
-msgstr ""
-
-#: templates/metaboxes/types/typography.php:44
-msgid "pt"
-msgstr ""
-
-#: templates/metaboxes/types/typography.php:45
-msgid "rem"
-msgstr ""
-
-#: templates/metaboxes/types/typography.php:59
-#: templates/metaboxes/types/typography.php:153
-#: templates/metaboxes/types/typography.php:217
-msgid "Web fonts"
-msgstr ""
-
-#: templates/metaboxes/types/typography.php:71
-msgid "Google fonts"
-msgstr ""
-
-#: templates/metaboxes/types/typography.php:96
-msgid "Regular"
-msgstr ""
-
-#: templates/metaboxes/types/typography.php:97
-msgid "Bold"
-msgstr ""
-
-#: templates/metaboxes/types/typography.php:98
-msgid "Extra bold"
-msgstr ""
-
-#: templates/metaboxes/types/typography.php:99
-msgid "Italic"
-msgstr ""
-
-#: templates/metaboxes/types/typography.php:100
-msgid "Italic bold"
-msgstr ""
-
-#: templates/panel/sidebar/widgets/widgets.php:17
-msgid "Join the club"
-msgstr ""
-
-#: templates/panel/sidebar/widgets/widgets.php:24
-msgid "Despacho Theme - 100% FREE"
-msgstr ""
-
-#: templates/panel/sidebar/widgets/widgets.php:28
-msgid "FREE!"
-msgstr ""
-
-#: templates/panel/sidebar/widgets/widgets.php:34
-msgid "Important Links"
-msgstr ""
-
-#: templates/panel/types/upload.php:32
+#: templates/fields/upload.php:39
 msgid "Reset"
 msgstr ""
 
-#: templates/panel/woocommerce/woocommerce-form.php:17
+#: templates/panel/panel-header.php:23 templates/panel/v2/panel-header.php:18
+msgid "We need your support"
+msgstr ""
+
+#: templates/panel/panel-header.php:24 templates/panel/v2/panel-header.php:19
+msgid "to keep updating and improving the plugin. Please,"
+msgstr ""
+
+#: templates/panel/panel-header.php:26 templates/panel/v2/panel-header.php:21
+msgid "help us by leaving a good review"
+msgstr ""
+
+#: templates/panel/panel-header.php:27 templates/panel/v2/panel-header.php:22
+msgid ":) Thanks!"
+msgstr ""
+
+#: templates/panel/v2/panel-content-page.php:57
+#: templates/panel/v2/woocommerce/woocommerce-form.php:69
+#: templates/panel/woocommerce/woocommerce-form.php:27
+#: templates/panel/woocommerce/woocommerce-form.php:31
+msgid "Save Options"
+msgstr ""
+
+#: templates/panel/v2/panel-content-page.php:58
+#: templates/panel/v2/woocommerce/woocommerce-form.php:70
+#: templates/panel/woocommerce/woocommerce-form.php:41
 msgid "Reset Defaults"
+msgstr ""
+
+#: templates/panel/v2/panel-nav.php:36
+msgid "Collapse"
+msgstr ""
+
+#: templates/panel/v2/your-store-tools-tab.php:17
+msgid "#1 Independent Seller of <mark>WooCommerce plugins</mark>"
+msgstr ""
+
+#: templates/panel/v2/your-store-tools-tab.php:21
+msgid ""
+"Additional tools to improve UX, increase conversions, and loyalize "
+"customers."
+msgstr ""
+
+#: templates/panel/welcome-modals/update.php:34
+#. translators: %s is the plugin version.
+msgid "is successfully updated to version %s."
+msgstr ""
+
+#: templates/panel/welcome-modals/update.php:44
+#. translators: %s is the plugin version.
+msgid "What's new in version %s"
+msgstr ""
+
+#: templates/panel/welcome-modals/update.php:49
+msgid "Check the changelog >"
+msgstr ""
+
+#: templates/panel/welcome-modals/update.php:64
+#: templates/panel/welcome-modals/welcome.php:60
+msgid "Got it, close this window"
+msgstr ""
+
+#: templates/panel/welcome-modals/welcome.php:30
+msgid "Thank you for using our plugin"
+msgstr ""
+
+#: templates/panel/welcome-modals/welcome.php:45
+#. translators: %s is the number of steps.
+msgid "Start with these %s steps:"
+msgstr ""
+
+#: templates/panel/woocommerce/woocommerce-form.php:31
+msgid "Options Saved"
+msgstr ""
+
+#: templates/sysinfo/system-information-panel.php:12
+msgid "PHPInfo"
+msgstr ""
+
+#: templates/sysinfo/system-information-panel.php:13
+#: templates/sysinfo/tabs/error-log.php:26
+msgid "Log Files"
+msgstr ""
+
+#: templates/sysinfo/system-information-panel.php:22
+msgid "YITH System Information"
+msgstr ""
+
+#: templates/sysinfo/tabs/error-log.php:13
+msgid "WP debug.log file"
+msgstr ""
+
+#: templates/sysinfo/tabs/error-log.php:18
+msgid "PHP error_log file"
+msgstr ""
+
+#: templates/sysinfo/tabs/error-log.php:61
+msgid "Download"
+msgstr ""
+
+#: templates/sysinfo/tabs/error-log.php:74
+msgid "The file size exceeds 8 megabytes so it must be downloaded"
+msgstr ""
+
+#: templates/sysinfo/tabs/error-log.php:98
+#. translators: %s file name.
+msgid ""
+"No Log file available. Enable the WordPress debug by adding this in the %s "
+"file of your installation"
+msgstr ""
+
+#: templates/sysinfo/tabs/error-log.php:107
+msgid "Copied!"
+msgstr ""
+
+#: templates/sysinfo/tabs/error-log.php:107
+msgid "Copy Code"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:21
+msgid "Site Info"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:26
+msgid "Site URL"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:35
+msgid "Output IP Address"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:43
+msgid "Defined WP_CACHE"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:46 templates/sysinfo/tabs/main.php:54
+msgid "Yes"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:51
+msgid "External object cache"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:59
+msgid "YITH Plugin Framework Version"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:68
+#. translators: %s is the name of the plugin that is loading the framework.
+msgid "loaded by %s"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:79
+msgid "Plugins Requirements"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:114
+msgid "Database Info"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:119
+msgid "MySQL version"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:129
+#. Translators: %s: Codex link.
+msgid "WordPress recommends a minimum MySQL version of 5.6. See: %s"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:129
+msgid "WordPress requirements"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:136
+msgid "Total Database Size"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:144
+msgid "Database Data Size"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:152
+msgid "Database Index Size"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:160
+msgid "Database Free Size"
+msgstr ""
+
+#: templates/sysinfo/tabs/main.php:174
+#. Translators: %1$f: Table size, %2$f: Index size, %3$f: Free size, %4$s
+#. Engine.
+msgid "Data: %1$.2fMB | Index: %2$.2fMB | Free: %3$.2fMB | Engine: %4$s"
+msgstr ""
+
+#: yit-functions.php:1939
+#. translators: %s is the title of the post object.
+msgid "Are you sure you want to move \"%s\" to trash?"
+msgstr ""
+
+#: yit-functions.php:1941 yit-functions.php:2100
+#. translators: %s is the title of the post object.
+msgid "Are you sure you want to delete \"%s\"?"
+msgstr ""
+
+#: yit-functions.php:2039 yit-functions.php:2047 yit-functions.php:2163
+msgid "Further actions"
+msgstr ""
+
+#: yit-plugin.php:233
+msgid "License"
+msgstr ""
+
+#: yit-plugin.php:272
+#. translators: 1. Plugin(s) name(s).
+msgid ""
+"%s was deactivated as you're running an higher tier version of the same "
+"plugin."
+msgid_plural ""
+"%s were deactivated as you're running higher tier versions of the same "
+"plugins."
+msgstr[0] ""
+msgstr[1] ""
+
+#. Author of the plugin/theme
+msgid "YITH"
+msgstr ""
+
+#: includes/builders/elementor/class-yith-elementor-widget.php:252
+#. translators: %s it the Elementor Widget title.
+msgctxt "Elementor Widget - section title"
+msgid "%s - Options"
+msgstr ""
+
+#: includes/builders/gutenberg/class-yith-gutenberg.php:152
+msgctxt "[gutenberg]: Category Name"
+msgid "YITH"
+msgstr ""
+
+#: includes/class-yit-assets.php:121
+msgctxt "Enhanced select"
+msgid "No matches found"
+msgstr ""
+
+#: includes/class-yit-assets.php:122
+msgctxt "Enhanced select"
+msgid "Please enter 1 or more characters"
+msgstr ""
+
+#: includes/class-yit-assets.php:124
+#. translators: %s is the number of characters.
+msgctxt "Enhanced select"
+msgid "Please enter %s or more characters"
+msgstr ""
+
+#: includes/class-yit-assets.php:125
+msgctxt "Enhanced select"
+msgid "Searching&hellip;"
+msgstr ""
+
+#: includes/class-yit-assets.php:137
+msgctxt "Title"
+msgid "Error"
+msgstr ""
+
+#: includes/class-yit-assets.php:149
+msgctxt "Button text"
+msgid "Confirm"
+msgstr ""
+
+#: includes/class-yit-assets.php:150
+msgctxt "Button text"
+msgid "Cancel"
+msgstr ""
+
+#: includes/class-yit-assets.php:163 yit-functions.php:2010
+msgctxt "Trash confirmation action"
+msgid "Yes, move to trash"
+msgstr ""
+
+#: includes/class-yit-assets.php:167 yit-functions.php:2028
+#: yit-functions.php:2154
+msgctxt "Delete confirmation action"
+msgid "Yes, delete"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:875
+#. translators: 1. Plugin name.
+msgctxt "Help tab default title"
+msgid "Thank you for purchasing %s!"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:875
+msgctxt "Help tab default title"
+msgid "Thank you for using %s!"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:884
+msgctxt "Help tab default description"
+msgid "We want to help you enjoy a wonderful experience with all of our products."
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:933
+msgctxt "Premium tab name"
+msgid "Get premium"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:949
+msgctxt "Panel tab name"
+msgid "Your Store Tools"
+msgstr ""
+
+#: includes/class-yit-plugin-panel.php:965
+msgctxt "Help tab name"
+msgid "Help"
+msgstr ""
+
+#: includes/class-yith-dashboard.php:96
+msgctxt "Plugin FW"
+msgid "View Changelog"
+msgstr ""
+
+#: includes/class-yith-dashboard.php:97
+msgctxt "Plugin FW"
+msgid "Latest update released on"
+msgstr ""
+
+#: includes/class-yith-dashboard.php:137
+msgctxt "Button label"
+msgid "Close"
+msgstr ""
+
+#: includes/privacy/class-yith-privacy.php:61
+msgctxt "Privacy Policy Guide Title"
+msgid "YITH Plugins"
+msgstr ""
+
+#: includes/privacy/class-yith-privacy.php:93
+msgctxt "Privacy Policy Content"
+msgid ""
+"This sample language includes the basics around what personal data your "
+"store may be collecting, storing and sharing, as well as who may have "
+"access to that data. Depending on what settings are enabled and which "
+"additional plugins are used, the specific information shared by your store "
+"will vary. We recommend consulting with a lawyer when deciding what "
+"information to disclose on your privacy policy."
+msgstr ""
+
+#: includes/privacy/class-yith-privacy.php:97
+msgctxt "Privacy Policy Content"
+msgid "What we collect and store"
+msgstr ""
+
+#: includes/privacy/class-yith-privacy.php:100
+msgctxt "Privacy Policy Content"
+msgid "Who on our team has access"
+msgstr ""
+
+#: includes/privacy/class-yith-privacy.php:103
+msgctxt "Privacy Policy Content"
+msgid "What we share with others"
+msgstr ""
+
+#: includes/privacy/class-yith-privacy.php:106
+msgctxt "Privacy Policy Content"
+msgid "Payments"
+msgstr ""
+
+#: templates/fields/copy-to-clipboard.php:41
+msgctxt "Copy-to-clipboard message"
+msgid "Copied!"
+msgstr ""
+
+#: templates/fields/copy-to-clipboard.php:45
+msgctxt "Copy-to-clipboard button text"
+msgid "Copy"
+msgstr ""
+
+#: templates/fields/dimensions.php:13
+msgctxt "Position in the \"Dimensions\" field"
+msgid "Top"
+msgstr ""
+
+#: templates/fields/dimensions.php:14
+msgctxt "Position in the \"Dimensions\" field"
+msgid "Right"
+msgstr ""
+
+#: templates/fields/dimensions.php:15
+msgctxt "Position in the \"Dimensions\" field"
+msgid "Bottom"
+msgstr ""
+
+#: templates/fields/dimensions.php:16
+msgctxt "Position in the \"Dimensions\" field"
+msgid "Left"
+msgstr ""
+
+#: templates/fields/dimensions.php:94
+msgctxt "Tooltip in the \"Dimensions\" field"
+msgid "Link values together"
+msgstr ""
+
+#: templates/fields/image-dimensions.php:18
+msgctxt "Image width field label"
+msgid "Width"
+msgstr ""
+
+#: templates/fields/image-dimensions.php:23
+msgctxt "Image height field label"
+msgid "Height"
+msgstr ""
+
+#: templates/panel/help-tab.php:89
+#. translators: 1. Url to EN playlist.
+msgctxt "Help tab view all video link"
+msgid ""
+"Check the full <a href=\"%s\" target=\"_blank\">Playlist on Youtube</a> to "
+"learn more >"
+msgstr ""
+
+#: templates/panel/help-tab.php:96
+msgctxt "Help tab Watch Videotutorials link"
+msgid "Videos are also available in:"
+msgstr ""
+
+#: templates/panel/help-tab.php:126
+msgctxt "Help tab Read Documentation link"
+msgid "Read the documentation"
+msgstr ""
+
+#: templates/panel/help-tab.php:129
+msgctxt "Help tab Read Documentation link"
+msgid "to learn how the plugin works from the basics."
+msgstr ""
+
+#: templates/panel/help-tab.php:139
+msgctxt "Help tab Watch video tutorials link"
+msgid "Watch our video tutorials"
+msgstr ""
+
+#: templates/panel/help-tab.php:142
+msgctxt "Help tab Watch video tutorials link"
+msgid "to see some helpful use cases."
+msgstr ""
+
+#: templates/panel/help-tab.php:152
+msgctxt "Help tab view FAQs link"
+msgid "Check the FAQs"
+msgstr ""
+
+#: templates/panel/help-tab.php:155
+msgctxt "Help tab view FAQs link"
+msgid "to find answers to your doubts."
+msgstr ""
+
+#: templates/panel/help-tab.php:170
+msgctxt "Help tab FAQ title"
+msgid "Last FAQs in our Help Center"
+msgstr ""
+
+#: templates/panel/help-tab.php:184
+msgctxt "Help tab FAQ link"
+msgid "View all FAQs >"
+msgstr ""
+
+#: templates/panel/help-tab.php:193
+msgctxt "Help tab submit ticket title"
+msgid "Need help?"
+msgstr ""
+
+#: templates/panel/help-tab.php:196
+msgctxt "Help tab submit ticket description"
+msgid ""
+"If you are experiencing any technical issues, ask for help from our "
+"developers. Submit a ticket through our support desk and we will help you "
+"as soon as possible."
+msgstr ""
+
+#: templates/panel/help-tab.php:204
+msgctxt "Help tab submit ticket button"
+msgid "Submit a ticket"
+msgstr ""
+
+#: templates/panel/help-tab.php:216 templates/panel/help-tab.php:218
+#: templates/panel/help-tab.php:223
+msgctxt "Help tab documentation"
+msgid "Read the plugin documentation"
+msgstr ""
+
+#: templates/panel/help-tab.php:220
+msgctxt "Help tab documentation"
+msgid "to learn how it works from the basics."
+msgstr ""
+
+#: templates/panel/help-tab.php:231 templates/panel/help-tab.php:233
+msgctxt "Help tab support"
+msgid "Need some help?"
+msgstr ""
+
+#: templates/panel/help-tab.php:235
+msgctxt "Help tab support"
+msgid "From DIY to full-service help"
+msgstr ""
+
+#: templates/panel/help-tab.php:238
+msgctxt "Help tab support"
+msgid ""
+"Call or chat 24/7 with our support agents, or let our experts build your "
+"site."
+msgstr ""
+
+#: templates/panel/help-tab.php:241
+msgctxt "Help tab support"
+msgid "Yes, I need help"
+msgstr ""
+
+#: templates/panel/premium-tab.php:30
+msgctxt "Premium Tab"
+msgid "Get the premium version to unlock advanced features"
+msgstr ""
+
+#: templates/panel/premium-tab.php:34
+msgctxt "Premium Tab"
+msgid "Get premium"
+msgstr ""
+
+#: templates/panel/premium-tab.php:39
+msgctxt "Premium Tab"
+msgid "Plugin premium features images"
+msgstr ""
+
+#: templates/panel/premium-tab.php:51 templates/panel/premium-tab.php:58
+#. translators: alt attribute of main image tag.
+msgctxt "Premium Tab"
+msgid "And so much more!"
+msgstr ""
+
+#: templates/panel/premium-tab.php:53
+msgctxt "Premium Tab"
+msgid "Check the premium features >"
+msgstr ""
+
+#: templates/panel/premium-tab.php:60
+msgctxt "Premium Tab"
+msgid "Check the free vs premium features >"
+msgstr ""
+
+#: templates/panel/premium-tab.php:65
+msgctxt "Premium Tab"
+msgid "Get the premium version"
+msgstr ""
+
+#: templates/panel/v2/panel-option-label-tags.php:16
+msgctxt "Panel option tag"
+msgid "PREMIUM"
+msgstr ""
+
+#: templates/panel/v2/your-store-tools-tab.php:35
+msgctxt "Plugin in \"Your Store Tools\" tab"
+msgid "Best choice"
+msgstr ""
+
+#: templates/panel/v2/your-store-tools-tab.php:46
+msgctxt "Plugin in \"Your Store Tools\" tab"
+msgid "Active"
+msgstr ""
+
+#: templates/panel/v2/your-store-tools-tab.php:51
+msgctxt "Plugin in \"Your Store Tools\" tab"
+msgid "Get it"
+msgstr ""
+
+#: yit-functions.php:1953
+msgctxt "Post action"
+msgid "Preview"
+msgstr ""
+
+#: yit-functions.php:1962
+msgctxt "Post action"
+msgid "View"
+msgstr ""
+
+#: yit-functions.php:1973
+msgctxt "Post action"
+msgid "Edit"
+msgstr ""
+
+#: yit-functions.php:1981
+msgctxt "Post action"
+msgid "Duplicate"
+msgstr ""
+
+#: yit-functions.php:1993
+msgctxt "Post action"
+msgid "Restore"
+msgstr ""
+
+#: yit-functions.php:2001
+msgctxt "Post action"
+msgid "Trash"
+msgstr ""
+
+#: yit-functions.php:2018
+msgctxt "Post action"
+msgid "Delete Permanently"
+msgstr ""
+
+#: yit-functions.php:2114
+msgctxt "Term action"
+msgid "View"
+msgstr ""
+
+#: yit-functions.php:2124
+msgctxt "Term action"
+msgid "Edit"
+msgstr ""
+
+#: yit-functions.php:2132
+msgctxt "Term action"
+msgid "Duplicate"
+msgstr ""
+
+#: yit-functions.php:2145
+msgctxt "Term action"
+msgid "Delete"
+msgstr ""
+
+#: yit-plugin.php:85
+msgctxt "Plugin Row Meta"
+msgid "Live Demo"
+msgstr ""
+
+#: yit-plugin.php:89
+msgctxt "Plugin Row Meta"
+msgid "Documentation"
+msgstr ""
+
+#: yit-plugin.php:93
+msgctxt "Plugin Row Meta"
+msgid "Support"
+msgstr ""
+
+#: yit-plugin.php:97
+msgctxt "Plugin Row Meta"
+msgid "Premium version"
+msgstr ""
+
+#: yit-plugin.php:229
+msgctxt "Action links"
+msgid "Settings"
 msgstr ""

@@ -12,8 +12,7 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-
-add_action( 'schema_wp_output_knowledge_graph', 'schema_wp_seo_framework_knowledge_graph_remove' );
+add_filter( 'schema_wp_filter_output_knowledge_graph', 'schema_wp_seo_framework_knowledge_graph_remove' );
 /*
 * Remove Knowledge Graph
 *
@@ -25,8 +24,7 @@ function schema_wp_seo_framework_knowledge_graph_remove( $knowledge_graph ) {
 	return $knowledge_graph;
 }
 
-
-add_action( 'schema_wp_output_sitelinks_search_box', 'schema_wp_seo_framework_sitelinks_search_box_remove' );
+add_filter( 'schema_wp_output_sitelinks_search_box', 'schema_wp_seo_framework_sitelinks_search_box_remove' );
 /*
 * Remove SiteLinks Search Box
 *

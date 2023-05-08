@@ -2,14 +2,9 @@
 /**
  * WooCommerce Importer Interface
  *
- * @author   Automattic
- * @category Admin
- * @package  WooCommerce/Import
+ * @package  WooCommerce\Interface
  * @version  3.1.0
  */
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * WC_Importer_Interface class.

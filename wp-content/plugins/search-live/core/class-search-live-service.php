@@ -54,6 +54,11 @@ class Search_Live_Service {
 	const POST_CACHE_GROUP   = 'ixslp';
 	const RESULT_CACHE_GROUP = 'ixslr';
 
+	const MAX_SEARCH_TERMS_DEFAULT = 10;
+
+	/**
+	 * Adds actions and filters.
+	 */
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'wp_init' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'wp_enqueue_scripts' ) );
@@ -79,6 +84,9 @@ class Search_Live_Service {
 		exit;
 	}
 
+	/**
+	 * Registers scripts and styles.
+	 */
 	public static function wp_enqueue_scripts() {
 		wp_register_script( 'typewatch', SEARCH_LIVE_DEBUG ? SEARCH_LIVE_PLUGIN_URL . '/js/jquery.typewatch.js' : SEARCH_LIVE_PLUGIN_URL . '/js/jquery.typewatch.min.js', array( 'jquery' ), SEARCH_LIVE_PLUGIN_VERSION, true );
 		wp_register_script( 'search-live', SEARCH_LIVE_DEBUG ? SEARCH_LIVE_PLUGIN_URL . '/js/search-live.js' : SEARCH_LIVE_PLUGIN_URL . '/js/search-live.min.js', array( 'jquery', 'typewatch' ), SEARCH_LIVE_PLUGIN_VERSION, true );
@@ -105,10 +113,12 @@ class Search_Live_Service {
 	 * Modifies the search results, replacing the standard search results.
 	 * This method is hooked on the pre_get_posts action
 	 * when the request contains the ixsl parameter.
-	 * 
+	 *
 	 * @see Search_Live_Service::wp_init()
 	 * @since 1.5.0
+	 *
 	 * @param WP_Query $wp_query
+	 *
 	 * @return string
 	 */
 	public static function pre_get_posts( $wp_query ) {
@@ -126,26 +136,35 @@ class Search_Live_Service {
 
 	/**
 	 * Empty the search clause in the query when we use our own results.
-	 * We're doing this instead of $wp_query->set( 's', '' ) to void the standard query; 
+	 * We're doing this instead of $wp_query->set( 's', '' ) to void the standard query;
 	 * since the 's' query variable is used in get_search_query() which in turn is
 	 * used in general-template.php and by many themes to display the search
 	 * terms along with results (these would appear empty if we voided 's').
-	 * 
+	 *
 	 * @param string $search
 	 * @param WP_Query $wp_query
+	 *
 	 * @return string
 	 */
 	public static function posts_search( $search, $wp_query ) {
 		if ( self::process_search_query( $wp_query ) ) {
-			$search = '';
+			// Only void it if we have any results. Otherwise
+			// we would get the default for an empty search term
+			// which contains all posts. This would show all posts
+			// when there are in fact no matches.
+			$post__in = $wp_query->get( 'post__in' );
+			if ( !empty( $post__in ) ) {
+				$search = '';
+			}
 		}
 		return $search;
 	}
 
 	/**
 	 * Returns true if the query is to be handled by us.
-	 * 
+	 *
 	 * @param WP_Query $wp_query
+	 *
 	 * @return boolean true if the query should be handled by us
 	 */
 	private static function process_search_query( &$wp_query ) {
@@ -160,16 +179,16 @@ class Search_Live_Service {
 
 	/**
 	 * Returns true if the request should be handled by us.
-	 * 
+	 *
 	 * @return boolean true if the request should be hanlded by us
 	 */
 	private static function process_request() {
-		return isset( $_REQUEST['s'] ) && isset( $_REQUEST['ixsl'] ); // @todo remove true
+		return isset( $_REQUEST['s'] ) && isset( $_REQUEST['ixsl'] );
 	}
 
 	/**
 	 * Looks at the $_REQUEST for search parameters.
-	 * 
+	 *
 	 * @return array
 	 */
 	private static function get_request_parameters() {
@@ -216,11 +235,20 @@ class Search_Live_Service {
 
 	/**
 	 * Returns results for the search request as an array of post IDs.
+	 *
 	 * @return array of post IDs
 	 */
 	public static function get_post_ids_for_request() {
 
 		global $wpdb;
+
+		$title        = null;
+		$excerpt      = null;
+		$content      = null;
+		$numberposts  = null;
+		$order        = null;
+		$order_by     = null;
+		$search_query = null;
 
 		$parameters = self::get_request_parameters();
 		extract( $parameters );
@@ -230,7 +258,17 @@ class Search_Live_Service {
 			$title = true;
 		}
 
-		$search_terms = explode( ' ', $search_query );
+		$search_terms = array();
+		$_search_terms = explode( ' ', trim( $search_query ) );
+		$_search_terms = array_map( 'trim', $_search_terms );
+		$_search_terms = array_unique( $_search_terms );
+		foreach ( $_search_terms as $search_term ) {
+			if ( strlen( $search_term ) > 0 ) {
+				$search_terms[] = $search_term;
+			}
+		}
+		$max_search_terms = apply_filters( 'search_live_max_search_terms', self::MAX_SEARCH_TERMS_DEFAULT );
+		$search_terms = array_slice( $search_terms, 0, $max_search_terms );
 
 		$cache_key = self::get_cache_key( array(
 			'title'        => $title,
@@ -249,6 +287,7 @@ class Search_Live_Service {
 
 		$options = Search_Live::get_options();
 		$conj = array();
+		$conj_content = array();
 
 		foreach ( $search_terms as $search_term ) {
 
@@ -268,14 +307,15 @@ class Search_Live_Service {
 				$args[] = ' post_excerpt LIKE %s ';
 				$params[] = $like;
 			}
-			if ( $content ) {
-				$args[] = ' post_content LIKE %s ';
-				$params[] = $like;
-			}
 
 			if ( !empty( $args ) ) {
 				// IMPORTANT : Do NOT skip the call to prepare() as we have $like in there!
 				$conj[] = $wpdb->prepare( sprintf( ' ( %s ) ', implode( ' OR ', $args ) ), $params );
+			}
+
+			if ( $content ) {
+				// IMPORTANT : As above, do NOT skip the call to prepare()!
+				$conj_content[] = $wpdb->prepare( ' post_content LIKE %s ', $like );
 			}
 
 		}
@@ -284,21 +324,46 @@ class Search_Live_Service {
 		$include = array();
 
 		if ( $title || $excerpt || $content ) {
+
 			$post_types = get_post_types( array( 'public' => true ) );
 			if ( empty( $post_types ) || !is_array( $post_types ) ) {
 				$post_types = array( 'post', 'page' );
 			}
+			$post_types = apply_filters( 'search_live_post_types', $post_types );
 			$post_types = array_map( 'esc_sql', $post_types );
-			$post_types = "('" . implode( "','", $post_types) . "')";
-			$query =  sprintf( "SELECT ID FROM $wpdb->posts WHERE ( post_status = 'publish' AND post_type IN %s ) AND %s", $post_types, $conditions );
-			// Preliminary results based on post title, excerpt, content
-			$results = $wpdb->get_results( $query );
-			if ( !empty( $results ) && is_array( $results ) ) {
-				foreach ( $results as $result ) {
-					$include[] = intval( $result->ID );
+			$post_types = "('" . implode( "','", $post_types ) . "')";
+
+			if ( $title || $excerpt ) {
+				$query =  sprintf( "SELECT ID FROM $wpdb->posts WHERE ( post_status = 'publish' AND post_type IN %s ) AND %s", $post_types, $conditions );
+				// Preliminary results based on post title, excerpt, content
+				$results = $wpdb->get_col( $query );
+				if ( !empty( $results ) && is_array( $results ) ) {
+					$include = array_map( 'intval', $results );
+				}
+				unset( $results );
+			}
+
+			if ( $content ) {
+				if ( count( $include ) > 0 ) {
+					array_unshift( $conj_content, ' ID NOT IN ( ' . implode( ',', $include ) . ' ) ' );
+				}
+				$conditions_content = implode( ' AND ', $conj_content );
+				$query =  sprintf(
+					"SELECT ID FROM $wpdb->posts WHERE ( post_status = 'publish' AND post_type IN %s ) AND %s",
+					$post_types,
+					$conditions_content
+				);
+
+				$include_content = array();
+				$results = $wpdb->get_col( $query );
+				if ( !empty( $results ) && is_array( $results ) ) {
+					$include_content = array_map( 'intval', $results );
+				}
+				unset( $results );
+				if ( count( $include_content ) > 0 ) {
+					$include = array_unique( array_merge( $include, $include_content ) );
 				}
 			}
-			unset( $results );
 		}
 
 		$cached = wp_cache_set( $cache_key, $include, self::POST_CACHE_GROUP, self::get_cache_lifetime() );
@@ -308,9 +373,10 @@ class Search_Live_Service {
 
 	/**
 	 * Helper to array_map boolean and.
-	 * 
+	 *
 	 * @param boolean $a
 	 * @param boolean $b
+	 *
 	 * @return boolean
 	 */
 	public static function mand( $a, $b ) {
@@ -319,17 +385,26 @@ class Search_Live_Service {
 
 	/**
 	 * Obtain search results based on the request parameters.
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function request_results() {
 
 		global $wpdb;
 
+		$title        = null;
+		$excerpt      = null;
+		$content      = null;
+		$numberposts  = null;
+		$order        = null;
+		$order_by     = null;
+		$search_query = null;
+		$thumbnails   = null;
+
 		$parameters = self::get_request_parameters();
 		extract( $parameters );
 
-		$thumbnails = isset( $_REQUEST[self::THUMBNAILS] ) ? intval( $_REQUEST[self::THUMBNAILS] ) > 0 : self::DEFAULT_THUMBNAILS; 
+		$thumbnails = isset( $_REQUEST[self::THUMBNAILS] ) ? intval( $_REQUEST[self::THUMBNAILS] ) > 0 : self::DEFAULT_THUMBNAILS;
 
 		$cache_key = self::get_cache_key( array(
 			'title'        => $title,
@@ -480,8 +555,9 @@ class Search_Live_Service {
 
 	/**
 	 * Computes a cache key based on the parameters provided.
-	 * 
+	 *
 	 * @param array $parameters
+	 *
 	 * @return string
 	 */
 	public static function get_cache_key( $parameters ) {
@@ -490,6 +566,7 @@ class Search_Live_Service {
 
 	/**
 	 * Returns the cache lifetime for stored results in seconds.
+	 *
 	 * @return int
 	 */
 	public static function get_cache_lifetime() {
@@ -499,8 +576,9 @@ class Search_Live_Service {
 
 	/**
 	 * Set the language if specified in the request.
-	 * 
+	 *
 	 * @param string $lang
+	 *
 	 * @return string
 	 */
 	public static function icl_set_current_language( $lang ) {
@@ -513,9 +591,10 @@ class Search_Live_Service {
 
 	/**
 	 * Index sort.
-	 * 
+	 *
 	 * @param array $e1
 	 * @param array $e2
+	 *
 	 * @return int
 	 */
 	public static function usort( $e1, $e2 ) {
@@ -526,6 +605,7 @@ class Search_Live_Service {
 	 * Reduces content to flat text only.
 	 *
 	 * @param string $content
+	 *
 	 * @return string
 	 */
 	private static function flatten( $content ) {

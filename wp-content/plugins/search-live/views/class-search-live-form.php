@@ -46,8 +46,9 @@ class Search_Live_Form {
 	/**
 	 * Returns our own search form instead of the standard search form.
 	 * Hooked on the get_search_form filter if the option is activated.
-	 * 
+	 *
 	 * @param string $form
+	 *
 	 * @return string
 	 */
 	public static function get_search_form( $form ) {

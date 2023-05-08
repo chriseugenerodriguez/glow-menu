@@ -7,6 +7,11 @@ var wp = require('wp'),
 var postMediaFrame = wp.media.view.MediaFrame.Post;
 var mediaFrame = postMediaFrame.extend( {
 
+	events: _.extend( {}, postMediaFrame.prototype.events, {
+			'click .media-menu-item' : 'resetMediaController',
+		}
+	),
+
 	initialize: function() {
 
 		postMediaFrame.prototype.initialize.apply( this, arguments );
@@ -37,12 +42,6 @@ var mediaFrame = postMediaFrame.extend( {
 
 	},
 
-	events: function() {
-		return _.extend( {}, postMediaFrame.prototype.events, {
-			'click .media-menu-item' : 'resetMediaController',
-		} );
-	},
-
 	resetMediaController: function( event ) {
 		if ( this.state() && 'undefined' !== typeof this.state().props && this.state().props.get('currentShortcode') ) {
 			this.mediaController.reset();
@@ -51,6 +50,7 @@ var mediaFrame = postMediaFrame.extend( {
 	},
 
 	contentRender : function( id, tab ) {
+		this.setState( 'shortcode-ui' );
 		this.content.set(
 			new Shortcode_UI( {
 				controller: this,

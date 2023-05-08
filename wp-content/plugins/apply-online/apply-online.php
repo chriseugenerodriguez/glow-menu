@@ -3,20 +3,20 @@
 /**
  * The plugin bootstrap file
  *
- * @link              http://wpreloaded.com/farhan-noor
+ * @link              https://wpreloaded.com
  * @since             1.0
  * @package           Applyonline
  *
  * @wordpress-plugin
  * Plugin Name:       Apply Online
- * Plugin URI:        http://wpreloaded.com/plugins/applyonline
- * Description:       Post ads and start receiving applications online. 
- * Version:           1.6.3
- * Author:            Farhan Noor
- * Author URI:        https://www.linkedin.com/in/thenoors
+ * Plugin URI:        https://wpreloaded.com
+ * Description:       Online Application Form Builder and Manager
+ * Version:           2.4.4
+ * Author:            Spider Teams
+ * Author URI:        https://spiderteams.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       apply-online
+ * Text Domain:       ApplyOnline
  * Domain Path:       /languages
  */
 
@@ -24,7 +24,9 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
+define( 'APPLYONLINE_VERSION', '2.4.3' );
 
+require_once( 'class-addons-update.php' );
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-applyonline-activator.php
@@ -51,6 +53,7 @@ register_deactivation_hook( __FILE__, 'deactivate_applyonline' );
  * admin-specific hooks, and public-facing site hooks.
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-applyonline.php';
+require plugin_dir_path( __FILE__ ) . 'includes/applyonline-functions.php';
 
 /**
  * Begins execution of the plugin.
@@ -62,9 +65,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-applyonline.php';
  * @since    1.0.0
  */
 function run_applyonline() {
-
 	$plugin = new Applyonline();
 	$plugin->run();
-
 }
 run_applyonline();

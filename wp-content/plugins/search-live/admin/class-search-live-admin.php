@@ -37,7 +37,7 @@ class Search_Live_Admin {
 	const MENU_SLUG             = 'search-live';
 	const MENU_SLUG_THUMBNAILS  = 'search-live-thumbnails';
 	const MENU_SLUG_APPEARANCE  = 'search-live-appearance';
-	const MENU_POSITION         = '37.017113';
+	const MENU_POSITION         = 37;
 
 	/**
 	 * Register a hook on the init action.
@@ -122,12 +122,15 @@ class Search_Live_Admin {
 	 *
 	 * @param array $links
 	 * @param array $links with additional links
+	 *
+	 * @return string[]
 	 */
 	public static function admin_settings_link( $links ) {
 		if ( current_user_can( Search_Live::MANAGE_SEARCH_LIVE ) ) {
 			$url = self::get_admin_section_url();
 			$links[] = '<a href="' . esc_url( $url ) . '">' . __( 'Settings', 'search-live' ) . '</a>';
-			$links[] = '<a href="http://docs.itthinx.com/document/search-live/">' . __( 'Documentation', 'search-live' ) . '</a>';
+			$links[] = '<a href="https://docs.itthinx.com/document/search-live/">' . esc_html__( 'Documentation', 'search-live' ) . '</a>';
+			$links[] = '<a href="https://www.itthinx.com/shop/">' . esc_html__( 'Shop', 'search-live' ) . '</a>';
 		}
 		return $links;
 	}
@@ -148,7 +151,7 @@ class Search_Live_Admin {
 					'<h3>' . __( 'Search Live', 'search-live' ) . '</h3>' .
 					'<h4>' . __( 'Documentation', 'search-live' ) . '</h4>' .
 					'<p>' .
-					__( 'Please refer to the <a href="http://docs.itthinx.com/document/search-live/">Search Live</a> documentation page for more details.', 'search-live' ) .
+					__( 'Please refer to the <a href="https://docs.itthinx.com/document/search-live/">Search Live</a> documentation page for more details.', 'search-live' ) .
 					'</p>' .
 					'</div>'
 			) );
@@ -203,8 +206,10 @@ class Search_Live_Admin {
 
 	/**
 	 * Returns the admin URL for the default or given section.
-	 * 
+	 *
 	 * @param string $section
+	 *
+	 * @return string
 	 */
 	public static function get_admin_section_url( $section = '' ) {
 		switch( $section ) {
@@ -299,14 +304,23 @@ class Search_Live_Admin {
 		}
 	}
 
+	/**
+	 * Renders the settings section.
+	 */
 	public static function search_live_settings() {
 		self::search_live( self::SECTION_SETTINGS );
 	}
 
+	/**
+	 * Renders the thumbnails section.
+	 */
 	public static function search_live_thumbnails() {
 		self::search_live( self::SECTION_THUMBNAILS );
 	}
 
+	/**
+	 * Renders the CSS section.
+	 */
 	public static function search_live_appearance() {
 		self::search_live( self::SECTION_CSS );
 	}
@@ -356,6 +370,19 @@ class Search_Live_Admin {
 				echo '<h1 class="section-heading">' . __( 'Search Live', 'search-live' ) . '</h1>';
 
 				echo '<h2>' . __( 'General Settings', 'search-live' ) . '</h2>';
+
+				echo '<div style="border-radius: 8px; border: 8px solid #69c; margin: 8px; padding: 8px; font-weight: 600; font-size: 16px; background-color: #fff; color: #000; text-align: center; line-height: 48px;">';
+				printf( esc_html__( 'If you would like to support our work, please visit our %sShop%s!' ), '<a href="' . esc_url( 'https://www.itthinx.com/shop/>' ) . '">', '</a>' );
+				echo '<div>&sim;</div>';
+				echo '<div>';
+				printf(
+					'<a href="%s">WooCommerce Product Search</a>',
+					'https://woocommerce.com/products/woocommerce-product-search/?aff=7223&cid=2409803'
+				);
+				echo ' &ndash; ';
+				esc_html_e( 'The essential extension for every WooCommerce Store! The perfect Search Engine for your store helps your customers to find and buy the right products quickly.', 'search-live' );
+				echo '</div>';
+				echo '</div>';
 
 				echo '<h3>' . __( 'Descriptions', 'search-live' ) . '</h3>';
 
@@ -522,13 +549,15 @@ class Search_Live_Admin {
 
 	/**
 	 * Returns or renders the footer.
-	 * 
+	 *
 	 * @param boolean $render
+	 *
+	 * @return string
 	 */
 	public static function footer( $render = true ) {
 		$footer =
 			'<div class="search-live-admin-footer">' .
-			__( 'Thank you for using <a href="http://www.itthinx.com/plugins/search-live/" target="_blank">Search Live</a> by <a href="http://www.itthinx.com" target="_blank">itthinx</a>.', 'search-live' ) .
+			__( 'Thank you for using <a href="https://www.itthinx.com/plugins/search-live/" target="_blank">Search Live</a> by <a href="https://www.itthinx.com" target="_blank">itthinx</a>.', 'search-live' ) .
 			'</div>';
 		$footer = apply_filters( 'search_live_admin_footer', $footer );
 		if ( $render ) {

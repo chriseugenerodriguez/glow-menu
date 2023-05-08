@@ -1,152 +1,82 @@
-=== MailChimp for WooCommerce ===
-Contributors: ryanhungate, MailChimp
+=== Mailchimp for WooCommerce ===
+Contributors: ryanhungate, Mailchimp
 Tags: ecommerce,email,workflows,mailchimp
 Donate link: https://mailchimp.com
-Requires at least: 4.3
-Tested up to: 4.6.1
-Stable tag: 4.6.1
+Requires at least: 4.9
+Tested up to: 6.2
+Stable tag: 2.8.3
+Requires PHP: 7.4
+WC requires at least: 4.2
+WC tested up to: 7.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-
-Connect your store to your MailChimp list to track sales, create targeted emails, send abandoned cart emails, and more.
+Connect your store to your Mailchimp audience to track sales, create targeted emails, send abandoned cart emails, and more.
 
 == Description ==
-- MailChimp for WooCommerce is a free plugin that connects your WooCommerce store with your MailChimp account.
-- Your customers and their purchase data are automatically synced with MailChimp, so you can create targeted email campaigns based on buying behavior.
-
-You’ll have the power to:
-
-- Sync list and purchase data
-- Create abandoned cart Automation workflows
-- Send product recommendations
-- Segment based on purchase history
-- View your results and measure ROI
-- Grow your audience and sell more stuff with Facebook Ad Campaigns in MailChimp
-
-###A note for current WooCommerce integration users
-This plugin supports our most powerful API 3.0 features, and is intended for users who have not yet integrated their WooCommerce stores with MailChimp.
-
-You can run this new integration at the same time as your current WooCommerce integration for MailChimp. However, data from the older integration will display separately in subscriber profiles, and can’t be used with e-commerce features that require API 3.0.
+Join the 17 million customers who use Mailchimp, the world's largest marketing automation platform, to develop their e-commerce marketing strategy. With the official Mailchimp for WooCommerce integration, your customers and their purchase data are automatically synced with your Mailchimp account, making it easy to send targeted campaigns, automatically follow up with customers post-purchase, recommend products, recover abandoned carts, and measure the ROI of your marketing efforts. And it's completely free.
+###What you can do with this plugin
+- Sync to your Audience in Mailchimp with purchase data.
+- Sync new subscribers to your Audience when they create an account and opt-in.
+- Set up marketing automations to remind customers about items they left in their cart or viewed on your site, win back lapsed customers, and follow up post-purchase. (Now available for free accounts!)
+- Showcase product recommendations.
+- Track and segment customers based on purchase history and purchase frequency.
+- View detailed data on your marketing performance in your Mailchimp Dashboard.
+- Find new customers, connect with current ones, and drive them all to your website with [Facebook](https://mailchimp.com/features/facebook-ads/) and [Instagram](https://mailchimp.com/features/instagram-ads/) ads. Then, set up [Google remarketing](https://mailchimp.com/features/google-remarketing-ads/) ads to turn your site visitors into shoppers.
+- Automatically embed a pop-up form that converts your website visitors to subscribers.
+- Add discount codes created in WooCommerce to your emails and automations with a Promo Code content block
+- Create beautiful landing pages that make it easy to highlight your products, promote a sale or giveaway, and grow your audience.
+- This plugin is [WPML compatible](https://wpml.org/plugin/mailchimp-for-woocommerce/)
+###Important Notes
+This plugin supports our most powerful API 3.0 features, and is intended for users who have not yet integrated their WooCommerce stores with Mailchimp.
+You can run this new integration at the same time as your current WooCommerce integration for Mailchimp. However, data from the older integration will display separately in subscriber profiles, and can’t be used with e-commerce features that require API 3.0.
+WordPress.com compatibility is limited to Business tier users only.
 
 == Installation ==
 ###Before You Start
 Here are some things to know before you begin this process.
-
 - This plugin requires you to have the [WooCommerce plugin](https://woocommerce.com/) already installed and activated in WordPress.
-- Your hosting environment must meet [WooCommerce's minimum requirements](https://docs.woocommerce.com/document/server-requirements), including PHP 5.6 or greater.
+- Your hosting environment must meet [WooCommerce's minimum requirements](https://docs.woocommerce.com/document/server-requirements), including PHP 7.0 or greater.
+- `WP_CRON` must be activated with your hosting provider to sync data. Please verify that it is enabled.
 - We recommend you use this plugin in a staging environment before installing it on production servers. To learn more about staging environments, [check out these related Wordpress plugins](https://wordpress.org/plugins/search.php?q=staging).
-- MailChimp for WooCommerce syncs the customer’s first name, last name, email address, and orders.
-- WooCommerce customers who haven't signed up for marketing emails will appear in the **Transactional** portion of your list, and cannot be exported. 
+- Mailchimp for WooCommerce syncs the customer’s first name, last name, email address, and orders.
+- WooCommerce customers who haven't signed up for marketing emails will appear in the **Transactional** portion of your audience, and cannot be exported.
 
-###Task Roadmap
-You’ll need to do a few things to connect your WooCommerce store to MailChimp. 
-
+###Getting Started
+You’ll need to do a few things to connect your WooCommerce store to Mailchimp.
 - Download the plugin.
 - Install the plugin on your WordPress Admin site.
-- Connect the plugin with your MailChimp API Key.
-- Configure your list settings to complete the data sync process.
+- Connect securely to your Mailchimp account via secure OAuth pop-up window.
+- Configure your Audience settings to complete the data sync process.
+- If you have more advanced configuration needs, please refer to our [GitHub wiki](https://github.com/mailchimp/mc-woocommerce/wiki)
 
-For more information on settings and configuration, please visit our Knowledge Base: [http://kb.mailchimp.com/integrations/e-commerce/connect-or-disconnect-mailchimp-for-woocommerce](http://kb.mailchimp.com/integrations/e-commerce/connect-or-disconnect-mailchimp-for-woocommerce)
+== Frequently Asked Questions ==
+
+= Who is subscribed to my Audience with this plugin? =
+
+- Customers are subscribed to your Audience when they opt-in at checkout or when an account is created. If an account is created through the standard WooCommerce `My Account` page, they must opt-in to be added.
+- Customers are sent to your Audience as `Transactional` if they do not opt-in. This is done so you can send [abandoned carts](https://mailchimp.com/help/create-an-abandoned-cart-email/) or [order notifications](https://mailchimp.com/help/create-order-notifications/).
+- If double opt-in is enabled, customers will only be subscribed to your Audience if they approve the subscription from the confirmation email that is sent.
+
+= What is the recommended way to sync larger stores? =
+
+To optimize the performance of your Mailchimp integration we recommend running the queue in CLI mode. Please refer to [this guide](https://github.com/mailchimp/mc-woocommerce/wiki/Advanced-Queue-Setup-In-CLI-mode) in our Wiki.
+
+= Are multisite configurations supported?
+
+Multisites are supported, with a few caveats. Please refer to our [Wiki page](https://github.com/mailchimp/mc-woocommerce/wiki/Multisite-Setups) on this topic for more information.
+
+= Why aren't product categories being sent to Mailchimp? =
+At this time, the synchronization of product categories from WooCommerce to Mailchimp is not supported by the Mailchimp API.
+
+= My sync is slow, or has stalled =
+- If you're using the current version of the plugin, it utilizes a queue system powered by [Action Scheduler](https://actionscheduler.org/). It depends on `WP_CRON` to be activated with your hosting provider. Please verify that it is enabled.
+- If you're using a host that makes use of CPU throttling, please check to see if you've hit your limit after initiating the sync.
+- If you're using Redis, Nginx or MemCache, check to see if you or your hosting provider can exclude certain paths to the `REST API` and `/wp-json/mailchimp-for-woocommerce`.
+- If you have a large number of plugins being used, you may need to bump up your memory limit on your server (1GB for example) to accommodate the initial sync.
+
+= My question is not listed =
+If you are unable to sync or connect with Mailchimp, you can open a ticket on our [Github plugin page](https://github.com/mailchimp/mc-woocommerce/issues). Please provide the version of the plugin and PHP you're using, any fatal errors in the WooCommerce logs (WooCommerce -> Status -> Logs) you're seeing, along with relevant information to the problem you're experiencing.
 
 == Changelog ==
-= 2.0 = 
-* Support WooComerce 3.0 
-* Support for manually uploaded WooCommerce
-* Fix for sync issues 
-* Fix for guest orders sync issue
-* Remove MailChimp debug logger
-
-= 1.1.1 = 
-* Support for site url changes 
-* Fix for WP Version 4.4 compatibility issues 
-
-= 1.1.0 =
-* Fix for persisting opt-in status
-* Pass order URLs to MailChimp
-* Pass partial refund status to MailChimp 
-
-= 1.0.9 =
-* billing and shipping address support for orders
-
-= 1.0.8 =
-* add landing_site, financial status and discount information for orders
-* fix to support php 5.3
-
-= 1.0.7 =
-* add options to move, hide and change defaults for opt-in checkbox
-* add ability to re-sync and display connection details
-* support for subscriptions without orders
-* additional small fixes and some internal logging removal
-
-= 1.0.6 =
-* fixed conflict with the plugin updater where the class could not be loaded correctly.
-* fixed error validation for store name.
-* fixed cross device abandoned cart url's
-
-= 1.0.4 =
-* fix for Abandoned Carts without cookies
-
-= 1.0.3 =
-* fixed cart posts on dollar amounts greater than 1000
-
-= 1.0.2 =
-* title correction for Product Variants
-* added installation checks for WooCommerce and phone contact info
-* support for free orders
-
-= 1.0 =
-* added is_synicng flag to prevent sends during backfill
-* fix for conflicts with Gravity Forms Pro and installation issues
-* skip all Amazon orders
-* allow users to set opt-in for pre-existing customers during first sync
-* add Plugin Updater
-
-= 0.1.22 =
-* flag quantity as 1 if the product does not manage inventory
-
-= 0.1.21 =
-* php version check to display warnings < 5.5
-
-= 0.1.19 =
-* fix campaign tracking on new orders
-
-= 0.1.18 =
-* check woocommerce dependency before activating the plugin
-
-= 0.1.17 =
-* fix php version syntax errors for array's
-
-= 0.1.16 =
-* fix namespace conflicts
-* fix free order 0.00 issue
-* fix product variant naming issue
-
-= 0.1.15 =
-* adding special MailChimp header to requests
-
-= 0.1.14 =
-* removing jquery dependencies
-
-= 0.1.13 =
-* fixing a number format issue on total_spent
-
-= 0.1.12 =
-* skipping orders placed through amazon due to seller agreements
-
-= 0.1.11 =
-* removed an extra debug log that was not needed
-
-= 0.1.10 =
-* altered debug logging and fixed store settings validation requirements
-
-= 0.1.9 =
-* using fallback to stream context during failed patch requests
-
-= 0.1.8 =
-* fixing http request header for larger patch requests
-
-= 0.1.7 =
-* fixing various bugs with the sync and product issues.
-
-= 0.1.2 =
-* fixed admin order update hook.
+= 2.8.3 =
+* back-end updates for support

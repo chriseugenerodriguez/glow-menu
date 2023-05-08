@@ -25,11 +25,11 @@ function schema_wp_output_sitelinks_search_box() {
 		$site_name				= schema_wp_get_option( 'site_name' );
 		$site_alternate_name	= schema_wp_get_option( 'site_alternate_name' );
 		
-		if ( ! isset($sitelinks_search_box) ) return;
+		if ( ! isset($sitelinks_search_box) || ! $sitelinks_search_box ) return;
 		
 		$output .= PHP_EOL . '<script type="application/ld+json">' . PHP_EOL;
 		$output .= '{' . PHP_EOL;
-		$output .= '  "@context": "http://schema.org",' . PHP_EOL;
+		$output .= '  "@context": "https://schema.org",' . PHP_EOL;
 		$output .= '  "@type": "WebSite",' . PHP_EOL;
 		$output .= '  "@id": "#website",' . PHP_EOL;
 		
@@ -38,7 +38,7 @@ function schema_wp_output_sitelinks_search_box() {
 			if ( $site_alternate_name ) $output .= '  "alternateName": "' . $site_alternate_name . '",' . PHP_EOL;
 		}
 		
-		$output .= '  "url": "' . get_site_url() . '/",' . PHP_EOL;
+		$output .= '  "url": "' . get_home_url() . '/",' . PHP_EOL;
 		$output .= '  "potentialAction": {' . PHP_EOL;
 		$output .= '    "@type": "SearchAction",' . PHP_EOL;
 		$output .= '    "target": "' . get_home_url() . '/?s={search_term_string}",' . PHP_EOL;
@@ -52,7 +52,6 @@ function schema_wp_output_sitelinks_search_box() {
 		echo $output;
 	}
 }
-
 
 
 //add_action('wp_head', 'schema_wp_output_sitelinks_search_box_disable');

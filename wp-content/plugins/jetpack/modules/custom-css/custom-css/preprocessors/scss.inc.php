@@ -1,13 +1,13 @@
-<?php
+<?php // phpcs:disable -- Copy-pasted library. Not reformatting to facilitate identification of actual changes.
 /**
  * SCSS compiler written in PHP
  *
  * @copyright 2012-2013 Leaf Corcoran
  *
- * @license http://opensource.org/licenses/gpl-license GPL-3.0
- * @license http://opensource.org/licenses/MIT MIT
+ * @license https://opensource.org/licenses/gpl-license GPL-3.0
+ * @license https://opensource.org/licenses/MIT MIT
  *
- * @link http://leafo.net/scssphp
+ * @link https://leafo.net/scssphp
  */
 
 /**
@@ -1631,7 +1631,7 @@ class scssc {
 
 		foreach ($args as $arg) {
 			list($key, $value) = $arg;
-			$key = $key[1];
+			$key = isset( $key[1] ) ? $key[1] : null;
 			if (empty($key)) {
 				$posArgs[] = $value;
 			} else {
@@ -2380,7 +2380,7 @@ class scssc {
 	/**
 	 * CSS Colors
 	 *
-	 * @see http://www.w3.org/TR/css3-color
+	 * @see https://www.w3.org/TR/css-color-4/
 	 */
 	static protected $cssColors = array(
 		'aliceblue' => '240,248,255',
@@ -2502,6 +2502,7 @@ class scssc {
 		'plum' => '221,160,221',
 		'powderblue' => '176,224,230',
 		'purple' => '128,0,128',
+		'rebeccapurple' => '102,51,153',
 		'red' => '255,0,0',
 		'rosybrown' => '188,143,143',
 		'royalblue' => '65,105,225',

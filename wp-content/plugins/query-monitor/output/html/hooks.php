@@ -1,78 +1,91 @@
-<?php
-/*
-Copyright 2009-2016 John Blackbourn
+<?php declare(strict_types = 1);
+/**
+ * Hooks and actions output for HTML pages.
+ *
+ * @package query-monitor
+ */
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 class QM_Output_Html_Hooks extends QM_Output_Html {
 
-	public $id = 'hooks';
+	/**
+	 * Collector instance.
+	 *
+	 * @var QM_Collector_Hooks Collector.
+	 */
+	protected $collector;
 
 	public function __construct( QM_Collector $collector ) {
 		parent::__construct( $collector );
 		add_filter( 'qm/output/menus', array( $this, 'admin_menu' ), 80 );
 	}
 
-	public function output() {
+	/**
+	 * @return string
+	 */
+	public function name() {
+		return __( 'Hooks & Actions', 'query-monitor' );
+	}
 
+	/**
+	 * @return void
+	 */
+	public function output() {
+		/** @var QM_Data_Hooks */
 		$data = $this->collector->get_data();
 
-		if ( empty( $data['hooks'] ) ) {
+		if ( empty( $data->hooks ) ) {
 			return;
 		}
 
-		if ( is_multisite() and is_network_admin() ) {
-			$screen = preg_replace( '|-network$|', '', $data['screen'] );
-		} else {
-			$screen = $data['screen'];
-		}
+		$this->before_tabular_output();
 
-		echo '<div class="qm" id="' . esc_attr( $this->collector->id() ) . '">';
-		echo '<table cellspacing="0">';
-		echo '<caption class="screen-reader-text">' . esc_html__( 'Hooks', 'query-monitor' ) . '</caption>';
+		$callback_label = $data->all_hooks ? __( 'Callback', 'query-monitor' ) : __( 'Action', 'query-monitor' );
+
 		echo '<thead>';
 		echo '<tr>';
-		echo '<th scope="col">';
-		echo $this->build_filter( 'name', $data['parts'], __( 'Hook', 'query-monitor' ) ); // WPCS: XSS ok.
+		echo '<th scope="col" class="qm-filterable-column">';
+		echo $this->build_filter( 'name', $data->parts, __( 'Hook', 'query-monitor' ) ); // WPCS: XSS ok.
 		echo '</th>';
-		echo '<th  scope="col" colspan="3">';
-		echo $this->build_filter( 'component', $data['components'], __( 'Actions', 'query-monitor' ), 'subject' ); // WPCS: XSS ok.
+		echo '<th scope="col">' . esc_html__( 'Priority', 'query-monitor' ) . '</th>';
+		echo '<th scope="col">' . esc_html( $callback_label ) . '</th>';
+		echo '<th scope="col" class="qm-filterable-column">';
+		echo $this->build_filter( 'component', $data->components, __( 'Component', 'query-monitor' ), array(
+			'highlight' => 'subject',
+		) ); // WPCS: XSS ok.
 		echo '</th>';
 		echo '</tr>';
 		echo '</thead>';
+
 		echo '<tbody>';
+		self::output_hook_table( $data->hooks );
+		echo '</tbody>';
 
-		foreach ( $data['hooks'] as $hook ) {
+		$this->after_tabular_output();
+	}
 
-			if ( !empty( $screen ) ) {
+	/**
+	 * @param array<int, mixed[]> $hooks
+	 * @return void
+	 */
+	public static function output_hook_table( array $hooks ) {
+		$core = __( 'WordPress Core', 'query-monitor' );
 
-				if ( false !== strpos( $hook['name'], $screen . '.php' ) ) {
-					$hook_name = str_replace( '-' . $screen . '.php', '-<span class="qm-current">' . $screen . '.php</span>', esc_html( $hook['name'] ) );
-				} else {
-					$hook_name = str_replace( '-' . $screen, '-<span class="qm-current">' . $screen . '</span>', esc_html( $hook['name'] ) );
-				}
-
-			} else {
-				$hook_name = esc_html( $hook['name'] );
-			}
-
+		foreach ( $hooks as $hook ) {
 			$row_attr = array();
-			$row_attr['data-qm-name']      = implode( ' ', $hook['parts'] );
+			$row_attr['data-qm-name'] = implode( ' ', $hook['parts'] );
 			$row_attr['data-qm-component'] = implode( ' ', $hook['components'] );
+
+			if ( ! empty( $row_attr['data-qm-component'] ) && $core !== $row_attr['data-qm-component'] ) {
+				$row_attr['data-qm-component'] .= ' non-core';
+			}
 
 			$attr = '';
 
-			if ( !empty( $hook['actions'] ) ) {
+			if ( ! empty( $hook['actions'] ) ) {
 				$rowspan = count( $hook['actions'] );
 			} else {
 				$rowspan = 1;
@@ -82,89 +95,128 @@ class QM_Output_Html_Hooks extends QM_Output_Html {
 				$attr .= ' ' . $a . '="' . esc_attr( $v ) . '"';
 			}
 
-			if ( !empty( $hook['actions'] ) ) {
+			if ( ! empty( $hook['actions'] ) ) {
 
 				$first = true;
 
 				foreach ( $hook['actions'] as $action ) {
+					$component = '';
+					$subject = '';
 
 					if ( isset( $action['callback']['component'] ) ) {
 						$component = $action['callback']['component']->name;
-					} else {
-						$component = '';
+						$subject = $component;
+					}
+
+					if ( $core !== $component ) {
+						$subject .= ' non-core';
 					}
 
 					printf( // WPCS: XSS ok.
 						'<tr data-qm-subject="%s" %s>',
-						esc_attr( $component ),
+						esc_attr( $subject ),
 						$attr
 					);
 
 					if ( $first ) {
 
-						echo '<th scope="row" rowspan="' . absint( $rowspan ) . '" class="qm-nowrap qm-ltr">';
-						echo $hook_name; // WPCS: XSS ok.
+						echo '<th scope="row" rowspan="' . intval( $rowspan ) . '" class="qm-nowrap qm-ltr"><span class="qm-sticky">';
+						echo '<code>' . esc_html( $hook['name'] ) . '</code>';
 						if ( 'all' === $hook['name'] ) {
-							echo '<br><span class="qm-warn">';
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							echo '<br><span class="qm-warn">' . QueryMonitor::icon( 'warning' );
 							printf(
 								/* translators: %s: Action name */
 								esc_html__( 'Warning: The %s action is extremely resource intensive. Try to avoid using it.', 'query-monitor' ),
 								'<code>all</code>'
 							);
-							echo '<span>';
+							echo '</span>';
 						}
-						echo '</th>';
+						echo '</span></th>';
 
-					}
-
-					echo '<td class="qm-num">' . intval( $action['priority'] ) . '</td>';
-					echo '<td class="qm-ltr qm-wrap">';
-
-					if ( isset( $action['callback']['file'] ) ) {
-						echo self::output_filename( $action['callback']['name'], $action['callback']['file'], $action['callback']['line'] ); // WPCS: XSS ok.
-					} else {
-						echo esc_html( $action['callback']['name'] );
 					}
 
 					if ( isset( $action['callback']['error'] ) ) {
-						echo '<br><span class="qm-warn">';
-						echo esc_html( sprintf(
-							/* translators: %s: Error message text */
-							__( 'Error: %s', 'query-monitor' ),
-							$action['callback']['error']->get_error_message()
-						) );
-						echo '<span>';
+						$class = ' qm-warn';
+					} else {
+						$class = '';
+					}
+
+					echo '<td class="qm-num' . esc_attr( $class ) . '">';
+
+					echo esc_html( $action['priority'] );
+
+					if ( PHP_INT_MAX === $action['priority'] ) {
+						echo ' <span class="qm-info">(PHP_INT_MAX)</span>';
+					} elseif ( PHP_INT_MIN === $action['priority'] ) {
+						echo ' <span class="qm-info">(PHP_INT_MIN)</span>';
+					} elseif ( -PHP_INT_MAX === $action['priority'] ) {
+						echo ' <span class="qm-info">(-PHP_INT_MAX)</span>';
 					}
 
 					echo '</td>';
-					echo '<td class="qm-nowrap">';
+
+					if ( isset( $action['callback']['file'] ) ) {
+						if ( self::has_clickable_links() ) {
+							echo '<td class="qm-nowrap qm-ltr' . esc_attr( $class ) . '">';
+							echo self::output_filename( $action['callback']['name'], $action['callback']['file'], $action['callback']['line'] ); // WPCS: XSS ok.
+							echo '</td>';
+						} else {
+							echo '<td class="qm-nowrap qm-ltr qm-has-toggle' . esc_attr( $class ) . '">';
+							echo self::build_toggler(); // WPCS: XSS ok;
+							echo '<ol>';
+							echo '<li>';
+							echo self::output_filename( $action['callback']['name'], $action['callback']['file'], $action['callback']['line'] ); // WPCS: XSS ok.
+							echo '</li>';
+							echo '</ol></td>';
+						}
+					} else {
+						echo '<td class="qm-ltr qm-nowrap' . esc_attr( $class ) . '">';
+						echo '<code>' . esc_html( $action['callback']['name'] ) . '</code>';
+
+						if ( isset( $action['callback']['error'] ) ) {
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							echo '<br>' . QueryMonitor::icon( 'warning' );
+							echo esc_html( sprintf(
+								/* translators: %s: Error message text */
+								__( 'Error: %s', 'query-monitor' ),
+								$action['callback']['error']->get_error_message()
+							) );
+						}
+
+						echo '</td>';
+					}
+
+					echo '<td class="qm-nowrap' . esc_attr( $class ) . '">';
 					echo esc_html( $component );
 					echo '</td>';
 					echo '</tr>';
 					$first = false;
 				}
-
 			} else {
 				echo "<tr{$attr}>"; // WPCS: XSS ok.
 				echo '<th scope="row" class="qm-ltr">';
-				echo $hook_name; // WPCS: XSS ok.
+				echo '<code>' . esc_html( $hook['name'] ) . '</code>';
 				echo '</th>';
-				echo '<td colspan="3">&nbsp;</td>';
+				echo '<td></td>';
+				echo '<td></td>';
+				echo '<td></td>';
 				echo '</tr>';
 			}
-
 		}
-
-		echo '</tbody>';
-		echo '</table>';
-		echo '</div>';
 
 	}
 
 }
 
+/**
+ * @param array<string, QM_Output> $output
+ * @param QM_Collectors $collectors
+ * @return array<string, QM_Output>
+ */
 function register_qm_output_html_hooks( array $output, QM_Collectors $collectors ) {
-	if ( $collector = QM_Collectors::get( 'hooks' ) ) {
+	$collector = QM_Collectors::get( 'hooks' );
+	if ( $collector ) {
 		$output['hooks'] = new QM_Output_Html_Hooks( $collector );
 	}
 	return $output;

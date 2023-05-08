@@ -24,7 +24,7 @@
  * if we are going somewhere else using document.location.
  */
 var ixsl = {
-	doPost : true, 
+	doPost : true,
 	blinkerTimeouts : [],
 	blinkerTimeout : 5000
 };
@@ -152,32 +152,15 @@ ixsl.navigate = function( fieldId, resultsId ) {
 };
 
 /**
- * Adjusts the width of the results to the width of the search field.
- */
-ixsl.autoAdjust = function( fieldId, resultsId ) {
-	var $field = $('#'+fieldId),
-		$results = $('#'+resultsId);
-	$results.on('adjustWidth',function(e){
-		e.stopPropagation();
-		// Field width minus own border.
-		var w = $field.outerWidth() - ( $results.outerWidth() - $results.innerWidth() );
-		$results.width(w);
-	});
-	$(window).on('resize',function(e){
-		$results.trigger('adjustWidth');
-	});
-};
-
-/**
  * POST the search query and display the results.
- * 
+ *
  * The args parameter object allows to indicate:
  * - blinkerTimeout : to modify the default blinker timeout in milliseconds or 0 to disable it
  * - lang : language code
  * - no_results : alternative text to show when no results are obtained
  * - show_description : whether to render descriptions
  * - thumbnails : whether to render thumbnails
- * 
+ *
  * @param fieldId
  * @param containerId
  * @param resultsId
@@ -290,7 +273,6 @@ ixsl.searchLive = function( fieldId, containerId, resultsId, url, query, args ) 
 				}
 				$results.show().html( results );
 				ixsl.clickable( resultsId );
-				$results.trigger('adjustWidth');
 				$blinker.removeClass('blinker');
 				if ( blinkerTimeout > 0 ) {
 					clearTimeout(ixsl.blinkerTimeouts["#"+fieldId]);

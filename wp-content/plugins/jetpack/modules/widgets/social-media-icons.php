@@ -1,18 +1,26 @@
-<?php
-/*
-Plugin Name: Social Media Icons Widget
-Description: A simple widget that displays social media icons
-Author: Automattic Inc.
-*/
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName.php
+/**
+ * Social Media Icons Widget
+ *
+ * This widget is now deprecated.
+ * Any new features should go into modules/widgets/social-icons.php instead.
+ *
+ * @see https://github.com/Automattic/jetpack/pull/8498
+ *
+ * @package automattic/jetpack
+ */
 
+// phpcs:disable Universal.Files.SeparateFunctionsFromOO.Mixed -- TODO: Move classes to appropriately-named class files.
 
 /**
  * WPCOM_social_media_icons_widget class.
  *
  * @extends WP_Widget
+ *
+ * phpcs:disable PEAR.NamingConventions.ValidClassName.Invalid
  */
 class WPCOM_social_media_icons_widget extends WP_Widget {
-
+	// phpcs:enable PEAR.NamingConventions.ValidClassName.Invalid
 	/**
 	 * Defaults
 	 *
@@ -29,7 +37,6 @@ class WPCOM_social_media_icons_widget extends WP_Widget {
 	 */
 	private $services;
 
-
 	/**
 	 * __construct function.
 	 *
@@ -40,9 +47,9 @@ class WPCOM_social_media_icons_widget extends WP_Widget {
 		parent::__construct(
 			'wpcom_social_media_icons_widget',
 			/** This filter is documented in modules/widgets/facebook-likebox.php */
-			apply_filters( 'jetpack_widget_name', esc_html__( 'Social Media Icons', 'jetpack' ) ),
+			apply_filters( 'jetpack_widget_name', esc_html__( 'Social Media Icons (Deprecated)', 'jetpack' ) ),
 			array(
-				'description' => __( 'A simple widget that displays social media icons.', 'jetpack' ),
+				'description'                 => __( 'A simple widget that displays social media icons.', 'jetpack' ),
 				'customize_selective_refresh' => true,
 			)
 		);
@@ -125,34 +132,38 @@ class WPCOM_social_media_icons_widget extends WP_Widget {
 			wp_enqueue_style( 'genericons' );
 		}
 		$index = 10;
-		$html = array();
+		$html  = array();
+		/* Translators: 1. Username. 2. Service name. */
 		$alt_text = esc_attr__( 'View %1$s&#8217;s profile on %2$s', 'jetpack' );
 		foreach ( $this->services as $service => $data ) {
 			list( $service_name, $url ) = $data;
 			if ( ! isset( $instance[ $service . '_username' ] ) ) {
 				continue;
 			}
-			$username = $link_username = $instance[ $service . '_username' ];
+			$link_username = $instance[ $service . '_username' ];
+			$username      = $link_username;
 			if ( empty( $username ) ) {
 				continue;
 			}
-			$index += 10;
+			$index         += 10;
 			$predefined_url = false;
 
-			/** Check if full URL entered in configuration, use it instead of tinkering **/
+			/** Check if full URL entered in configuration, use it instead of tinkering */
 			if (
 				in_array(
-					parse_url( $username, PHP_URL_SCHEME ),
-					array( 'http', 'https' )
+					wp_parse_url( $username, PHP_URL_SCHEME ),
+					array( 'http', 'https' ),
+					true
 				)
 			) {
 				$predefined_url = $username;
 
-				// In case of a predefined link we only display the service name
-				// for screen readers
+				/*
+				 * In case of a predefined link we only display the service name
+				 * for screen readers
+				 */
 				$alt_text = '%2$s';
 			}
-
 
 			if ( 'googleplus' === $service
 				&& ! is_numeric( $username )
@@ -162,7 +173,7 @@ class WPCOM_social_media_icons_widget extends WP_Widget {
 			}
 			if ( 'youtube' === $service && 'UC' === substr( $username, 0, 2 ) ) {
 				$link_username = 'channel/' . $username;
-			} else if ( 'youtube' === $service ) {
+			} elseif ( 'youtube' === $service ) {
 				$link_username = 'user/' . $username;
 			}
 
@@ -181,7 +192,7 @@ class WPCOM_social_media_icons_widget extends WP_Widget {
 			 * @param string $url the currently processed URL
 			 * @param string $service the lowercase service slug, e.g. 'facebook', 'youtube', etc.
 			 */
-			$link = apply_filters(
+			$link           = apply_filters(
 				'jetpack_social_media_icons_widget_profile_link',
 				$predefined_url,
 				$service
@@ -209,7 +220,7 @@ class WPCOM_social_media_icons_widget extends WP_Widget {
 		ksort( $html );
 		$html = '<ul><li>' . join( '</li><li>', $html ) . '</li></ul>';
 		if ( ! empty( $instance['title'] ) ) {
-			$html = $args['before_title'] . esc_html( $instance['title'] ) . $args['after_title'] . $html;
+			$html = $args['before_title'] . $instance['title'] . $args['after_title'] . $html;
 		}
 		$html = $args['before_widget'] . $html . $args['after_widget'];
 
@@ -225,7 +236,7 @@ class WPCOM_social_media_icons_widget extends WP_Widget {
 		 *
 		 * @param string $html Social Media Icons widget html output.
 		 */
-		echo apply_filters( 'jetpack_social_media_icons_widget_output', $html );
+		echo apply_filters( 'jetpack_social_media_icons_widget_output', $html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -250,13 +261,16 @@ class WPCOM_social_media_icons_widget extends WP_Widget {
 			</p>
 		<?php
 		foreach ( $this->services as $service => $data ) {
-			list( $service_name, $url ) = $data;
+			list( $service_name, $url ) = $data; // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 			?>
 				<p>
 					<label for="<?php echo esc_attr( $this->get_field_id( $service . '_username' ) ); ?>">
 					<?php
-						/* Translators: %s is a social network name, e.g. Facebook. */
-						printf( __( '%s username:', 'jetpack' ), $service_name );
+						printf(
+							/* translators: %s is a social network name, e.g. Facebook. */
+							esc_html__( '%s username:', 'jetpack' ),
+							esc_html( $service_name )
+						);
 					?>
 				</label>
 				<input
@@ -325,6 +339,18 @@ class WPCOM_social_media_icons_widget extends WP_Widget {
  * @return void
  */
 function wpcom_social_media_icons_widget_load_widget() {
-	register_widget( 'wpcom_social_media_icons_widget' );
+	$transient  = 'wpcom_social_media_icons_widget::is_active';
+	$has_widget = get_transient( $transient );
+
+	if ( false === $has_widget ) {
+		$is_active_widget = is_active_widget( false, false, 'wpcom_social_media_icons_widget', false );
+		$has_widget       = (int) ! empty( $is_active_widget );
+		set_transient( $transient, $has_widget, 1 * HOUR_IN_SECONDS );
+	}
+
+	// [DEPRECATION]: Only register widget if active widget exists already
+	if ( $has_widget ) {
+		register_widget( 'wpcom_social_media_icons_widget' );
+	}
 }
 add_action( 'widgets_init', 'wpcom_social_media_icons_widget_load_widget' );

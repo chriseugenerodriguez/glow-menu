@@ -51,6 +51,11 @@ class Search_Live {
 
 	const MANAGE_SEARCH_LIVE        = 'manage_search_live';
 
+	/**
+	 * Holds temporary admin messages if any apply.
+	 *
+	 * @var string[]
+	 */
 	private static $admin_messages = array();
 
 	/**
@@ -90,11 +95,11 @@ class Search_Live {
 
 	/**
 	 * Activate plugin action.
-	 * 
+	 *
 	 * Adds the plugin's capabilities to the administrator role, or
 	 * in lack thereof, to those roles that have the activate_plugins
 	 * capability.
-	 * 
+	 *
 	 * @param boolean $network_wide
 	 */
 	public static function activate( $network_wide = false ) {
@@ -112,9 +117,9 @@ class Search_Live {
 
 	/**
 	 * Deactivate plugin action.
-	 * 
+	 *
 	 * Currently not used.
-	 * 
+	 *
 	 * @param boolean $network_wide
 	 */
 	public static function deactivate( $network_wide = false ) {
@@ -122,7 +127,7 @@ class Search_Live {
 
 	/**
 	 * Uninstall plugin action.
-	 * 
+	 *
 	 * Currently not used.
 	 */
 	public static function uninstall() {
@@ -141,6 +146,7 @@ class Search_Live {
 
 	/**
 	 * Get plugin options.
+	 *
 	 * @return array
 	 */
 	public static function get_options() {
@@ -155,6 +161,7 @@ class Search_Live {
 
 	/**
 	 * Set plugin options.
+	 *
 	 * @param array $data
 	 */
 	public static function set_options( $data ) {
@@ -168,7 +175,7 @@ class Search_Live {
 
 	/**
 	 * Returns the plugin name intended for humans to read.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function get_plugin_name() {

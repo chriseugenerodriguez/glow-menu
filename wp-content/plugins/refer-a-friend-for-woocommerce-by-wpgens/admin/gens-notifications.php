@@ -137,8 +137,7 @@ if(!function_exists('wpgens_notification'))
 }
 
 $gens_current_user = wp_get_current_user();
-$htmlNotification = '<p>Hey '.$gens_current_user->user_firstname.', thanks for using Refer a Friend by WPGens. In this update, we added compatibility with older PHP versions. Added missing translation strings, and fixed one email bug. In the next version we will add more filters/actions for developers. More info <a target="_blank" href="https://wordpress.org/plugins/refer-a-friend-for-woocommerce-by-wpgens/changelog/">here</a>. If you are happy with Refer a Friend plugin, please do us a HUGE favor and rate plugin <a target="_blank" href="https://wordpress.org/support/plugin/refer-a-friend-for-woocommerce-by-wpgens/reviews/#new-post">here.</a> Each rating is a huge motivator!</p>
-    <p>Premium version got updated with guest coupons. Read more <a target="_blank" href="https://wpgens.com/downloads/refer-a-friend-for-woocommerce-premium/">on this link.</a> Click on top right x to remove this window permanently.</p>
+$htmlNotification = '<p>Hey '.$gens_current_user->user_firstname.', thanks for using Refer a Friend by WPGens. In this update, we made coupon code much smaller, and every code starts with RAF- text. Also check out PREMIUM Version with additional features <a target="_blank" href="https://wpgens.com/downloads/refer-a-friend-for-woocommerce-premium/">on this link.</a> Click on top right x to remove this window permanently.</p>
     <p><strong>~ Goran Jakovljevic<br>Founder of WPGens</strong></p>';
 
-wpgens_notification( "raf-free-1_1_1", $htmlNotification, $type = 'info', $dismissible = true, $class = '', $network = false );
+wpgens_notification( "raf-free-1_1_2", $htmlNotification, $type = 'info', $dismissible = true, $class = '', $network = false );

@@ -17,8 +17,6 @@ add_action( 'admin_bar_menu', 'schema_wp_admin_bar_menu_items', 99 );
 * @since 1.5.4
 */
 function schema_wp_admin_bar_menu_items( $admin_bar ) {
-	
-	global $post;
 		
 	/* This print_r will show you the current contents of the admin menu bar, use it if you want to examine the $admin_bar array
 	* echo "<pre>";
@@ -32,15 +30,22 @@ function schema_wp_admin_bar_menu_items( $admin_bar ) {
 	// Get current page url
 	$url =  'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
 	
-	// If user can't edit posts, then get out
-	if ( ! current_user_can( 'edit_post', $post->ID ) ) return;
+	// If user can't publish posts, then get out
+	if ( ! current_user_can( 'publish_posts' ) ) return;
 	
+	// Get language to be used in url
+	// Example hl=en-US
+	// @since 1.7.9.5
+	//
+	$lang = get_bloginfo( 'language' );
+	$hl = 'hl=' . $lang . '&';
+
 	$admin_bar->add_menu( array(
 		'id'	=> 'schema-test-item',
 		'title'	=> __('', 'schema-wp'),
-		'href'	=> 'https://developers.google.com/structured-data/testing-tool/?url='.$url,
+		'href' => 'https://validator.schema.org/?' . $hl . 'url=' . $url,
 		'meta'	=> array(
-			'title'		=> __('Structured Data Testing Tool', 'schema-wp'),
+			'title'		=> __('Schema Markup Validator', 'schema-wp'),
 			'class'		=> 'schema_google_developers',
 			'target'	=> __('_blank')
 		),
@@ -65,7 +70,7 @@ function schema_wp_admin_bar_styles() {
 	<style type="text/css">
 		/* admin bar */
 		.schema_google_developers a {
-			padding-left:30px !important;
+			padding-left:20px !important;
 			background:	transparent url('<?php echo SCHEMAWP_PLUGIN_URL; ?>assets/images/admin-bar/google-developers.png') 8px 50% no-repeat !important;
 		}
 		.schema_google_developers a:hover {

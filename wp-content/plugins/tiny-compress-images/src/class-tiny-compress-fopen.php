@@ -1,7 +1,7 @@
 <?php
 /*
 * Tiny Compress Images - WordPress plugin.
-* Copyright (C) 2015-2017 Voormedia B.V.
+* Copyright (C) 2015-2018 Tinify B.V.
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the Free
@@ -21,6 +21,9 @@
 class Tiny_Compress_Fopen extends Tiny_Compress {
 	private $last_error_code = 0;
 	private $compression_count;
+	private $remaining_credits;
+	private $paying_state;
+	private $email_address;
 	private $api_key;
 
 	protected static function identifier() {
@@ -41,19 +44,28 @@ class Tiny_Compress_Fopen extends Tiny_Compress {
 		return $this->compression_count;
 	}
 
+	public function get_remaining_credits() {
+		return $this->remaining_credits;
+	}
+
+	public function get_paying_state() {
+		return $this->paying_state;
+	}
+
+	public function get_email_address() {
+		return $this->email_address;
+	}
+
 	public function get_key() {
 		return $this->api_key;
 	}
 
-	public function limit_reached() {
-		return 429 == $this->last_error_code;
-	}
-
 	protected function validate() {
-		$params = $this->request_options( 'POST' );
-		list($details, $headers, $status_code) = $this->request( $params );
+		$params = $this->request_options( 'GET' );
+		$url = Tiny_Config::KEYS_URL . '/' . $this->get_key();
+		list($details, $headers, $status_code) = $this->request( $params, $url );
 
-		if ( 429 == $status_code || 400 == $status_code ) {
+		if ( 429 == $status_code || 400 == $status_code || 200 == $status_code ) {
 			return true;
 		} elseif ( is_array( $details ) && isset( $details['error'] ) ) {
 			throw new Tiny_Exception(
@@ -135,13 +147,13 @@ class Tiny_Compress_Fopen extends Tiny_Compress {
 		return array( $output, $meta );
 	}
 
-	private function request( $params, $url = Tiny_Config::URL ) {
+	private function request( $params, $url = Tiny_Config::SHRINK_URL ) {
 		$context = stream_context_create( $params );
 		$request = fopen( $url, 'rb', false, $context );
 
 		if ( ! $request ) {
 			throw new Tiny_Exception(
-				'Could not execute request, enable cURL for detailed errors',
+				'Could not execute fopen request',
 				'Tinify\FopenError'
 			);
 		}
@@ -157,6 +169,18 @@ class Tiny_Compress_Fopen extends Tiny_Compress {
 
 		if ( isset( $headers['compression-count'] ) ) {
 			$this->compression_count = intval( $headers['compression-count'] );
+		}
+
+		if ( isset( $headers['compression-count-remaining'] ) ) {
+			$this->remaining_credits = intval( $headers['compression-count-remaining'] );
+		}
+
+		if ( isset( $headers['paying-state'] ) ) {
+			$this->paying_state = $headers['paying-state'];
+		}
+
+		if ( isset( $headers['email-address'] ) ) {
+			$this->email_address = $headers['email-address'];
 		}
 
 		$this->last_error_code = $status_code;
@@ -200,6 +224,7 @@ class Tiny_Compress_Fopen extends Tiny_Compress {
 				'header' => array_merge( $headers, array(
 					'Authorization: Basic ' . base64_encode( 'api:' . $this->api_key ),
 					'User-Agent: ' . self::identifier(),
+					'Content-Type: multipart/form-data',
 				) ),
 				'content' => $body,
 				'follow_location' => 0,

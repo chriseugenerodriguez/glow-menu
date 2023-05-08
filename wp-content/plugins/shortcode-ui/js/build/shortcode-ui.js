@@ -49,10 +49,17 @@ var MediaController = wp.media.controller.State.extend({
 			action: 'select',
 			search: null,
 			insertCallback: this.insertCallback,
+			editor: wpActiveEditor,
 		});
 
 		this.props.on( 'change:action', this.refresh, this );
+		this.on( 'activate', this.activate, this );
 
+	},
+
+	activate: function() {
+		var $el = this.frame.$el;
+		_.defer( function() { $el.addClass( 'hide-router' ); } );
 	},
 
 	refresh: function() {
@@ -74,12 +81,13 @@ var MediaController = wp.media.controller.State.extend({
 		var shortcode      = this.props.get( 'currentShortcode' );
 		var insertCallback = this.props.get( 'insertCallback' );
 
+		this.setActiveEditor( this.props.get( 'editor' ) );
+
 		if ( shortcode && insertCallback ) {
 			insertCallback( shortcode );
 		}
 
 		this.reset();
-		this.resetState();
 		this.frame.close();
 	},
 
@@ -92,13 +100,13 @@ var MediaController = wp.media.controller.State.extend({
 		this.props.set( 'currentShortcode', null );
 		this.props.set( 'search', null );
 		this.props.set( 'insertCallback', this.insertCallback );
-	},
 
-	resetState: function() {
 		var menuItem = this.frame.menu.get().get('shortcode-ui');
 		menuItem.options.text = shortcodeUIData.strings.media_frame_title;
 		menuItem.render();
+
 		this.frame.setState( 'insert' );
+		this.frame.uploader.uploader.uploader.init();
 	},
 
 	setActionSelect: function() {
@@ -134,7 +142,31 @@ var MediaController = wp.media.controller.State.extend({
 
 			this.frame.once( 'close', function() {
 				this.frame.mediaController.toggleSidebar( false );
+				/* Trigger render_closed */
+				/*
+				 * Action run after the shortcode overlay is closed.
+				 *
+				 * Called as `shortcode-ui.render_closed`.
+				 *
+				 * @param shortcodeModel (object)
+				 *		   Reference to the shortcode model used in this overlay.
+				 */
+				var hookName = 'shortcode-ui.render_closed';
+				var shortcodeModel = this.frame.mediaController.props.get( 'currentShortcode' );
+				wp.shortcake.hooks.doAction( hookName, shortcodeModel );
+
 			}.bind( this ) );
+
+			/*
+			 * Action run after an edit shortcode overlay is rendered.
+			 *
+			 * Called as `shortcode-ui.render_edit`.
+			 *
+			 * @param shortcodeModel (object)
+			 *		   Reference to the shortcode model used in this overlay.
+			 */
+			var hookName = 'shortcode-ui.render_edit';
+			wp.shortcake.hooks.doAction( hookName, currentShortcode );
 
 		}.bind( this ) );
 
@@ -144,6 +176,15 @@ var MediaController = wp.media.controller.State.extend({
 		this.frame.$el.toggleClass( 'hide-menu', show );
 	},
 
+	setActiveEditor: function( editorId ) {
+		var editor = tinymce.get( editorId );
+
+		if ( editor ) {
+			tinymce.setActive( editor );
+		}
+
+		window.wpActiveEditor = editorId;
+	},
 });
 
 sui.controllers.MediaController = MediaController;
@@ -265,7 +306,7 @@ Shortcode = Backbone.Model.extend({
 		this.get( 'attrs' ).each( function( attr ) {
 
 			// Skip empty attributes.
-			if ( ! attr.get( 'value' ) ||  attr.get( 'value' ).length < 1 ) {
+			if ( ! attr.get( 'value' ) || attr.get( 'value' ).length < 1 ) {
 				return;
 			}
 
@@ -347,7 +388,8 @@ $(document).ready(function(){
 			options = {
 				frame: 'post',
 				state: 'shortcode-ui',
-				title: shortcodeUIData.strings.media_frame_title
+				title: shortcodeUIData.strings.media_frame_title,
+				editor: this.dataset.editor
 			};
 
 		event.preventDefault();
@@ -359,6 +401,7 @@ $(document).ready(function(){
 
 		if ( frame ) {
 			frame.mediaController.setActionSelect();
+			frame.mediaController.props.set( 'editor', this.dataset.editor );
 			frame.open();
 		} else {
 			frame = wp.media.editor.open( editor, options );
@@ -366,11 +409,7 @@ $(document).ready(function(){
 
 		// Make sure to reset state when closed.
 		frame.once( 'close submit', function() {
-			frame.state().props.set('currentShortcode', false);
-			var menuItem = frame.menu.get().get('shortcode-ui');
-			menuItem.options.text = shortcodeUIData.strings.media_frame_title;
-			menuItem.render();
-			frame.setState( 'insert' );
+			frame.mediaController.reset();
 		} );
 
 	} );
@@ -464,7 +503,8 @@ var Fetcher = (function() {
 		}
 
 		var request = wp.ajax.post( 'bulk_do_shortcode', {
-			queries: _.pluck( fetcher.queries, 'query' )
+			queries: _.pluck( fetcher.queries, 'query' ),
+			nonce: shortcodeUIData.nonces.preview
 		});
 
 		request.done( function( responseData ) {
@@ -580,7 +620,7 @@ var shortcodeViewConstructor = {
 
 			if ( attr && attr.get('encode') ) {
 				value = decodeURIComponent( value );
-				value = value.replace( "&#37;", "%" );
+				value = value.replace( /&#37;/g, "%" );
 			}
 
 			if ( attr ) {
@@ -666,12 +706,14 @@ var shortcodeViewConstructor = {
 
 			if ( frame ) {
 				frame.mediaController.setActionUpdate( currentShortcode );
+				frame.mediaController.props.set( 'editor', wpActiveEditor );
 				frame.open();
 			} else {
 				frame = wp.media.editor.open( window.wpActiveEditor, {
 					frame : "post",
 					state : 'shortcode-ui',
 					currentShortcode : currentShortcode,
+					editor : wpActiveEditor,
 				});
 			}
 
@@ -679,19 +721,10 @@ var shortcodeViewConstructor = {
 				update( shortcode.formatShortcode() );
 			} );
 
-			/* Trigger render_edit */
-			/*
-			 * Action run after an edit shortcode overlay is rendered.
-			 *
-			 * Called as `shortcode-ui.render_edit`.
-			 *
-			 * @param shortcodeModel (object)
-			 *           Reference to the shortcode model used in this overlay.
-			 */
-			var hookName = 'shortcode-ui.render_edit';
-			var shortcodeModel = this.shortcodeModel;
-			wp.shortcake.hooks.doAction( hookName, shortcodeModel );
-
+			// Make sure to reset state when closed.
+			frame.once( 'close submit', function() {
+				frame.mediaController.reset();
+			} );
 		}
 
 	},
@@ -887,6 +920,8 @@ var editAttributeFieldAttachment = sui.views.editAttributeField.extend( {
 		}.bind( this ) );
 
 		this._renderAll();
+
+        this.triggerCallbacks();
 
 	},
 
@@ -1230,7 +1265,7 @@ var editAttributeField = Backbone.View.extend( {
 		// Ensure default value for select field.
 		if ( 'select' === data.type && '' === this.model.get( 'value' ) && ! _.findWhere( data.options, { value: '' } ) ) {
 			var firstVisibleOption = _.first( data.options );
-			if ( 'undefined' !== typeof firstVisibleOption.value ) {
+			if ( firstVisibleOption && 'undefined' !== typeof firstVisibleOption.value ) {
 				this.setValue( firstVisibleOption.value );
 				data.value = firstVisibleOption.value;
 			}
@@ -1443,7 +1478,7 @@ var EditShortcodeForm = wp.Backbone.View.extend({
 
 });
 
-module.exports = EditShortcodeForm;
+module.exports = sui.views.EditShortcodeForm = EditShortcodeForm;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./../utils/sui.js":10,"./edit-attribute-field-attachment.js":11,"./edit-attribute-field-color.js":12,"./edit-attribute-field-post-select.js":13,"./edit-attribute-field-term-select.js":14,"./edit-attribute-field-user-select.js":15,"./edit-attribute-field.js":16}],18:[function(require,module,exports){
@@ -1538,6 +1573,11 @@ var wp = (typeof window !== "undefined" ? window['wp'] : typeof global !== "unde
 var postMediaFrame = wp.media.view.MediaFrame.Post;
 var mediaFrame = postMediaFrame.extend( {
 
+	events: _.extend( {}, postMediaFrame.prototype.events, {
+			'click .media-menu-item' : 'resetMediaController',
+		}
+	),
+
 	initialize: function() {
 
 		postMediaFrame.prototype.initialize.apply( this, arguments );
@@ -1568,12 +1608,6 @@ var mediaFrame = postMediaFrame.extend( {
 
 	},
 
-	events: function() {
-		return _.extend( {}, postMediaFrame.prototype.events, {
-			'click .media-menu-item' : 'resetMediaController',
-		} );
-	},
-
 	resetMediaController: function( event ) {
 		if ( this.state() && 'undefined' !== typeof this.state().props && this.state().props.get('currentShortcode') ) {
 			this.mediaController.reset();
@@ -1582,6 +1616,7 @@ var mediaFrame = postMediaFrame.extend( {
 	},
 
 	contentRender : function( id, tab ) {
+		this.setState( 'shortcode-ui' );
 		this.content.set(
 			new Shortcode_UI( {
 				controller: this,
@@ -1750,6 +1785,11 @@ sui.views.editAttributeSelect2Field = sui.views.editAttributeField.extend( {
 	inputChanged: function(e) {
 		var _selected = $( e.currentTarget ).val();
 
+		// Empty fields will have null values. We don't want to coerce that to the string "null".
+		if ( _selected === null ) {
+			_selected = '';
+		}
+
 		// Store multiple selections as comma-delimited list
 		if ( Array.isArray( _selected ) ) {
 			_selected = _selected.join( ',' );
@@ -1816,7 +1856,10 @@ sui.views.editAttributeSelect2Field = sui.views.editAttributeField.extend( {
 	render: function() {
 
 		var self = this,
-			defaults = { multiple: false };
+			defaults = { 
+				multiple: false,
+				allowClear: false
+			};
 
 		for ( var arg in defaults ) {
 			if ( ! this.model.get( arg ) ) {
@@ -1836,6 +1879,8 @@ sui.views.editAttributeSelect2Field = sui.views.editAttributeField.extend( {
 		var $fieldSelect2 = $field[ shortcodeUIData.select2_handle ]({
 			placeholder: "Search",
 			multiple: this.model.get( 'multiple' ),
+			allowClear: this.model.get( 'allowClear' ),
+			dropdownParent: this.$el,
 
 			ajax: {
 				url: ajaxurl,

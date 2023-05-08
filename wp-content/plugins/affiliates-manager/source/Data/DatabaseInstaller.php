@@ -56,7 +56,8 @@ class WPAM_Data_DatabaseInstaller {
         `uniqueRefKey` char(128) NOT NULL DEFAULT '<none>',
         `nameOnCheck` varchar(255) DEFAULT NULL,
         `paypalEmail` varchar(255) DEFAULT NULL,
-        `paymentMethod` enum('paypal','check','manual') DEFAULT NULL,
+        `bankDetails` varchar(255) DEFAULT NULL,
+        `paymentMethod` enum('paypal','check','manual','bank') DEFAULT NULL,
         `bountyType` enum('fixed','percent') DEFAULT NULL,
         `bountyAmount` decimal(18,2) DEFAULT NULL,
         `phoneNumber` varchar(32) NOT NULL default '',
@@ -75,6 +76,7 @@ class WPAM_Data_DatabaseInstaller {
         `name` varchar(250) NOT NULL,
         `linkText` varchar(255) DEFAULT NULL,
         `slug` VARCHAR(255) NOT NULL default '',
+        `image` varchar(255) default '',
         PRIMARY KEY (`creativeId`)
         )" . $charset_collate . ";";
         dbDelta($creatives_tbl_sql);
@@ -130,7 +132,7 @@ class WPAM_Data_DatabaseInstaller {
         $aff_fields_tbl_sql = "CREATE TABLE " . $affiliates_fields_table . " (
         `affiliateFieldId` int(11) NOT NULL AUTO_INCREMENT,
         `type` enum('base','custom') NOT NULL,
-        `name` varchar(60) NOT NULL,
+        `name` varchar(255) NOT NULL,
         `length` int(11) NOT NULL,
         `fieldType` varchar(45) NOT NULL,
         `required` tinyint(1) NOT NULL,
@@ -192,6 +194,8 @@ class WPAM_Data_DatabaseInstaller {
     }
 
     public function doFreshInstallDbDefaultData() {
+        
+        global $wpdb;
         //Only inserts the default data if the respective tables are empty
         
         $affiliates_fields_table = $this->db->prefix . WPAM_Data_DataAccess::TABLE_AFFILIATES_FIELDS;        
@@ -230,8 +234,28 @@ class WPAM_Data_DatabaseInstaller {
             );
         }
         
-        $results = $this->db->get_results("SELECT * FROM " . $messages_table);
+        $results = $wpdb->get_results("SELECT * FROM " . $messages_table);
         if( is_null($results) || is_array($results) && empty($results) ){//No record in this table 
+            $affiliate_application_approved_use = __('Displayed to user at logon if affiliate STATUS = APPROVED', 'affiliates-manager');
+            $affiliate_application_approved_content = __('Congratulations, the administrator has <strong>approved</strong> your application. You have one more step to complete before you can begin publishing for this store and generating revenue! The store owner has specified the terms of your agreement, which you will need to review and agree to.<br /><br />', 'affiliates-manager');
+            $wpdb->insert($messages_table, array('name' => 'affiliate_application_approved', 'use' => $affiliate_application_approved_use, 'content' => $affiliate_application_approved_content, 'type' => 'web'));
+            
+            $affiliate_application_declined_use = __('Displayed to user at logon if affiliate STATUS = DECLINED', 'affiliates-manager');
+            $affiliate_application_declined_content = __("I'm sorry, your application was declined.", 'affiliates-manager');          
+            $wpdb->insert($messages_table, array('name' => 'affiliate_application_declined', 'use' => $affiliate_application_declined_use, 'content' => $affiliate_application_declined_content, 'type' => 'web'));
+            
+            $affiliate_application_pending_use = __('Displayed to user at logon if affiliate STATUS = PENDING', 'affiliates-manager');
+            $affiliate_application_pending_content = __('Your application is still being reviewed. Please check back later!', 'affiliates-manager');           
+            $wpdb->insert($messages_table, array('name' => 'affiliate_application_pending', 'use' => $affiliate_application_pending_use, 'content' => $affiliate_application_pending_content, 'type' => 'web'));
+            
+            $affiliate_application_submitted_use = __('Displayed to user after successfully submitting the affiliate registration form', 'affiliates-manager');
+            $affiliate_application_submitted_content = __('Your application has been submitted. The store owner will be contacting you soon.<br /><br />Thank you!<br />', 'affiliates-manager');          
+            $wpdb->insert($messages_table, array('name' => 'affiliate_application_submitted', 'use' => $affiliate_application_submitted_use, 'content' => $affiliate_application_submitted_content, 'type' => 'web'));
+            
+            $affiliate_application_submitted_email_use = __('Body of e-mail sent to the affiliate immediately after submitting their application.', 'affiliates-manager');
+            $affiliate_application_submitted_email_content = __('Your application will be reviewed and you will be hearing from us soon!', 'affiliates-manager');
+            $wpdb->insert($messages_table, array('name' => 'affiliate_application_submitted_email', 'use' => $affiliate_application_submitted_email_use, 'content' => $affiliate_application_submitted_email_content, 'type' => 'email'));
+            /*
             $this->db->query("
             INSERT INTO `$messages_table`
             VALUES
@@ -240,24 +264,24 @@ class WPAM_Data_DatabaseInstaller {
             (3,'affiliate_application_pending','Displayed to user at logon if affiliate STATUS = PENDING','Your application is still being reviewed. Please check back later!','web'),
             (4,'affiliate_application_submitted','Displayed to user after successfully submitting the affiliate registration form','Your application has been submitted.  The store owner will be contacting you soon.<br />\r\n<br />\r\nThank you!<br />\r\n','web'),
             (5,'affiliate_application_submitted_email','Body of e-mail sent to the affiliate immediately after submitting their application.','Your application will be reviewed and you will be hearing from us soon!','email')
-            ");
-
+            ");                     
+            */            
             $db = new WPAM_Data_DataAccess();
             $msgRepo = $db->getMessageRepository();
             $msg = new WPAM_Data_Models_MessageModel();
-            $msg->content = "I'm sorry, your application was declined.";
+            $msg->content = __("I'm sorry, your application was declined.", 'affiliates-manager');
             $msg->name = 'affiliate_application_declined_email';
             $msg->type = 'email';
-            $msg->use = 'Body of e-mail sent to the affiliate immediately following their application being declined.';
+            $msg->use = __('Body of e-mail sent to the affiliate immediately following their application being declined.', 'affiliates-manager');
             $msgRepo->insert($msg);
 
             $db = new WPAM_Data_DataAccess();
             $msgRepo = $db->getMessageRepository();
             $msg = new WPAM_Data_Models_MessageModel();
-            $msg->content = "Thank you. Your registration is now complete. You can log into the affiliate area and begin promoting.";
+            $msg->content = __("Thank you. Your registration is now complete. You can log into the affiliate area and begin promoting.", 'affiliates-manager');
             $msg->name = 'aff_app_submitted_auto_approved';
             $msg->type = 'web';
-            $msg->use = 'Displayed to a newly registered affiliate if automatic affiliate approval option is enabled.';
+            $msg->use = __('Displayed to a newly registered affiliate if automatic affiliate approval option is enabled.', 'affiliates-manager');
             $msgRepo->insert($msg);
         }
         
@@ -267,10 +291,46 @@ class WPAM_Data_DatabaseInstaller {
         $message = $msgRepo->loadBy(array('name' => 'affiliate_application_approved_email'));
         if($message === NULL){
             $msg = new WPAM_Data_Models_MessageModel();
-            $msg->content = "Your affiliate account for {blogname} has been approved!. \n\nUsername: {affusername} \nPassword: {affpassword} \nLogin URL: {affloginurl} \n\nPlease log into your account to get referral code.";
+            $msg->content = __("Your affiliate account for {blogname} has been approved!. \n\nUsername: {affusername} \nPassword: {affpassword} \nLogin URL: {affloginurl} \n\nPlease log into your account to get referral code.", 'affiliates-manager');
             $msg->name = 'affiliate_application_approved_email';
             $msg->type = 'email';
-            $msg->use = 'Body of e-mail sent to a newly registered affiliate immediately following their application being approved.';
+            $msg->use = __('Body of e-mail sent to a newly registered affiliate immediately following their application being approved.', 'affiliates-manager');
+            $msgRepo->insert($msg);
+        }
+        
+        $db = new WPAM_Data_DataAccess();
+        $msgRepo = $db->getMessageRepository();
+        $message = $msgRepo->loadBy(array('name' => 'affiliate_commission_notification_email'));
+        if($message === NULL){
+            $msg = new WPAM_Data_Models_MessageModel();
+            $msg->content = __("Great news, you have just earned a commission by sending a referral to our site! \n\nPlease log into your affiliate account to view the details. \n\nThank You", 'affiliates-manager');
+            $msg->name = 'affiliate_commission_notification_email';
+            $msg->type = 'email';
+            $msg->use = __('Body of e-mail sent to the affiliate immediately after earning a commission.', 'affiliates-manager');
+            $msgRepo->insert($msg);
+        }
+        
+        $db = new WPAM_Data_DataAccess();
+        $msgRepo = $db->getMessageRepository();
+        $message = $msgRepo->loadBy(array('name' => 'admin_affiliate_commission_notification_email'));
+        if($message === NULL){
+            $msg = new WPAM_Data_Models_MessageModel();
+            $msg->content = __("An affiliate just earned a commission by sending a referral to the site. \n\nPlease log into your WordPress admin dashboard to view the details.", 'affiliates-manager');
+            $msg->name = 'admin_affiliate_commission_notification_email';
+            $msg->type = 'email';
+            $msg->use = __('Body of e-mail sent to the admin when an affiliate earns a commission.', 'affiliates-manager');
+            $msgRepo->insert($msg);
+        }
+        
+        $db = new WPAM_Data_DataAccess();
+        $msgRepo = $db->getMessageRepository();
+        $message = $msgRepo->loadBy(array('name' => 'aff_approved_email_existing_user_account'));
+        if($message === NULL){
+            $msg = new WPAM_Data_Models_MessageModel();
+            $msg->content = __("New affiliate registration for {blogname} has been approved! \n\nLog into the site with your existing account and get started.", 'affiliates-manager');
+            $msg->name = 'aff_approved_email_existing_user_account';
+            $msg->type = 'email';
+            $msg->use = __('Body of e-mail sent to a newly approved affiliate if they have an existing user account.', 'affiliates-manager');
             $msgRepo->insert($msg);
         }
         //Add other options below
@@ -320,36 +380,36 @@ class WPAM_Data_DatabaseInstaller {
         if (!isset($home_page_id) || empty($home_page_id)) {
             //Could not find a ID for the affiliate homepage. Lets create this page
             $home_page_id = $new_pages[WPAM_Plugin::PAGE_NAME_HOME]->install();
+            update_option(WPAM_PluginConfig::$HomePageId, $home_page_id); //Save the ID of our affiliate area home page
+            $home_page = get_permalink($home_page_id);
+            update_option(WPAM_PluginConfig::$AffHomePageURL, $home_page); //Save the URL of the affiliate home page
         }
-        update_option(WPAM_PluginConfig::$HomePageId, $home_page_id); //Save the ID of our affiliate area home page
-        $home_page = get_permalink($home_page_id);
-        update_option(WPAM_PluginConfig::$AffHomePageURL, $home_page); //Save the URL of the affiliate home page
-
         $reg_page_id = get_option( WPAM_PluginConfig::$RegPageId );
         if (!isset($reg_page_id) || empty($reg_page_id)) {
             //Could not find the ID of the affiliate registration page. Lets create this page
             $reg_page_id = $new_pages[WPAM_Plugin::PAGE_NAME_REGISTER]->install();
-        }
-        update_option(WPAM_PluginConfig::$RegPageId, $reg_page_id); //Save the ID of the registration page.
-        $reg_page = get_permalink($reg_page_id);
-        update_option(WPAM_PluginConfig::$AffRegPageURL, $reg_page); //Save the URL of the affiliate registration page       
-        
+            update_option(WPAM_PluginConfig::$RegPageId, $reg_page_id); //Save the ID of the registration page.
+            $reg_page = get_permalink($reg_page_id);
+            update_option(WPAM_PluginConfig::$AffRegPageURL, $reg_page); //Save the URL of the affiliate registration page 
+        }            
         $login_page = get_option( WPAM_PluginConfig::$AffLoginPageURL );
         if (!isset($login_page) || empty($login_page)) {
             //Could not find the URL of the affiliate login page. Lets create this page
             $login_page_id = $new_pages[WPAM_Plugin::PAGE_NAME_LOGIN]->install();
-            $login_page = get_permalink($login_page_id);          
-        }
-        update_option(WPAM_PluginConfig::$AffLoginPageURL, $login_page); //Save the URL of the login page      
+            $login_page = get_permalink($login_page_id); 
+            update_option(WPAM_PluginConfig::$AffLoginPageURL, $login_page); //Save the URL of the login page
+        }      
         // save default messages for the pages
         $login_url = get_option(WPAM_PluginConfig::$AffLoginPageURL);
         $register_page_id = get_option(WPAM_PluginConfig::$RegPageId);
         $register_page_url = get_permalink($register_page_id);
-        $affhomemsg = 'This is the affiliates section of this store. If you are an existing affiliate, please <a href="'.$login_url.'">log in</a> to access your control panel.';
+        $affhomemsg = sprintf( __( 'This is the affiliates section of this store. If you are an existing affiliate, please <a href="%s">log in</a> to access your control panel.', 'affiliates-manager' ), $login_url );
         $affhomemsg .= '<br />';
         $affhomemsg .= '<br />';
-        $affhomemsg .= 'If you are not an affiliate, but wish to become one, you will need to apply. To apply, you must be a registered user on this blog. If you have an existing account on this blog, please <a href="'.$login_url.'">log in</a>. If not, please <a href="'.$register_page_url.'">register</a>.';
+        $affhomemsg .= sprintf( __( 'If you are not an affiliate, but wish to become one, you will need to apply. To apply, you must be a registered user on this blog. If you have an existing account on this blog, please <a href="%s">log in</a>. If not, please <a href="%s">register</a>.', 'affiliates-manager' ), $login_url, $register_page_url);
         add_option( WPAM_PluginConfig::$AffHomeMsg, $affhomemsg );
+        $affhomemsgnotregistered = sprintf( __( 'This is the affiliates section of this store. You are not currently an affiliate of this store. If you wish to become one, please <a href="%s"/>apply</a>.', 'affiliates-manager' ), $register_page_url );
+        add_option( WPAM_PluginConfig::$AffHomeMsgNotRegistered, $affhomemsgnotregistered );
         //
         $tnc_page = get_option( WPAM_PluginConfig::$AffTncPageURL );
         if (!isset($tnc_page) || empty($tnc_page)) {
@@ -365,9 +425,9 @@ class WPAM_Data_DatabaseInstaller {
                 'post_type' => 'page'
             );
             $tnc_page_id = wp_insert_post($tnc_post);
-            $tnc_page = get_permalink($tnc_page_id);          
+            $tnc_page = get_permalink($tnc_page_id);
+            update_option(WPAM_PluginConfig::$AffTncPageURL, $tnc_page); //Save the URL of the terms and conditions page
         }
-        update_option(WPAM_PluginConfig::$AffTncPageURL, $tnc_page); //Save the URL of the terms and conditions page
         //Add code for any new page needed for this plugin.
     }
     

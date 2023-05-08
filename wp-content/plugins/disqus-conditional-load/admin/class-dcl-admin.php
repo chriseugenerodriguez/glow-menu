@@ -1,226 +1,268 @@
 <?php
 
 // If this file is called directly, abort.
-if (!defined('WPINC')) {
-    die('Damn it.! Dude you are looking for what?');
-}
+defined( 'ABSPATH' ) || die( 'K. Bye.' );
 
 /**
- * The dashboard-specific functionality of the plugin.
+ * Admin functionality for Disqus Conditional Load.
  *
- * Defines the plugin name, version, and enqueue the 
- * dashboard-specific stylesheet and JavaScript.
+ * A class definition that includes attributes and functions used across the dashboard.
  *
- * @link       http://dclwp.com
- * @since      10.0.0
- * @package    DCL
- * @subpackage DCL/admin
- * @author     Joel James <me@joelsays.com>
+ * @category   Core
+ * @package    DCLAdmin
+ * @subpackage Admin
+ * @author     Joel James <mail@cjoel.com>
+ * @license    http://www.gnu.org/licenses/ GNU General Public License
+ * @link       https://dclwp.com
  */
 class DCL_Admin {
 
-    /**
-     * The ID of this plugin.
-     *
-     * @since    10.0.0
-     * @access   private
-     * @var      string    $plugin_name    The ID of this plugin.
-     */
-    private $plugin_name;
+	/**
+	 * DCL Helper instance.
+	 *
+	 * @var DCL_Helper
+	 */
+	private $helper;
 
-    /**
-     * The version of this plugin.
-     *
-     * @since    10.0.0
-     * @access   private
-     * @var      string    $version    The current version of this plugin.
-     */
-    private $version;
+	/**
+	 * Define the public functionality of the plugin.
+	 *
+	 * Set the required properties of the core class.
+	 *
+	 * @since  10.0.0
+	 * @access public
+	 */
+	public function __construct() {
 
-    /**
-     * Initialize the class and set its properties.
-     *
-     * @since    10.0.0
-     * @var      string    $plugin_name       The name of this plugin.
-     * @var      string    $version    The version of this plugin.
-     */
-    public function __construct($plugin_name, $version) {
+		global $dcl_helper;
 
-        $this->plugin_name = $plugin_name;
-        $this->version = $version;
-    }
+		$this->helper = $dcl_helper;
+	}
 
-    /**
-     * Register the stylesheets for the Dashboard.
-     *
-     * @since    10.0.0
-     */
-    public function enqueue_styles() {
+	/**
+	 * Create a submenu page for Disqus settings.
+	 *
+	 * Register new submenu for DCL under Disqus menu, so it won't be
+	 * confusing for users to find settings page.
+	 *
+	 * @uses   add_submenu_page() To register submenu.
+	 * @since  3.0.0
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function create_menu() {
 
-        global $pagenow;
+		$hook = add_submenu_page(
+			'disqus',
+			__( 'Disqus Conditional Load - Settings', 'disqus-conditional-load' ),
+			__( 'DCL Settings', 'disqus-conditional-load' ),
+			DCL_ACCESS,
+			'dcl-settings',
+			array( $this, 'admin_page' )
+		);
 
-        if (( $pagenow == 'admin.php' ) && ( $_GET['page'] == 'dcl-settings')) {
-            wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/min/admin.css', array(), $this->version, 'all');
-        }
-        if (is_rtl()) {
-            wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/min/admin-rtl.css', array(), $this->version, 'all');
-        }
-    }
+		/**
+		 * Action hook to register new submenu item under Disqus.
+		 *
+		 * @param $hook DCL Settings page hook.
+		 *
+		 * @since 11.0.0
+		 */
+		do_action( 'dcl_admin_menu', $hook );
+	}
 
-    /**
-     * Show warning message if Disqus is not configured
-     *
-     * If Disqus is not setup, let us warn user that they need to set it up.
-     * Otherwise comments will not work
-     * @since	10.0.0
-     * @uses	dsq_is_installed()	To check if Disqus configured.
-     * @return	void.
-     */
-    public function dcl_setup_required_notice() {
+	/**
+	 * Admin options page display for DCL.
+	 *
+	 * Admin page template to manage plugin settings and
+	 * other options.
+	 *
+	 * @since  3.0.0
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function admin_page() {
 
-        if (!dsq_is_installed()) {
-            $class = "error";
+		include_once DCL_DIR . 'admin/views/admin-display.php';
+	}
 
-            $message = "<strong>Please configure Disqus in order to start using Disqus comments. <a href='" . DCL_DISQUS_PAGE . "'>Click here</a> to configure</strong>";
+	/**
+	 * Registering DCL settings.
+	 *
+	 * Register all DCL settings options using WordPress settings API.
+	 *
+	 * @since  3.0.0
+	 * @access public
+	 * @uses   register_setting().
+	 *
+	 * @return void
+	 */
+	public function register_settings() {
 
-            echo "<div class=\"$class\"> <p>$message</p></div>";
-        }
-    }
+		register_setting( 'dcl_general', 'dcl_gnrl_options' );
+	}
 
-    /**
-     * Run upgrade functions
-     *
-     * If DCL is upgraded, we may need to perform few updations in db
-     * This function is used for that.
-     * @since	10.0.2
-     * @uses	get_option()	To get the activation redirect option from db.
-     * @return	void.
-     */
-    public function dcl_upgrade_if_new() {
+	/**
+	 * Register the stylesheet for the DCL dashboard.
+	 *
+	 * This function is used to register all the required stylesheets for
+	 * dashboard. Styles will be registered only for our plugin pages.
+	 *
+	 * @since  3.0.0
+	 * @access public
+	 * @uses   wp_enqueue_style To register styles.
+	 *
+	 * @return void
+	 */
+	public function enqueue_styles() {
 
-        if (!get_option('dcl_version_no') || ( get_option('dcl_version_no') < DCL_VERSION )) {
-            if (class_exists('DCL_Activator')) {
-                DCL_Activator::activate();
-            }
+		// No. We don't load our custom css all over the admin. We are not idiots!
+		if ( $this->helper->is_dcl_page() ) {
 
-            update_option('dcl_version_no', DCL_VERSION);
-        }
-    }
+			// Register DCL admin page styles.
+			wp_enqueue_style( DCL_NAME, DCL_PATH . 'assets/css/admin.min.css', array(), DCL_VERSION, 'all' );
+		}
+	}
 
-    /**
-     * Creating admin page for DCL.
-     *
-     * @since	1.0.0
-     * @author	Joel James
-     * @action	hook	add_menu_page	  Action hook to add new admin menu.
-     * @action	hook	add_submenu_page	Action hook to add new submenu menu.
-     */
-    public function dcl_create_menu() {
+	/**
+	 * Custom footer text about DCL.
+	 *
+	 * Add some custom text to DCL admin pages. Don't add to other pages.
+	 * We can show Pro version link, reviews link etc.
+	 *
+	 * @since  10.0.0
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function footer_text() {
 
-        add_menu_page(
-                'DCL Settings', 'DCL Settings', DCL_ADMIN_PERMISSION, 'dcl-settings', array($this, 'dcl_admin_page'), plugin_dir_url(__FILE__) . 'images/js-icon.png'
-        );
-    }
+		if ( $this->helper->is_dcl_page() ) {
 
-    /**
-     * Admin options page display.
-     *
-     * Includes admin page contents to manage options.
-     * Including an Html content page.
-     *
-     * @since    1.0.0
-     * @author	Joel James
-     */
-    public function dcl_admin_page() {
+			// Custom footer text with links to reviews and pro version.
+			printf(
+				// translators: These are the links to upgrade and leave a review.
+				esc_html__( 'Thank you for choosing this DCL | %1$sUpgrade to DCL Pro%4$s | %2$sRate it %3$s%4$s', 'disqus-conditional-load' ),
+				'<a href="https://dclwp.com" target="_blank">',
+				'<a href="https://wordpress.org/support/plugin/disqus-conditional-load/reviews/?filter=5#postform" target="_blank">',
+				'&#9733; &#9733; &#9733; &#9733; &#9733;',
+				'</a>'
+			);
 
-        require plugin_dir_path(__FILE__) . 'partials/dcl-admin-display.php';
-    }
+			/**
+			 * Hook to add custom text along with DCL text.
+			 *
+			 * @since 11.0.0
+			 */
+			do_action( 'dcl_admin_footer_text' );
+		}
+	}
 
-    /**
-     * Registering DCL options.
-     *
-     * @since	1.0.0
-     * @author	Joel James
-     * @action	hooks 		register_setting       Hook to register options in db.
-     */
-    public function dcl_options_register() {
+	/**
+	 * Custom plugin action link to DCL pages.
+	 *
+	 * Add a quick link to DCL settings page from WordPress plugins
+	 * listing page screen.
+	 *
+	 * @param array  $links Existing links.
+	 * @param string $file  Plugin file name.
+	 *
+	 * @since 10.0.0
+	 * @access public
+	 *
+	 * @return array $links Altered links.
+	 */
+	public function action_links( $links, $file ) {
 
-        register_setting(
-                'dcl_gnrl_options', 'dcl_gnrl_options'
-        );
-    }
+		// Check if it is our plugin listing slot.
+		if ( basename( $file ) === basename( DCL_BASE_FILE ) ) {
 
-    /**
-     * Custom footer text.
-     *
-     * Function to alter the default footer text and add DCL
-     * custom texts and links.
-     * This will be applied only to DCL admin pages.
-     *
-     * @var	string	$pagenow 	Global variable which gives current page details.
-     * @since    1.0.0
-     * @return	$string		HTML content for footer or nothing.
-     * @author	Joel James
-     */
-    public function dcl_dashboard_footer() {
+			// Prepare our custom link.
+			// Translators: Link to DCL settings.
+			$link = sprintf( __( '%1$sSettings%2$s', 'disqus-conditional-load' ), '<a href="admin.php?page=dcl-settings">', '</a>' );
+			// Insert our custom link at the beginning.
+			array_unshift( $links, $link );
 
-        global $pagenow;
-        
-        if (( $pagenow == 'admin.php' ) && ( in_array($_GET['page'], array('dcl-settings')))) {
-            echo 'Thank you for choosing this plugin | <a href="http://dclwp.com">Upgrade to DCL Pro</a> | <a href="https://wordpress.org/support/view/plugin-reviews/disqus-conditional-load?filter=5#postform">Rate it &#9733; &#9733;</a>';
-        } else {
-            return;
-        }
-    }
+			/**
+			 * Hook to add custom links to DCL plugin action links.
+			 *
+			 * @param array $links Current array of links.
+			 *
+			 * @since 11.0.0
+			 */
+			do_action( 'dcl_admin_action_links', $links );
+		}
 
-    /**
-     * Custom Plugin Action Link.
-     *
-     * Function to add a quick link to DCL, when being listed on your
-     * plugins list view.
-     *
-     * @since    1.0.0
-     * @return	$links		Links to display.
-     * @author	Joel James
-     */
-    public function dcl_plugin_action_links($links, $file) {
+		return $links;
+	}
 
-        $plugin_file = basename('disqus-conditional-load.php');
-        
-        if (basename($file) == $plugin_file) {
-            
-            if (!dsq_is_installed()) {
-                $settings_link = '<a href="edit-comments.php?page=disqus">' . dsq_i('Configure') . '</a>';
-            } else {
-                $settings_link = '<a href="admin.php?page=dcl-settings">' . dsq_i('Settings') . '</a>';
-            }
-            array_unshift($links, $settings_link);
-        }
-        
-        return $links;
-    }
+	/**
+	 * Plugin row meta links for DCL.
+	 *
+	 * @param array  $input Already defined meta links.
+	 * @param string $file Plugin file path and name being processed.
+	 *
+	 * @since  10.0.0
+	 * @access public
+	 *
+	 * @return array $input
+	 */
+	public function plugin_row_meta( $input, $file ) {
 
-    /**
-     * Plugin row meta links
-     *
-     * @author Michael Cannon <mc@aihr.us>
-     * @since 10.0.0
-     * @param array $input already defined meta links
-     * @param string $file plugin file path and name being processed
-     * @return array $input
-     */
-    function dcl_plugin_row_meta($input, $file) {
+		// DCL base file path.
+		$dcl_file = DCL_NAME . '/' . basename( DCL_BASE_FILE );
 
-        if ($file != 'disqus-conditional-load/disqus-conditional-load.php')
-            return $input;
+		// Check if currently processing file is DCL.
+		if ( $dcl_file === $file ) {
 
-        $dcl_link = array(
-            '<a href="http://dclwp.com/" target="_blank">Upgrade to Pro</a>'
-        );
+			// Our custom link to Pro.
+			// Translators: Link to pro.
+			$link = array( sprintf( __( '%1$sUpgrade to Pro%2$s', 'disqus-conditional-load' ), '<a href="https://dclwp.com">', '</a>' ) );
+			// Merge them to existing links.
+			$input = array_merge( $input, $link );
 
-        $input = array_merge($input, $dcl_link);
+			/**
+			 * Hook to add custom links to DCL plugin row links.
+			 *
+			 * @param array $link Current array of links.
+			 *
+			 * @since 11.0.0
+			 */
+			do_action( 'dcl_plugin_row_meta', $link );
+		}
 
-        return $input;
-    }
+		return $input;
+	}
 
+	/**
+	 * Show alert if Disqus is not configured.
+	 *
+	 * @since 11.0.0
+	 *
+	 * @return void
+	 */
+	public function not_configured_alert() {
+
+		global $dcl_helper;
+
+		// If not configured.
+		if ( empty( $dcl_helper->short_name ) && $dcl_helper->is_dcl_page() ) {
+			$html = '<div class="notice notice-warning">';
+			$html .= '<p>';
+			$html .= sprintf( __( '%1$sDisqus Conditional Load%2$s will not work, unless you %3$sfinish Disqus setup%4$s.', 'disqus-conditional-load' ), '<strong>', '</strong>', '<a href="' . admin_url( 'admin.php?page=disqus' ) . '">', '</a>' );
+			$html .= '</p>';
+			$html .= '</div>';
+
+			/**
+			 * Filter hook to alter message content.
+			 *
+			 * @param string $html Message content.
+			 *
+			 * @since 11.0.0
+			 */
+			echo apply_filters( 'dcl_not_configured_alert_text', $html );
+		}
+	}
 }

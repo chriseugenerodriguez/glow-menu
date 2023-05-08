@@ -19,7 +19,7 @@
  *
  * @package    Applyonline
  * @subpackage Applyonline/includes
- * @author     Farhan Noor <farhan.noor@yahoo.com>
+ * @author     Farhan Noor <profiles.wordpress.org/farhannoor>
  */
 class Applyonline_Loader {
 

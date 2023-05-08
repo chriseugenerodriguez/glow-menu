@@ -1,0 +1,169 @@
+.single-product {
+    .footer {
+        display: none;
+    }
+}
+
+
+.footer {
+    @include transition(transform .4s cubic-bezier(.694, 0, .335, 1));
+    position: relative;
+    margin:100px auto 0;
+    display: -ms-flexbox;
+    display: flex;
+
+    @media (min-width: $screen-sm-max) {
+        -ms-flex-direction: row;
+        flex-direction: row;
+        width: 40%;
+        padding-top: 200px;
+        padding-bottom: 140px;
+    }
+    @media (max-width: $screen-sm-max) {
+        -ms-flex-direction: column-reverse;
+        flex-direction: column-reverse;
+        width: 90%;
+        max-width: 1500px;
+        padding-top: 50px;
+        padding-bottom: 40px;
+        margin: 0 auto;
+    }
+    &::before {
+        background-image: url("../images/footer-bg.png");
+        background-repeat: repeat-x;
+        content: "";
+        height: 100%;
+        left: -100%;
+        position: absolute;
+        right: -100%;
+        top: 0;
+    }
+    &__branding {
+        &__logo {
+            text-align: center;
+            svg {
+                width: 30px;
+                height: 30px;
+                @media (max-width: $screen-xs-max) {
+                    width: 25px;
+                    height: 25px;
+                }
+                polygon {
+                    fill: #333;
+                }
+            }
+        }
+    }
+    &__nav {
+        @media (min-width: $screen-xs-max) {
+            -ms-flex-positive: 1;
+            display: -ms-flexbox;
+            display: flex;
+            flex-grow: 1;
+            margin-left: 5%;
+            width: 95%;
+        }
+        @media (max-width: $screen-sm-max) {
+            margin-bottom: 0;
+        }
+        .widget-box {
+            @media (min-width: $screen-xs-max) {
+                -ms-flex: 1 1 0%;
+                flex: 1 1 0%;
+            }
+            @media (max-width: $screen-xs-max) {
+                border-bottom: 1px solid #ddd;
+                overflow: hidden;
+            }
+            h2 {
+                margin-bottom: 2.2em;
+                color: #000;
+                @include font-size(13px);
+                letter-spacing: 2px;
+                position: relative;
+                text-transform: uppercase;
+                @media (max-width: $screen-xs-max) {
+                    padding-bottom: 25px;
+                    padding-top: 25px;
+                    margin-bottom: 0px;
+                    float: left;
+                    width: 100%;
+                }
+                .arrow-down {
+                    display: none;
+                    @media (max-width: $screen-xs-max) {
+                        @include transition(transform .3s ease);
+                        position: absolute;
+                        top: 60%;
+                        right: 0;
+                        width: 10px;
+                        margin-top: -9px;
+                        cursor: pointer;
+                        display: block;
+                    }
+                }
+            }
+            div[class^='menu'] {
+                float: left;
+                @media (max-width: $screen-xs-max) {
+                    @include transition(margin-top .3s ease);
+                    padding-bottom: 30px;
+                    padding-left: 10px;
+                    margin-top: -303px;
+                }
+                ul {
+                    margin: 0px;
+                    li {
+                        list-style: none;
+                        a {
+                            color: #aaa;
+                            @include font-size(12.5px);
+                            display: block;
+                            margin-bottom: 10px;
+                            letter-spacing: 1px;
+                            @include transition(color 0.3s ease 0s);
+                            &:hover {
+                                color: #333;
+                            }
+                        }
+                        &.current-menu-item {
+                            a {
+                                color: #333;
+                            }
+                        }
+                    }
+                }
+            }
+            @media (max-width: $screen-xs-max) {
+                &.is-active {
+                    div[class^='menu'] {
+                        margin-top: 0;
+                        li {
+                            margin-bottom: 15px;
+                            display: block;
+                            a {
+                                color: #888;
+                                font-weight: 300;
+                                line-height: 21px;
+                                @include font-size(14px);
+                            }
+                            &:last-child {
+                                margin-bottom: 0px;
+                            }
+                        }
+                    }
+                    .arrow-down {
+                        @include transform(rotate(180deg));
+                    }
+                }
+            }
+        }
+        .branding {
+            @media (max-width: $screen-sm-max) {
+                position: relative;
+                text-align: center;
+                margin-top: 60px;
+            }
+        }
+    }
+}

@@ -1,10 +1,11 @@
-=== WooCommerce Print Invoice & Delivery Note ===
+	=== Print Invoice & Delivery Notes for WooCommerce ===
 
-Contributors: piffpaffpuff
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=K2JKYEASQBBSQ&lc=US&item_name=WooCommerce%20Print%20Invoice%20%26%20Delivery%20Note&item_number=WCDN&amount=20%2e00&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHostedGuest
-Tags: delivery note, packing slip, invoice, delivery, shipping, print, order, woocommerce, woothemes, shop
+Contributors: ashokrane, tychesoftwares
+Donate link: https://www.paypal.me/TycheSoftwares
+Tags: packing slips, invoice, pdf invoice, delivery notes, woocommerce print invoice, print, pdf, invoices
 Requires at least: 4.0
-Tested up to: 4.2
+Tested up to: 6.1.1
+Author URI: https://www.tychesoftwares.com/
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.opensource.org/licenses/gpl-license.php
@@ -13,9 +14,10 @@ Print invoices and delivery notes for WooCommerce orders.
 
 == Description ==
 
-You can print out invoices and delivery notes for the [WooCommerce](http://wordpress.org/plugins/woocommerce/) orders. You can also edit the Company/Shop name, Company/Shop postal address and also add personal notes, conditions/policies (like a refund policy) and a footer imprint.
+You can print out invoices and delivery notes for the WooCommerce orders. You can also edit the Company/Shop name, Company/Shop postal address and also add personal notes, conditions/policies (like a refund policy) and a footer imprint.
 
 The plugin adds a new side panel on the order page to allow shop administrators to print out the invoice or delivery note. Registered customers can also print their order with a button that is added to the order screen.
+
 
 = Features =
 
@@ -37,11 +39,61 @@ Support can take place in the [public support forums](http://wordpress.org/suppo
 
 = Contributing =
 
-If you have a patch, or stumbled upon an issue with the source code that isn't a [WooCommerce issue](https://github.com/woothemes/woocommerce/issues?labels=Bug&milestone=22&state=open), you can contribute this back [on GitHub](https://github.com/piffpaffpuff/woocommerce-delivery-notes).
+If you have a patch, or stumbled upon an issue with the source code that isn't a [WooCommerce issue](https://github.com/woothemes/woocommerce/issues?labels=Bug&milestone=22&state=open), you can contribute this back [on GitHub](https://github.com/TycheSoftwares/woocommerce-delivery-notes).
 
 = Translating =
 
-When your language is missing you can contribute a translation to the [GitHub repository](https://github.com/piffpaffpuff/woocommerce-delivery-notes#translating).
+When your language is missing you can contribute a translation to the [GitHub repository](https://github.com/TycheSoftwares/woocommerce-delivery-notes#translating).
+
+**Some of our Pro plugins:**
+
+1. **[Abandoned Cart Pro for WooCommerce](https://www.tychesoftwares.com/store/premium-plugins/woocommerce-abandoned-cart-pro/?utm_source=wprepo&utm_medium=otherprolink&utm_campaign=WCDeliveryNotes "Abandoned Cart Pro for WooCommerce")**
+
+2. **[Booking & Appointment Plugin for WooCommerce](https://www.tychesoftwares.com/store/premium-plugins/woocommerce-booking-plugin/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Booking & Appointment Plugin for WooCommerce")**
+
+3. **[Order Delivery Date Pro for WooCommerce](https://www.tychesoftwares.com/store/premium-plugins/order-delivery-date-for-woocommerce-pro-21/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Order Delivery Date Pro for WooCommerce")**
+
+4. **[Product Delivery Date Pro for WooCommerce](https://www.tychesoftwares.com/store/premium-plugins/product-delivery-date-pro-for-woocommerce/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Product Delivery Date Pro for WooCommerce")**
+
+5. **[Deposits For WooCommerce](https://www.tychesoftwares.com/store/premium-plugins/deposits-for-woocommerce/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Deposits For WooCommerce")**
+
+6. **[Payment Gateway Based Fees and Discounts for WooCommerce - Pro](https://www.tychesoftwares.com/store/premium-plugins/payment-gateway-based-fees-and-discounts-for-woocommerce-plugin/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Payment Gateway Based Fees and Discounts for WooCommerce - Pro")**
+
+7. **[Custom Order Status for WooCommerce - Pro](https://www.tychesoftwares.com/store/premium-plugins/custom-order-status-woocommerce/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Custom Order Status for WooCommerce - Pro")**
+
+8. **[Custom Order Numbers for WooCommerce - Pro](https://www.tychesoftwares.com/store/premium-plugins/custom-order-numbers-woocommerce/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Custom Order Numbers for WooCommerce - Pro")**
+
+9. **[Product Input Fields for WooCommerce - Pro](https://www.tychesoftwares.com/store/premium-plugins/product-input-fields-for-woocommerce/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Product Input Fields for WooCommerce - Pro")**
+
+10. **[Call for Price for WooCommerce - Pro](https://www.tychesoftwares.com/store/premium-plugins/woocommerce-call-for-price-plugin/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Call for Price for WooCommerce - Pro")**
+
+11. **[Price based on User Role for WooCommerce - Pro](https://www.tychesoftwares.com/store/premium-plugins/price-user-role-woocommerce/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Price based on User Role for WooCommerce - Pro")**
+
+12. **[Currency per Product for WooCommerce - Pro](https://www.tychesoftwares.com/store/premium-plugins/currency-per-product-for-woocommerce/?utm_source=wprepo&utm_medium=link&utm_campaign=WCDeliveryNotes "Currency per Product for WooCommerce - Pro")**
+
+**Some of our other free plugins:**
+
+1. **[Abandoned Cart for WooCommerce](https://wordpress.org/plugins/woocommerce-abandoned-cart/ "Abandoned Cart for WooCommerce")**
+
+2. **[Order Delivery Date for WooCommerce - Lite](https://wordpress.org/plugins/order-delivery-date-for-woocommerce/ "Order Delivery Date for WooCommerce - Lite")**
+
+3. **[Product Delivery Date for WooCommerce - Lite](https://wordpress.org/plugins/product-delivery-date-for-woocommerce-lite/ "Product Delivery Date for WooCommerce")**
+
+4. **[Payment Gateway Based Fees and Discounts for WooCommerce](https://wordpress.org/plugins/checkout-fees-for-woocommerce/ "Payment Gateway Based Fees and Discounts for WooCommerce")**
+
+5. **[Custom Order Status for WooCommerce](https://wordpress.org/plugins/custom-order-statuses-woocommerce/ "Custom Order Status for WooCommerce")**
+
+6. **[Custom Order Numbers for WooCommerce](https://wordpress.org/plugins/custom-order-numbers-for-woocommerce/ "Custom Order Numbers for WooCommerce")**
+
+7. **[Product Input Fields for WooCommerce](https://wordpress.org/plugins/product-input-fields-for-woocommerce/ "Product Input Fields for WooCommerce")**
+
+8. **[Call for Price for WooCommerce](https://wordpress.org/plugins/woocommerce-call-for-price/ "Call for Price for WooCommerce")**
+
+9. **[Price based on User Role for WooCommerce](https://wordpress.org/plugins/price-by-user-role-for-woocommerce/ "Price based on User Role for WooCommerce")**
+
+10. **[Currency per Product for WooCommerce](https://wordpress.org/plugins/currency-per-product-for-woocommerce/ "Currency per Product for WooCommerce")**
+
+**[Developer Documentation](https://www.tychesoftwares.com/docs/print-invoice-apidocs/index.html "Developer Documentation")**
 
 == Installation ==
 
@@ -89,8 +141,8 @@ An example that changes the font and makes the addresses very large. Paste the c
 `
 function example_serif_font_and_large_address() {
 	?>
-		<style>
-			#page {
+		<style>	
+			`#page {
 				font-size: 1em;
 				font-family: Georgia, serif;
 			}
@@ -101,7 +153,7 @@ function example_serif_font_and_large_address() {
 			}
 		</style>
 	<?php
-}
+`}
 add_action( 'wcdn_head', 'example_serif_font_and_large_address', 20 );
 `
 
@@ -185,7 +237,7 @@ add_filter( 'wcdn_order_info_fields', 'example_removed_payment_method' );
 
 =  How can I add some more fields to the order info section? =
 
-Use the `wcdn_order_info_fields` filter hook. It returns all the fields as array. Read the WooCommerce documentation to learn how you get custom checkout and order fields. Tip: To get custom meta field values you will most probably need the `get_post_meta( $order->id, 'your_meta_field_name', true);` function and of course the `your_meta_field_name`. 
+Use the `wcdn_order_info_fields` filter hook. It returns all the fields as array. Read the WooCommerce documentation to learn how you get custom checkout and order fields. Tip: To get custom meta field values you will most probably need the `get_post_meta( $order->get_id(), 'your_meta_field_name', true);` function and of course the `your_meta_field_name`. 
 
 An example that adds a 'VAT' and 'Customer Number' field to the end of the list. Paste the code in the `functions.php` file of your theme:
 
@@ -193,17 +245,17 @@ An example that adds a 'VAT' and 'Customer Number' field to the end of the list.
 function example_custom_order_fields( $fields, $order ) {
 	$new_fields = array();
 		
-	if( get_post_meta( $order->id, 'your_meta_field_name', true ) ) {
+	if( get_post_meta( $order->get_id(), 'your_meta_field_name', true ) ) {
 		$new_fields['your_meta_field_name'] = array( 
 			'label' => 'VAT',
-			'value' => get_post_meta( $order->id, 'your_meta_field_name', true )
+			'value' => get_post_meta( $order->get_id(), 'your_meta_field_name', true )
 		);
 	}
 	
-	if( get_post_meta( $order->id, 'your_meta_field_name', true ) ) {
+	if( get_post_meta( $order->get_id(), 'your_meta_field_name', true ) ) {
 		$new_fields['your_meta_field_name'] = array( 
 			'label' => 'Customer Number',
-			'value' => get_post_meta( $order->id, 'your_meta_field_name', true )
+			'value' => get_post_meta( $order->get_id(), 'your_meta_field_name', true )
 		);
 	}
 	
@@ -220,8 +272,8 @@ An example that adds a 40px large product image. Paste the code in the `function
 
 `
 function example_product_image( $product ) {	
-	if( isset( $product->id ) && has_post_thumbnail( $product->id ) ) {
-		echo get_the_post_thumbnail( $product->id, array( 40, 40 ) );
+	if( ( '' !== $product->get_id() ) && has_post_thumbnail( $product->get_id() ) ) {
+		 echo get_the_post_thumbnail( $product->get_id(), array( 40, 40 ), array( 'loading' => false ) );
 	}
 }
 add_action( 'wcdn_order_item_before', 'example_product_image' );
@@ -273,7 +325,7 @@ The plugin uses the exact same content as WooCommerce. If the content isn't avai
 
 Upload your language file to `/wp-content/languages/plugins/` (create this folder if it doesn't exist). WordPress will then load the language. Make sure you use the same locale as in your configuration and the correct plugin locale i.e. `woocommerce-delivery-notes-it_IT.mo/.po`. 
 
-Please [contribute your translation](https://github.com/piffpaffpuff/woocommerce-delivery-notes#translating) to include it in the distribution.
+Please [contribute your translation](https://github.com/TycheSoftwares/woocommerce-delivery-notes#translating) to include it in the distribution.
 
 == Screenshots ==
 
@@ -286,8 +338,194 @@ Please [contribute your translation](https://github.com/piffpaffpuff/woocommerce
 
 == Changelog ==
 
-= Minimum Requirements: WooCommerce 2.2 =
+= 4.7.3 (21.03.2023) =
+* Fix - Cross-Site Request Forgery vulnerability in the plugin.
 
+= 4.7.2 (02.02.2023) =
+* Fix - Fixed a Reflected XSS vulnerability in the plugin.
+* Fix - Fixed a fatal error which occurs when plugins apart from ours are customizing the Bulk Actions on the WooCommerce Orders page.
+
+= 4.7.1 (07.12.2022) =
+* Fix :- Fix :- Removed the labels for shipping and billing address. This was added in 4.7.0, which is now reverted back.
+
+= 4.7.0 (06.12.2022) =
+* Fix :- Logo was not showing on Android phone earlier. This is fixed now.
+* Fix :- Display labels for shipping and billing address
+* Fix :- Removed redundant "Refund" line. 
+* Fix :- Compatibility with WooCommerce Product Addons plugin. All the fields from the plugin will be shown in the Invoice, Receipt & Delivery Note.
+
+= 4.6.5 (08.02.2022) =
+* Enhancement :- Added an option to print the invoice text in Right to Left direction.
+* Enhancement :- Added a filter called 'wcdn_product_meta_data' to remove the meta fields of the product in the invoice.
+* Fix :- Quantity column was showing wrong total in the print invoice on the frontend when the invoice contains WooCommerce Composite products.
+* Fix :- Extra tabs were added in the bulk action print link.
+* Fix :- When using the file field in the WooCommerce Product Addons plugin whole path was getting printed instead of the filename.
+* Fix :- The invoice number was not appearing when we open the invoice from the Order email sent to the customer.
+* Fix :- Debug log errors are been fixed.
+
+= 4.6.4 (21.07.2021) =
+* Fix :- After updating to v4.6.3 , fatal error was coming in some sites where the invoice template has been customized by copying print-content.php file in the theme folder. This is fixed now.
+
+= 4.6.3 (19.07.2021) =
+* Fix :- Fixed the errors coming with PHP 8.
+* Fix :- Shipping address was not printed in invoice when the order is created manually. This is fixed now.
+* Fix :- When printing receipts, the number of downloaded files is displayed as "%s files". This is fixed now. Props to @inc2734 for the PR.
+* Dev :- Translated the plugin in Korean language. Props to @shga89 for the PR.
+
+= 4.6.2 (11.12.2020) =
+
+Enhancement :- Added an option to insert the print link in the admin emails.
+Fix :- Strings of Bulk Printing options were not getting translated. This is fixed now. Props to @pomegranate
+Fix :- Finnish language locale name was incorrect. This is fixed now.
+Fix :- Custom fields on WooCommerce product page from Product Input Fields for WooCommerce plugin were not coming in the invoice. This is fixed now.
+Fix :- The BULK printing options of WooCommerce DYMO Print (PRO version) stopped working after installing our Print invoices plugin. This has been fixed. Props to @pepbc
+Tweak :- In FAQ page changed the code snippet to add the products image in the invoice.
+
+= 4.6.1 (23.10.2020) =
+
+* Fix :- Tracker cron event was not running properly which is fixed now.
+* Dev :- With the help of filters now able to change the name of the print invoice and delivery notes in the dropdown menu on Orders page.
+
+= 4.6.0 (22.09.2020) =
+
+* Fix :- Notice was coming since WooCommerce V4.4.0 which is fixed now.
+* Fix :- Bulk printing function was using old hooks & filters.Have changed them with the new ones.
+* Dev :- Now the Total number of quantity of the products in the row of quantity in invoice will be shown.
+* Dev :- With the help of filter now one can hide the child products in Composite Products.
+* Dev :- Translated the plugin in Greek language. Props to @edeuter for the PR.
+
+= Minimum Requirements: WooCommerce 3.0 =
+
+= 4.5.5 (12.03.2020) =
+
+* Changed the plugin name to 'Print Invoice & Delivery Notes for WooCommerce'
+
+= 4.5.4 (11.03.2020) =
+
+* Compatibility with WooCommerce v4.0.0
+
+= 4.5.3 (26.09.2019) =
+
+* The plugin now allows 3rd party code to add order item data on the print-content.php template. Props to @doozy for the PR.
+
+= 4.5.2 (23.08.2019) =
+
+* Fixed the issue of Print buttons not working on sites with PHP versions below 7.0.
+
+= 4.5.1 (21.08.2019) =
+
+* Fixed the issue of Print buttons not showing up on Order details page after the 4.4.9 update.
+
+= 4.5.0 (21.08.2019) =
+
+* Added a missing file from v4.4.9.
+
+= 4.4.9 (21.08.2019) =
+
+* Made the plugin code compliant with WPCS coding standards
+* Added filter wcdn_theme_print_button_template_type_arbitrary - this filter hook allows to change template type based on order status
+* Added filters wcdn_print_button_name_on_my_account_page, wcdn_print_button_name_order_page - these filter hooks allows to change the label of the Print button
+* When plugin is uninstalled, data cleanup wasn't happening. This has been fixed.
+
+= 4.4.8 (02.04.2019) =
+
+* Fix - When a noticed was dismissed from the plugin, then it will dismiss all other notices from other plugins also. This is fixed now. 
+* Fix - Some errors in debug.log file are fixed. 
+
+= 4.4.7 (24.11.2018) =
+
+* Fix – Fixed compatibility related issue with WooCommerce Product Add-ons v3.0.x. Options were not being printed.
+* Fix – Fixed compatibility related issue with Woocommerce Partial Orders Pro Plugin.
+
+= 4.4.6 (22.10.2018) =
+
+* .po, .mo is updated for all the other languages.
+
+= 4.4.5 (22.10.2018) =
+
+* .pot file updated.
+
+= 4.4.4 (13.10.2018) =
+
+* Removed the Welcome page of the plugin and also removed the promotional notices which were being displayed on admin end of the WordPress website.
+
+= 4.4.3 (23.07.2018) =
+
+* Usage Tracking has been added in the plugin. It provides an option to allow  tracking of the non-sensitive data of our plugin from the website. You can read more about it [here](https://www.tychesoftwares.com/docs/docs/woocommerce-print-invoice-delivery-note/usage-tracking/).
+
+= 4.4.2 (22.02.2018) =
+
+* Fix - With the latest WooCommerce version 3.3, the icons for Print were missing. This is fixed.
+
+= 4.4.1 (29.12.2017) =
+
+* This version has 1 bug fix.
+
+* Fix - PHP short tag was inadvertently added in the plugin in v4.4, which was causing an error. This has been fixed.
+
+= 4.4 (29.12.2017) =
+
+* This version has 1 bug fix.
+
+* Fix - Earlier with WooCommerce Local Pickup Plus v2.x.x, pickup locations were not displayed on the invoices, delivery notes & receipts. Now, the plugin is compatible with it and it will display the pickup locations. 
+
+* Code Enhancement - Now, the plugin has the uninstall file for deleting the plugin options.
+
+= 4.3.6 (19.12.2017) =
+
+* Added translation for the word 'Price' for dutch language
+* Removed Pro version link that was not going anywhere
+
+= 4.3.5 (14.11.2017) =
+
+* Fix issue of invoice date label not appearing translated
+
+= 4.3.4.1 (07.11.2017) =
+
+* Updating missing .mo files for Japanese and Norwegian.
+
+= 4.3.4 (26.09.2017) =
+
+* .po and .mo files for Japanese and Norwegian language is added in the plugin. The plugin strings can now be translated to this languages using these files.
+
+= 4.3.3 (13.09.2017) =
+
+* Fix - The unwanted attributes from products were getting displayed in the invoice.
+
+* Fix - Notice of deprecated function get_item_downloads() in the invoice for downloadable products.
+
+= 4.3.2 (05.09.2017) =
+
+* In this version deprecated functions and classes have been removed. Because of that attributes were missing and attribute slug was getting printed on Invoice page. This has been fixed.
+
+* Fix - There was no line break before SKU element for variable products on Invoice page. This has been fixed.
+
+* Fix - The deprecated function WC_Order::get_order_currency has been removed and replaced with get_currency().
+
+= 4.3.1 (23.08.2017) =
+
+* This version has 1 bug fix.
+
+* Fix - The attributes of variable product were not displayed with the variation name in the Print screen. This has been fixed.
+
+= 4.3 (19.08.2017) =
+
+* This version has 1 bug fix.
+
+* Fix - Warnings were displayed on My Account, Checkout, Orders page with WooCommerce version 3.0.x. This has been fixed.
+
+= 4.2.0 =
+
+* Tweak - Refactored settings screen
+* Fix - Compatibility with latest WooCommerce
+* Fix - Print preview loading indicators
+* Fix - Icon font embed
+* Dev - Load only one instance of the plugin (singleton class)
+* Dev - New settings hooks that work better with WooCommerce
+
+= 4.1.6 =
+
+* Fix - More flexible protocol checks of email permalinks
 
 = 4.1.5 =
 
@@ -422,6 +660,10 @@ Please [contribute your translation](https://github.com/piffpaffpuff/woocommerce
 * New template structure and action hooks
 
 == Upgrade Notice ==
+
+= 4.2.0 =
+
+4.2.0 requires at least WooCommerce 2.2.
 
 = 4.1.5 =
 

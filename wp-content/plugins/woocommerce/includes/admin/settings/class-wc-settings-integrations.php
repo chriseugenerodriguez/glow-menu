@@ -2,80 +2,94 @@
 /**
  * WooCommerce Integration Settings
  *
- * @author      WooThemes
- * @category    Admin
- * @package     WooCommerce/Admin
+ * @package     WooCommerce\Admin
  * @version     2.1.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+use Automattic\Jetpack\Constants;
+
+defined( 'ABSPATH' ) || exit;
 
 if ( ! class_exists( 'WC_Settings_Integrations', false ) ) :
 
-/**
- * WC_Settings_Integrations.
- */
-class WC_Settings_Integrations extends WC_Settings_Page {
-
 	/**
-	 * Constructor.
+	 * WC_Settings_Integrations.
 	 */
-	public function __construct() {
+	class WC_Settings_Integrations extends WC_Settings_Page {
 
-		$this->id    = 'integration';
-		$this->label = __( 'Integration', 'woocommerce' );
+		/**
+		 * Constructor.
+		 */
+		public function __construct() {
+			$this->id    = 'integration';
+			$this->label = __( 'Integration', 'woocommerce' );
 
-		if ( isset( WC()->integrations ) && WC()->integrations->get_integrations() ) {
-			add_filter( 'woocommerce_settings_tabs_array', array( $this, 'add_settings_page' ), 20 );
-			add_action( 'woocommerce_sections_' . $this->id, array( $this, 'output_sections' ) );
-			add_action( 'woocommerce_settings_' . $this->id, array( $this, 'output' ) );
-			add_action( 'woocommerce_settings_save_' . $this->id, array( $this, 'save' ) );
-		}
-	}
-
-	/**
-	 * Get sections.
-	 *
-	 * @return array
-	 */
-	public function get_sections() {
-		global $current_section;
-
-		$sections = array();
-
-		if ( ! defined( 'WC_INSTALLING' ) ) {
-			$integrations = WC()->integrations->get_integrations();
-
-			if ( ! $current_section && ! empty( $integrations ) ) {
-				$current_section = current( $integrations )->id;
+			if ( isset( WC()->integrations ) && WC()->integrations->get_integrations() ) {
+				parent::__construct();
 			}
+		}
 
-			if ( sizeof( $integrations ) > 1 ) {
-				foreach ( $integrations as $integration ) {
-					$title = empty( $integration->method_title ) ? ucfirst( $integration->id ) : $integration->method_title;
-					$sections[ strtolower( $integration->id ) ] = esc_html( $title );
+		/**
+		 * Get own sections.
+		 *
+		 * @return array
+		 */
+		protected function get_own_sections() {
+			global $current_section;
+
+			$sections = array();
+
+			if ( ! $this->wc_is_installing() ) {
+				$integrations = $this->get_integrations();
+
+				if ( ! $current_section && ! empty( $integrations ) ) {
+					$current_section = current( $integrations )->id;
+				}
+
+				if ( count( $integrations ) > 1 ) {
+					foreach ( $integrations as $integration ) {
+						$title                                      = empty( $integration->method_title ) ? ucfirst( $integration->id ) : $integration->method_title;
+						$sections[ strtolower( $integration->id ) ] = esc_html( $title );
+					}
 				}
 			}
+
+			return $sections;
 		}
 
-		return apply_filters( 'woocommerce_get_sections_' . $this->id, $sections );
-	}
+		/**
+		 * Is WC_INSTALLING constant defined?
+		 * This method exists to ease unit testing.
+		 *
+		 * @return bool True is the WC_INSTALLING constant is defined.
+		 */
+		protected function wc_is_installing() {
+			return Constants::is_defined( 'WC_INSTALLING' );
+		}
 
-	/**
-	 * Output the settings.
-	 */
-	public function output() {
-		global $current_section;
+		/**
+		 * Get the currently available integrations.
+		 * This method exists to ease unit testing.
+		 *
+		 * @return array Currently available integrations.
+		 */
+		protected function get_integrations() {
+			return WC()->integrations->get_integrations();
+		}
 
-		$integrations = WC()->integrations->get_integrations();
+		/**
+		 * Output the settings.
+		 */
+		public function output() {
+			global $current_section;
 
-		if ( isset( $integrations[ $current_section ] ) ) {
-			$integrations[ $current_section ]->admin_options();
+			$integrations = $this->get_integrations();
+
+			if ( isset( $integrations[ $current_section ] ) ) {
+				$integrations[ $current_section ]->admin_options();
+			}
 		}
 	}
-}
 
 endif;
 

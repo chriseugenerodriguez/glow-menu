@@ -11,6 +11,9 @@ class WPAM_Pages_Admin_MyAffiliatesPage extends WPAM_Pages_Admin_AdminPage {
     private $response;
 
     public function processRequest($request) {
+        if(is_array($request)){
+            $request = wpam_sanitize_array($request);
+        }
         $db = new WPAM_Data_DataAccess();
 
         if (isset($request['viewDetail']) && is_numeric($request['viewDetail'])) {
@@ -25,6 +28,9 @@ class WPAM_Pages_Admin_MyAffiliatesPage extends WPAM_Pages_Admin_AdminPage {
             }
 
             if (isset($request['action']) && $request['action'] == 'saveInfo') {
+                if(!isset($request['_wpnonce']) || !wp_verify_nonce($request['_wpnonce'], 'wpam_add_affiliate')){
+                    wp_die('Error! Nonce Security Check Failed! Go back to the page and submit again.');
+                }
                 $validator = new WPAM_Validation_Validator();
 
                 //validate bounty type & amount if they're in the appropriate status
@@ -37,10 +43,13 @@ class WPAM_Pages_Admin_MyAffiliatesPage extends WPAM_Pages_Admin_AdminPage {
                         $validator->addValidator('txtBountyAmount', new WPAM_Validation_NumberValidator());
                     }
 
-                    $validator->addValidator('ddPaymentMethod', new WPAM_Validation_SetValidator(array('check', 'paypal', 'manual')));
+                    $validator->addValidator('ddPaymentMethod', new WPAM_Validation_SetValidator(array('check', 'paypal', 'manual', 'bank')));
 
                     if ($request['ddPaymentMethod'] === 'paypal') {
                         $validator->addValidator('txtPaypalEmail', new WPAM_Validation_EmailValidator());
+                    }
+                    if ($request['ddPaymentMethod'] === 'bank') {
+                        $validator->addValidator('txtBankDetails', new WPAM_Validation_StringValidator(1));
                     }
                 }
 
@@ -85,6 +94,7 @@ class WPAM_Pages_Admin_MyAffiliatesPage extends WPAM_Pages_Admin_AdminPage {
         $response->viewData['paymentMethods'] = $affiliateHelper->getPaymentMethods();
         $response->viewData['paymentMethod'] = isset($request['ddPaymentMethod']) ? $request['ddPaymentMethod'] : $model->paymentMethod;
         $response->viewData['paypalEmail'] = isset($request['txtPaypalEmail']) ? $request['txtPaypalEmail'] : $model->paypalEmail;
+        $response->viewData['bankDetails'] = isset($request['txtBankDetails']) ? $request['txtBankDetails'] : $model->bankDetails;
         $response->viewData['bountyType'] = isset($request['ddBountyType']) ? $request['ddBountyType'] : $model->bountyType;
         $response->viewData['bountyAmount'] = isset($request['txtBountyAmount']) ? $request['txtBountyAmount'] : $model->bountyAmount;
 

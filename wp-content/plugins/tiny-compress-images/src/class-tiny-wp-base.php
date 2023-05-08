@@ -1,7 +1,7 @@
 <?php
 /*
 * Tiny Compress Images - WordPress plugin.
-* Copyright (C) 2015-2017 Voormedia B.V.
+* Copyright (C) 2015-2018 Tinify B.V.
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the Free
@@ -45,6 +45,10 @@ abstract class Tiny_WP_Base {
 		return defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST;
 	}
 
+	protected function doing_ajax_request() {
+		return defined( 'DOING_AJAX' ) && DOING_AJAX;
+	}
+
 	protected static function get_prefixed_name( $name ) {
 		return self::PREFIX . $name;
 	}
@@ -53,6 +57,8 @@ abstract class Tiny_WP_Base {
 		add_action( 'init', $this->get_method( 'init' ) );
 		if ( self::is_xmlrpc_request() ) {
 			add_action( 'init', $this->get_method( 'xmlrpc_init' ) );
+		} elseif ( self::doing_ajax_request() ) {
+			add_action( 'admin_init', $this->get_method( 'ajax_init' ) );
 		} elseif ( is_admin() ) {
 			add_action( 'admin_init', $this->get_method( 'admin_init' ) );
 			add_action( 'admin_menu', $this->get_method( 'admin_menu' ) );
@@ -79,6 +85,9 @@ abstract class Tiny_WP_Base {
 	}
 
 	public function xmlrpc_init() {
+	}
+
+	public function ajax_init() {
 	}
 
 	public function admin_init() {

@@ -16,7 +16,13 @@ class WPAM_Pages_Admin_NewAffiliatePage extends WPAM_Pages_Admin_AdminPage {
 		);
 		
 		if ( isset( $request['action'] ) && $request['action'] == 'saveInfo' ) {
-
+                        if(!isset($request['_wpnonce']) || !wp_verify_nonce($request['_wpnonce'], 'wpam_add_affiliate')){
+                            wp_die('Error! Nonce Security Check Failed! Go back to the page and submit again.');
+                        }
+                        if(is_array($request)){
+                            $request = wpam_sanitize_array($request);
+                        }
+                    
 			$validator = new WPAM_Validation_Validator();
 
 			$validator->addValidator('ddBountyType', new WPAM_Validation_SetValidator(array('fixed','percent')));
@@ -61,6 +67,9 @@ class WPAM_Pages_Admin_NewAffiliatePage extends WPAM_Pages_Admin_AdminPage {
 		$response->viewData['affiliateFields'] = $affiliateFields;
 		
 		if ( $request !== NULL ) {
+                        if(is_array($request)){
+                            $request = wpam_sanitize_array($request);
+                        }
 			$response->viewData['request'] = $request;
 			$response->viewData['bountyType'] = isset( $request['ddBountyType'] ) ? $request['ddBountyType'] : NULL;
 			$response->viewData['bountyAmount'] = isset( $request['txtBountyAmount'] ) ? $request['txtBountyAmount'] : NULL ;

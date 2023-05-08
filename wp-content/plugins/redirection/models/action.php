@@ -1,70 +1,136 @@
 <?php
 
-class Red_Action {
-	function __construct( $values ) {
+/**
+ * A redirect action - what happens after a URL is matched.
+ */
+abstract class Red_Action {
+	/**
+	 * The action code (i.e. HTTP code)
+	 *
+	 * @var integer
+	 */
+	protected $code = 0;
+
+	/**
+	 * The action type
+	 *
+	 * @var string
+	 */
+	protected $type = '';
+
+	/**
+	 * Target URL, if any
+	 *
+	 * @var String|null
+	 */
+	protected $target = null;
+
+	/**
+	 * Constructor
+	 *
+	 * @param array $values Values.
+	 */
+	public function __construct( $values = [] ) {
 		if ( is_array( $values ) ) {
 			foreach ( $values as $key => $value ) {
-			 	$this->$key = $value;
+				$this->$key = $value;
 			}
 		}
 	}
 
-	function can_change_code() {
-		return false;
-	}
+	abstract public function name();
 
-	function config() {
-	}
-
-	static function create( $name, $code ) {
+	/**
+	 * Create an action object
+	 *
+	 * @param string  $name Action type.
+	 * @param integer $code Action code.
+	 * @return Red_Action|null
+	 */
+	public static function create( $name, $code ) {
 		$avail = self::available();
 
 		if ( isset( $avail[ $name ] ) ) {
 			if ( ! class_exists( strtolower( $avail[ $name ][1] ) ) ) {
-				include dirname( __FILE__ ).'/../actions/'.$avail[ $name ][0];
+				include_once dirname( __FILE__ ) . '/../actions/' . $avail[ $name ][0];
 			}
 
-			$obj = new $avail[ $name ][1]( array( 'action_code' => $code ) );
+			/**
+			 * @var Red_Action
+			 */
+			$obj = new $avail[ $name ][1]( [ 'code' => $code ] );
 			$obj->type = $name;
 			return $obj;
 		}
 
-		return false;
+		return null;
 	}
 
-	static function available() {
-	 	return array(
-			'url'     => array( 'url.php',     'Url_Action' ),
-			'error'   => array( 'error.php',   'Error_Action' ),
-			'nothing' => array( 'nothing.php', 'Nothing_Action' ),
-			'random'  => array( 'random.php',  'Random_Action' ),
-			'pass'    => array( 'pass.php',    'Pass_Action' ),
-		);
+	/**
+	 * Get list of available actions
+	 *
+	 * @return array
+	 */
+	public static function available() {
+		return [
+			'url'     => [ 'url.php', 'Url_Action' ],
+			'error'   => [ 'error.php', 'Error_Action' ],
+			'nothing' => [ 'nothing.php', 'Nothing_Action' ],
+			'random'  => [ 'random.php', 'Random_Action' ],
+			'pass'    => [ 'pass.php', 'Pass_Action' ],
+		];
 	}
 
-	function type() {
+	/**
+	 * Get the action code
+	 *
+	 * @return integer
+	 */
+	public function get_code() {
+		return $this->code;
+	}
+
+	/**
+	 * Get action type
+	 *
+	 * @return string
+	 */
+	public function get_type() {
 		return $this->type;
 	}
 
-	function process_before( $code, $target ) {
-		return true;
+	/**
+	 * Set the target for this action
+	 *
+	 * @param String $target_url The original URL from the client.
+	 * @return void
+	 */
+	public function set_target( $target_url ) {
+		$this->target = $target_url;
 	}
 
-	function process_after( $code, $target ) {
-		return true;
+	/**
+	 * Get the target for this action
+	 *
+	 * @return String|null
+	 */
+	public function get_target() {
+		return $this->target;
 	}
 
-	function can_perform_action () {
-		return true;
+	/**
+	 * Does this action need a target?
+	 *
+	 * @return boolean
+	 */
+	public function needs_target() {
+		return false;
 	}
 
-	function action_codes () {
-		return array();
-	}
-
-	function display_actions() {
-		foreach ( $this->action_codes() as $key => $code ) {
-			echo '<option value="'.$key.'"'.( ( $key === intval( $this->action_code ) ) ? ' selected="selected"' : '' ).'>'.sprintf( '%s - %s', $key, $code ).'</option>';
-		}
-	}
+	/**
+	 * Run this action. May not return from this function.
+	 *
+	 * @return void
+	 */
+	abstract public function run();
 }

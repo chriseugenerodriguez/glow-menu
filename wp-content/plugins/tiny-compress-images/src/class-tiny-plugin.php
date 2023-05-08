@@ -1,7 +1,7 @@
 <?php
 /*
 * Tiny Compress Images - WordPress plugin.
-* Copyright (C) 2015-2017 Voormedia B.V.
+* Copyright (C) 2015-2018 Tinify B.V.
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the Free
@@ -18,7 +18,7 @@
 * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 class Tiny_Plugin extends Tiny_WP_Base {
-	const VERSION = '2.2.4';
+	const VERSION = '3.4.1';
 	const MEDIA_COLUMN = self::NAME;
 	const DATETIME_FORMAT = 'Y-m-d G:i:s';
 
@@ -39,7 +39,6 @@ class Tiny_Plugin extends Tiny_WP_Base {
 
 	public function __construct() {
 		parent::__construct();
-
 		$this->settings = new Tiny_Settings();
 	}
 
@@ -57,13 +56,58 @@ class Tiny_Plugin extends Tiny_WP_Base {
 		);
 
 		add_filter( 'wp_generate_attachment_metadata',
-			$this->get_method( 'compress_on_upload' ),
+			$this->get_method( 'process_attachment' ),
 			10, 2
 		);
 
 		load_plugin_textdomain( self::NAME, false,
 			dirname( plugin_basename( __FILE__ ) ) . '/languages'
 		);
+	}
+
+	public function ajax_init() {
+		add_filter( 'wp_ajax_tiny_async_optimize_upload_new_media',
+			$this->get_method( 'compress_on_upload' )
+		);
+
+		add_action( 'wp_ajax_tiny_compress_image_from_library',
+			$this->get_method( 'compress_image_from_library' )
+		);
+
+		add_action( 'wp_ajax_tiny_compress_image_for_bulk',
+			$this->get_method( 'compress_image_for_bulk' )
+		);
+
+		add_action( 'wp_ajax_tiny_get_optimization_statistics',
+			$this->get_method( 'ajax_optimization_statistics' )
+		);
+
+		add_action( 'wp_ajax_tiny_get_compression_status',
+			$this->get_method( 'ajax_compression_status' )
+		);
+
+		/* When touching any functionality linked to image compressions when
+			 uploading images make sure it also works with XML-RPC. See README. */
+		add_filter( 'wp_ajax_nopriv_tiny_rpc',
+			$this->get_method( 'process_rpc_request' )
+		);
+
+		if ( $this->settings->compress_wr2x_images() ) {
+			add_action( 'wr2x_upload_retina',
+				$this->get_method( 'compress_original_retina_image' ),
+				10, 2
+			);
+
+			add_action( 'wr2x_retina_file_added',
+				$this->get_method( 'compress_retina_image' ),
+				10, 3
+			);
+
+			add_action( 'wr2x_retina_file_removed',
+				$this->get_method( 'remove_retina_image' ),
+				10, 2
+			);
+		}
 	}
 
 	public function admin_init() {
@@ -96,18 +140,6 @@ class Tiny_Plugin extends Tiny_WP_Base {
 			$this->get_method( 'show_media_info' )
 		);
 
-		add_action( 'wp_ajax_tiny_compress_image_from_library',
-			$this->get_method( 'compress_image_from_library' )
-		);
-
-		add_action( 'wp_ajax_tiny_compress_image_for_bulk',
-			$this->get_method( 'compress_image_for_bulk' )
-		);
-
-		add_action( 'wp_ajax_tiny_get_optimization_statistics',
-			$this->get_method( 'ajax_optimization_statistics' )
-		);
-
 		$plugin = plugin_basename(
 			dirname( dirname( __FILE__ ) ) . '/tiny-compress-images.php'
 		);
@@ -116,15 +148,7 @@ class Tiny_Plugin extends Tiny_WP_Base {
 			$this->get_method( 'add_plugin_links' )
 		);
 
-		add_action( 'wr2x_retina_file_added',
-			$this->get_method( 'compress_retina_image' ),
-			10, 3
-		);
-
-		add_action( 'wr2x_retina_file_removed',
-			$this->get_method( 'remove_retina_image' ),
-			10, 2
-		);
+		$this->tiny_compatibility();
 
 		add_thickbox();
 	}
@@ -142,8 +166,7 @@ class Tiny_Plugin extends Tiny_WP_Base {
 	public function add_plugin_links( $current_links ) {
 		$additional = array(
 			'settings' => sprintf(
-				'<a href="options-media.php#%s">%s</a>',
-				self::NAME,
+				'<a href="options-general.php?page=tinify">%s</a>',
 				esc_html__( 'Settings', 'tiny-compress-images' )
 			),
 			'bulk' => sprintf(
@@ -154,11 +177,20 @@ class Tiny_Plugin extends Tiny_WP_Base {
 		return array_merge( $additional, $current_links );
 	}
 
-	public function compress_retina_image( $attachment_id, $path, $size_name ) {
-		if ( $this->settings->compress_wr2x_images() ) {
-			$tiny_image = new Tiny_Image( $this->settings, $attachment_id );
-			$tiny_image->compress_retina( $size_name . '_wr2x', $path );
+	public function tiny_compatibility() {
+		if ( defined( 'ICL_SITEPRESS_VERSION' ) ) {
+			$tiny_wpml_compatibility = new Tiny_WPML();
 		}
+	}
+
+	public function compress_original_retina_image( $attachment_id, $path ) {
+		$tiny_image = new Tiny_Image( $this->settings, $attachment_id );
+		$tiny_image->compress_retina( 'original_wr2x', $path );
+	}
+
+	public function compress_retina_image( $attachment_id, $path, $size_name ) {
+		$tiny_image = new Tiny_Image( $this->settings, $attachment_id );
+		$tiny_image->compress_retina( $size_name . '_wr2x', $path );
 	}
 
 	public function remove_retina_image( $attachment_id, $path ) {
@@ -173,7 +205,7 @@ class Tiny_Plugin extends Tiny_WP_Base {
 		);
 
 		wp_enqueue_style( self::NAME . '_chart',
-			plugins_url( '/css/chart.css', __FILE__ ),
+			plugins_url( '/css/optimization-chart.css', __FILE__ ),
 			array(), self::version()
 		);
 
@@ -217,7 +249,7 @@ class Tiny_Plugin extends Tiny_WP_Base {
 			);
 
 			wp_enqueue_style( self::NAME . '_chart',
-				plugins_url( '/css/chart.css', __FILE__ ),
+				plugins_url( '/css/optimization-chart.css', __FILE__ ),
 				array(), self::version()
 			);
 
@@ -229,17 +261,126 @@ class Tiny_Plugin extends Tiny_WP_Base {
 
 			wp_enqueue_script( self::NAME . '_tiny_bulk_optimization' );
 		}
-
 	}
 
-	public function compress_on_upload( $metadata, $attachment_id ) {
+	public function process_attachment( $metadata, $attachment_id ) {
+		if ( $this->settings->auto_compress_enabled() ) {
+			if (
+				$this->settings->background_compress_enabled() &&
+				! $this->settings->remove_local_files_setting_enabled()
+			) {
+				$this->async_compress_on_upload( $metadata, $attachment_id );
+			} else {
+				return $this->blocking_compress_on_upload( $metadata, $attachment_id );
+			}
+		}
+
+		return $metadata;
+	}
+
+	public function blocking_compress_on_upload( $metadata, $attachment_id ) {
 		if ( ! empty( $metadata ) ) {
 			$tiny_image = new Tiny_Image( $this->settings, $attachment_id, $metadata );
-			$result = $tiny_image->compress( $this->settings );
+			$result = $tiny_image->compress();
 			return $tiny_image->get_wp_metadata();
 		} else {
 			return $metadata;
 		}
+	}
+
+	public function async_compress_on_upload( $metadata, $attachment_id ) {
+		$context     = 'wp';
+		$action      = 'tiny_async_optimize_upload_new_media';
+		$_ajax_nonce = wp_create_nonce( 'new_media-' . $attachment_id );
+		$body = compact( 'action', '_ajax_nonce', 'metadata', 'attachment_id', 'context' );
+
+		$args = array(
+			'timeout'   => 0.01,
+			'blocking'  => false,
+			'body'      => $body,
+			'cookies'   => isset( $_COOKIE ) && is_array( $_COOKIE ) ? $_COOKIE : array(),
+			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
+		);
+
+		if ( defined( 'XMLRPC_REQUEST' ) && get_current_user_id() ) {
+			/* We generate a hash to be used for the transient we use to store the current user. */
+			$rpc_hash = md5( maybe_serialize( $body ) );
+
+			$args['body']['tiny_rpc_action'] = $args['body']['action'];
+			/* We set a different action to make sure that all RPC requests are first validated. */
+			$args['body']['action']          = 'tiny_rpc';
+			$args['body']['tiny_rpc_hash']   = $rpc_hash;
+			$args['body']['tiny_rpc_nonce']  = wp_create_nonce( 'tiny_rpc_' . $rpc_hash );
+
+			/*
+				We can't use cookies here, so we save the user id in a transient
+				so that we can retrieve it again when processing the RPC request.
+				We should be able to use a relatively short timeout, as the request
+				should be processed directly afterwards.
+			*/
+			set_transient( 'tiny_rpc_' . $rpc_hash, get_current_user_id(), 10 );
+		}
+
+		if ( getenv( 'WORDPRESS_HOST' ) !== false ) {
+			wp_remote_post( getenv( 'WORDPRESS_HOST' ) . '/wp-admin/admin-ajax.php', $args );
+		} else {
+			wp_remote_post( admin_url( 'admin-ajax.php' ), $args );
+		}
+	}
+
+	public function process_rpc_request() {
+		if (
+			empty( $_POST['tiny_rpc_action'] ) ||
+			empty( $_POST['tiny_rpc_hash'] ) ||
+			32 !== strlen( $_POST['tiny_rpc_hash'] )
+		) {
+			exit();
+		}
+
+		$rpc_hash = sanitize_key( $_POST['tiny_rpc_hash'] );
+		$user_id = absint( get_transient( 'tiny_rpc_' . $rpc_hash ) );
+		$user = $user_id ? get_userdata( $user_id ) : false;
+
+		/* We no longer need the transient. */
+		delete_transient( 'tiny_rpc_' . $rpc_hash );
+
+		if ( ! $user || ! $user->exists() ) {
+			exit();
+		}
+		wp_set_current_user( $user_id );
+
+		if ( ! check_ajax_referer( 'tiny_rpc_' . $rpc_hash, 'tiny_rpc_nonce', false ) ) {
+			exit();
+		}
+
+		/* Now that everything is checked, perform the actual action. */
+		$action = $_POST['tiny_rpc_action'];
+		unset(
+			$_POST['action'],
+			$_POST['tiny_rpc_action'],
+			$_POST['tiny_rpc_id'],
+			$_POST['tiny_rpc_nonce']
+		);
+		do_action( 'wp_ajax_' . $action );
+	}
+
+	public function compress_on_upload() {
+		if ( current_user_can( 'upload_files' ) ) {
+			$attachment_id = intval( $_POST['attachment_id'] );
+			$metadata = $_POST['metadata'];
+			if ( is_array( $metadata ) ) {
+				$tiny_image = new Tiny_Image( $this->settings, $attachment_id, $metadata );
+				$result = $tiny_image->compress();
+				// The wp_update_attachment_metadata call is thrown because the
+				// dimensions of the original image can change. This will then
+				// trigger other plugins and can result in unexpected behaviour and
+				// further changes to the image. This may require another approach.
+				// Note that as of WP 5.3 it is advised to not hook into this filter
+				// anymore, so other plugins are less likely to be triggered.
+				wp_update_attachment_metadata( $attachment_id, $tiny_image->get_wp_metadata() );
+			}
+		}
+		exit();
 	}
 
 	public function compress_image_from_library() {
@@ -274,12 +415,14 @@ class Tiny_Plugin extends Tiny_WP_Base {
 		}
 
 		$tiny_image = new Tiny_Image( $this->settings, $id, $metadata );
-		$result = $tiny_image->compress( $this->settings );
+		$result = $tiny_image->compress();
 
 		// The wp_update_attachment_metadata call is thrown because the
 		// dimensions of the original image can change. This will then
 		// trigger other plugins and can result in unexpected behaviour and
 		// further changes to the image. This may require another approach.
+		// Note that as of WP 5.3 it is advised to not hook into this filter
+		// anymore, so other plugins are less likely to be triggered.
 		wp_update_attachment_metadata( $id, $tiny_image->get_wp_metadata() );
 
 		echo $this->render_compress_details( $tiny_image );
@@ -325,12 +468,18 @@ class Tiny_Plugin extends Tiny_WP_Base {
 		}
 
 		$tiny_image_before = new Tiny_Image( $this->settings, $id, $metadata );
-		$image_statistics_before = $tiny_image_before->get_statistics();
+		$image_statistics_before = $tiny_image_before->get_statistics(
+			$this->settings->get_sizes(),
+			$this->settings->get_active_tinify_sizes()
+		);
 		$size_before = $image_statistics_before['optimized_total_size'];
 
 		$tiny_image = new Tiny_Image( $this->settings, $id, $metadata );
-		$result = $tiny_image->compress( $this->settings );
-		$image_statistics = $tiny_image->get_statistics();
+		$result = $tiny_image->compress();
+		$image_statistics = $tiny_image->get_statistics(
+			$this->settings->get_sizes(),
+			$this->settings->get_active_tinify_sizes()
+		);
 		wp_update_attachment_metadata( $id, $tiny_image->get_wp_metadata() );
 
 		$current_library_size = intval( $_POST['current_size'] );
@@ -365,33 +514,71 @@ class Tiny_Plugin extends Tiny_WP_Base {
 	}
 
 	public function ajax_optimization_statistics() {
+		if ( $this->check_ajax_referer() && current_user_can( 'upload_files' ) ) {
+			$stats = Tiny_Bulk_Optimization::get_optimization_statistics( $this->settings );
+			echo json_encode( $stats );
+		}
+		exit();
+	}
+
+	public function ajax_compression_status() {
 		if ( ! $this->check_ajax_referer() ) {
 			exit();
 		}
-		$stats = Tiny_Image::get_optimization_statistics( $this->settings );
-		echo json_encode( $stats );
+		if ( ! current_user_can( 'upload_files' ) ) {
+			exit();
+		}
+		if ( empty( $_POST['id'] ) ) {
+			$message = esc_html__(
+				'Not a valid media file.',
+				'tiny-compress-images'
+			);
+			echo $message;
+			exit();
+		}
+		$id = intval( $_POST['id'] );
+		$metadata = wp_get_attachment_metadata( $id );
+		if ( ! is_array( $metadata ) ) {
+			$message = esc_html__(
+				'Could not find metadata of media file.',
+				'tiny-compress-images'
+			);
+			echo $message;
+			exit;
+		}
+
+		$tiny_image = new Tiny_Image( $this->settings, $id, $metadata );
+
+		echo $this->render_compress_details( $tiny_image );
+
 		exit();
 	}
 
 	public function media_library_bulk_action() {
-
 		if ( empty( $_REQUEST['action'] ) || (
 				'tiny_bulk_action' != $_REQUEST['action'] &&
 				'tiny_bulk_action' != $_REQUEST['action2'] ) ) {
 			return;
 		}
-
 		if ( empty( $_REQUEST['media'] ) || ( ! $_REQUEST['media'] ) ) {
+			$_REQUEST['action'] = '';
 			return;
 		}
-
 		check_admin_referer( 'bulk-media' );
 		$ids = implode( '-', array_map( 'intval', $_REQUEST['media'] ) );
-		wp_redirect(add_query_arg(
-			'_wpnonce',
-			wp_create_nonce( 'tiny-bulk-optimization' ),
-			admin_url( "upload.php?page=tiny-bulk-optimization&ids=$ids" )
-		));
+		$location = 'upload.php?mode=list&ids=' . $ids;
+
+		if ( ! empty( $_REQUEST['paged'] ) ) {
+			$location = add_query_arg( 'paged', absint( $_REQUEST['paged'] ), $location );
+		}
+		if ( ! empty( $_REQUEST['s'] ) ) {
+			$location = add_query_arg( 's', $_REQUEST['s'], $location );
+		}
+		if ( ! empty( $_REQUEST['m'] ) ) {
+			$location = add_query_arg( 'm', $_REQUEST['m'], $location );
+		}
+
+		wp_redirect( admin_url( $location ) );
 		exit();
 	}
 
@@ -417,7 +604,7 @@ class Tiny_Plugin extends Tiny_WP_Base {
 		if ( $tiny_image->file_type_allowed() ) {
 			echo '<div class="misc-pub-section tiny-compress-images">';
 			echo '<h4>';
-			esc_html_e( 'JPEG and PNG optimization', 'tiny-compress-images' );
+			esc_html_e( 'JPEG, PNG, & WebP optimization', 'tiny-compress-images' );
 			echo '</h4>';
 			echo '<div class="tiny-ajax-container">';
 			$this->render_compress_details( $tiny_image );
@@ -436,23 +623,27 @@ class Tiny_Plugin extends Tiny_WP_Base {
 	}
 
 	public function render_bulk_optimization_page() {
-		$stats = Tiny_Image::get_optimization_statistics( $this->settings );
+		$stats = Tiny_Bulk_Optimization::get_optimization_statistics( $this->settings );
 		$estimated_costs = Tiny_Compress::estimate_cost(
 			$stats['available-unoptimised-sizes'],
 			$this->settings->get_compression_count()
 		);
 		$admin_colors = self::retrieve_admin_colors();
 
-		$active_tinify_sizes = $this->settings->get_active_tinify_sizes();
+		/* This makes sure that up to date information is retrieved from the API. */
+		$this->settings->get_compressor()->get_status();
 
-		$auto_start_bulk = isset( $_REQUEST['ids'] );
+		$active_tinify_sizes = $this->settings->get_active_tinify_sizes();
+		$remaining_credits = $this->settings->get_remaining_credits();
+		$is_on_free_plan = $this->settings->is_on_free_plan();
+		$email_address = $this->settings->get_email_address();
 
 		include( dirname( __FILE__ ) . '/views/bulk-optimization.php' );
 	}
 
 	public function add_dashboard_widget() {
 		wp_enqueue_style( self::NAME . '_chart',
-			plugins_url( '/css/chart.css', __FILE__ ),
+			plugins_url( '/css/optimization-chart.css', __FILE__ ),
 			array(), self::version()
 		);
 
@@ -466,11 +657,18 @@ class Tiny_Plugin extends Tiny_WP_Base {
 			array(), self::version(), true
 		);
 
+		/* This might be deduplicated with the admin script localization, but
+		   the order of including scripts is sometimes different. So in that
+		   case we need to make sure that the order of inclusion is correc.t */
+		wp_localize_script( self::NAME . '_dashboard_widget', 'tinyCompressDashboard', array(
+			'nonce' => wp_create_nonce( 'tiny-compress' ),
+		));
+
 		wp_enqueue_script( self::NAME . '_dashboard_widget' );
 
 		wp_add_dashboard_widget(
 			$this->get_prefixed_name( 'dashboard_widget' ),
-			esc_html__( 'Compress JPEG & PNG images', 'tiny-compress-images' ),
+			esc_html__( 'TinyPNG - JPEG, PNG & WebP image compression', 'tiny-compress-images' ),
 			$this->get_method( 'add_widget_view' )
 		);
 	}
@@ -511,21 +709,5 @@ class Tiny_Plugin extends Tiny_WP_Base {
 		$user = wp_get_current_user();
 		$name = ucfirst( empty( $user->first_name ) ? $user->display_name : $user->first_name );
 		return $name;
-	}
-
-	private function get_ids_to_compress() {
-		if ( empty( $_REQUEST['ids'] ) ) {
-			return array();
-		}
-
-		$ids = implode( ',', array_map( 'intval', explode( '-', $_REQUEST['ids'] ) ) );
-		$condition = "AND ID IN($ids)";
-
-		global $wpdb;
-		return $wpdb->get_results( // WPCS: unprepared SQL OK.
-			"SELECT ID, post_title FROM $wpdb->posts
-			WHERE post_type = 'attachment' $condition
-			AND (post_mime_type = 'image/jpeg' OR post_mime_type = 'image/png')
-			ORDER BY ID DESC", ARRAY_A);
 	}
 }

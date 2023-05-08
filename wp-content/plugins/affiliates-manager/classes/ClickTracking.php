@@ -42,20 +42,47 @@ class WPAM_Click_Tracking {
         }
         //this will be the new affiliate link. A click will be tracked when wpam_id is present in the URL
         if (isset($_REQUEST[WPAM_PluginConfig::$wpam_id]) && !empty($_REQUEST[WPAM_PluginConfig::$wpam_id])) {
+            global $wpdb;
             $aff_id = trim(strip_tags($_REQUEST[WPAM_PluginConfig::$wpam_id]));
             $cookie_life_time = wpam_get_cookie_life_time();
             setcookie('wpam_id', $aff_id, $cookie_life_time, "/", COOKIE_DOMAIN);
+            //do not record multiple clicks within 5 seconds
+            $current_datetime = date("Y-m-d H:i:s", time());
+            $cd_datetime = date("Y-m-d H:i:s", strtotime($current_datetime) - 5);
+            $user_ip = WPAM_Click_Tracking::get_user_ip();
+            $table = WPAM_TRACKING_TOKENS_TBL;
+            $result = $wpdb->get_var( $wpdb->prepare( 
+            "
+                    SELECT *
+                    FROM $table 
+                    WHERE dateCreated
+                    BETWEEN %s
+                    AND %s
+                    AND ipAddress = %s
+
+            ",
+            $cd_datetime,        
+            $current_datetime,
+            $user_ip        
+            ) );
+            if($result != null){
+                return;
+            }
             $args = array();
-            $args['dateCreated'] = date("Y-m-d H:i:s", time());
+            $args['dateCreated'] = $current_datetime;
             $args['sourceAffiliateId'] = $aff_id;
             $args['trackingKey'] = uniqid(); //save a unique ID to avoid error
             $args['sourceCreativeId'] = '';  // remove this column from the click tracking menu in the settings
-            $args['referer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+            $referer = '';
+            if(isset($_SERVER['HTTP_REFERER'])){
+                $referer = sanitize_text_field($_SERVER['HTTP_REFERER']);
+            }
+            $args['referer'] = $referer;
             $args['affiliateSubCode'] = '';
-            $args['ipAddress'] = WPAM_Click_Tracking::get_user_ip();
+            $args['ipAddress'] = $user_ip;
             /*
             WPAM_Logger::log_debug('inserting click');
-            WPAM_Logger::log_debug(print_r($args, true));
+            WPAM_Logger::log_debug_array($args);
             */
             WPAM_Click_Tracking::insert_click_data($args);
         }
@@ -120,14 +147,37 @@ class WPAM_Click_Tracking {
         return $total_clicks;
     }
     /*
+     * delete clicks data for a given period / delete all clicks data.
+     */
+    public static function delete_clicks_data_by_date($args = array()){
+        global $wpdb;
+        $table = WPAM_TRACKING_TOKENS_TBL;
+        $start_date = (isset($args['start_date']) && !empty($args['start_date'])) ? $args['start_date'] : '';
+        $end_date = (isset($args['end_date']) && !empty($args['end_date'])) ? $args['end_date'] : '';
+        $deletedb = '';
+        if(!empty($start_date) && !empty($end_date)){
+            $deletedb = "DELETE FROM $table WHERE dateCreated BETWEEN '$start_date' AND '$end_date'";
+        }
+        else if(!empty($start_date) && empty($end_date)){
+            $deletedb = "DELETE FROM $table WHERE dateCreated >= '$start_date'";
+        }
+        else if(empty($start_date) && !empty($end_date)){
+            $deletedb = "DELETE FROM $table WHERE dateCreated <= '$end_date'";
+        }
+        else{
+            $deletedb = "DELETE FROM $table";
+        }
+        $result = $wpdb->query($deletedb);
+    }
+    /*
      * Get the IP Address of the user.
      */
     public static function get_user_ip() {
         $user_ip = '';
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $user_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            $user_ip = sanitize_text_field($_SERVER['HTTP_X_FORWARDED_FOR']);
         } else {
-            $user_ip = $_SERVER['REMOTE_ADDR'];
+            $user_ip = sanitize_text_field($_SERVER['REMOTE_ADDR']);
         }
 
         if (strstr($user_ip, ',')) {
@@ -152,6 +202,38 @@ class WPAM_Click_Tracking {
 	",
         $ip_address       
         ) );
+        if(null !== $result){
+            $aff_id = $result->sourceAffiliateId;
+        }
+        return $aff_id;
+    }
+    
+    public static function get_referrer_id_from_ip_address_by_cookie_duration($ip_address) {
+        if(!isset($ip_address) || empty($ip_address)){
+            return "";
+        }
+        $cookie_duration = get_option(WPAM_PluginConfig::$CookieExpireOption);
+        $current_datetime = date("Y-m-d H:i:s", time());
+        $cookie_days = strval($current_datetime.' -'.$cookie_duration.' days');
+        $old_datetime = date("Y-m-d H:i:s", strtotime($cookie_days));
+        global $wpdb;
+        $table = WPAM_TRACKING_TOKENS_TBL;
+        $aff_id = '';
+        
+        $result = $wpdb->get_row( $wpdb->prepare( 
+	"
+		SELECT * FROM $table 
+		WHERE ipAddress = %s
+                AND dateCreated >= %s
+	",
+        $ip_address,
+        $old_datetime        
+        ) );
+        /*
+        WPAM_Logger::log_debug("cookie time: ".$cookie_duration);
+        WPAM_Logger::log_debug("current time: ".$current_datetime);
+        WPAM_Logger::log_debug("old time: ".$old_datetime); 
+        */
         if(null !== $result){
             $aff_id = $result->sourceAffiliateId;
         }

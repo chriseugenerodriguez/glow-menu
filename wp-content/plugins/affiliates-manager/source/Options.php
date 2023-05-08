@@ -43,8 +43,17 @@ class WPAM_Options
                 add_option( WPAM_PluginConfig::$AffEnableImpressions, 0, NULL, 'no' );
 		add_option( WPAM_PluginConfig::$PayoutMethodCheckIsEnabledOption,  true, NULL, 'no' );
 		add_option( WPAM_PluginConfig::$PayoutMethodPaypalIsEnabledOption, true, NULL, 'no' );
+                add_option( WPAM_PluginConfig::$BankTransferInstructions, 'Your Bank Account Details (Account Name, Account Number, Bank name, Routing Number, IBAN, BIC / Swift)' );
 		add_option( WPAM_PluginConfig::$TNCOptionOption, file_get_contents( WPAM_RESOURCES_DIR . "default_tnc.txt" ) );
 		add_option( WPAM_PluginConfig::$MinPayoutAmountOption, 20 );
 		add_option( WPAM_PluginConfig::$PaypalAPIEndPointOption, 'dev' );
+                add_option( WPAM_PluginConfig::$EmailType, 'plain' );
+                add_option( WPAM_PluginConfig::$SendAdminRegNotification, true );
+                add_option( WPAM_PluginConfig::$AdminRegNotificationEmail, get_option('admin_email') );
+                add_option( WPAM_PluginConfig::$AutoDeleteWPUserAccount, true );
+                add_option( WPAM_PluginConfig::$ShowRegTncChk, true );
+                add_option( WPAM_PluginConfig::$UseIPReferralTrack, true );
+                add_option( WPAM_PluginConfig::$EnableRegNonceChk, true );
+                update_option('wpam_options_version', WPAM_OPTIONS_VERSION);
 	}
 }

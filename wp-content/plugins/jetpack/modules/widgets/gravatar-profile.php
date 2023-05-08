@@ -1,28 +1,31 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
 
+// phpcs:disable Universal.Files.SeparateFunctionsFromOO.Mixed -- TODO: Move classes to appropriately-named class files.
+
+add_action( 'widgets_init', 'jetpack_gravatar_profile_widget_init' );
 /**
  * Register the widget for use in Appearance -> Widgets
  */
-add_action( 'widgets_init', 'jetpack_gravatar_profile_widget_init' );
-
 function jetpack_gravatar_profile_widget_init() {
 	register_widget( 'Jetpack_Gravatar_Profile_Widget' );
 }
 
 /**
  * Display a widgetized version of your Gravatar Profile
- * http://blog.gravatar.com/2010/03/26/gravatar-profiles/
+ * https://blog.gravatar.com/2010/03/26/gravatar-profiles/
  */
 class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
-
-	function __construct() {
+	/**
+	 * Jetpack_Gravatar_Profile_Widget constructor.
+	 */
+	public function __construct() {
 		parent::__construct(
 			'grofile',
 			/** This filter is documented in modules/widgets/facebook-likebox.php */
 			apply_filters( 'jetpack_widget_name', __( 'Gravatar Profile', 'jetpack' ) ),
 			array(
-				'classname'   => 'widget-grofile grofile',
-				'description' => __( 'Display a mini version of your Gravatar Profile', 'jetpack' ),
+				'classname'                   => 'widget-grofile grofile',
+				'description'                 => __( 'Display a mini version of your Gravatar Profile', 'jetpack' ),
 				'customize_selective_refresh' => true,
 			)
 		);
@@ -36,7 +39,15 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 		}
 	}
 
-	function widget( $args, $instance ) {
+	/**
+	 * Display the Widget.
+	 *
+	 * @see WP_Widget::widget()
+	 *
+	 * @param array $args     Display arguments.
+	 * @param array $instance The settings for the particular instance of the widget.
+	 */
+	public function widget( $args, $instance ) {
 		/**
 		 * Fires when an item is displayed on the front end.
 		 *
@@ -51,41 +62,60 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 		 */
 		do_action( 'jetpack_stats_extra', 'widget_view', 'grofile' );
 
-		$instance = wp_parse_args( $instance, array(
-			'title' => '',
-			'email' => ''
-		) );
+		$instance = wp_parse_args(
+			$instance,
+			array(
+				'title' => '',
+				'email' => '',
+			)
+		);
 
 		/** This filter is documented in core/src/wp-includes/default-widgets.php */
 		$title = apply_filters( 'widget_title', $instance['title'] );
 
-		if ( !$instance['email'] ) {
+		if ( ! $instance['email'] ) {
 			if ( current_user_can( 'edit_theme_options' ) ) {
-				echo $args['before_widget'];
-				if ( ! empty( $title ) )
-					echo $args['before_title'] . $title . $args['after_title'];
-				echo '<p>' . sprintf( __( 'You need to select what to show in this <a href="%s">Gravatar Profile widget</a>.', 'jetpack' ), admin_url( 'widgets.php' ) ) . '</p>';
-				echo $args['after_widget'];
+				echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				if ( ! empty( $title ) ) {
+					echo $args['before_title'] . $title . $args['after_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				}
+				echo '<p>' . wp_kses(
+					sprintf(
+						/* translators: %s is a link to the widget settings page. */
+						__( 'You need to select what to show in this <a href="%s">Gravatar Profile widget</a>.', 'jetpack' ),
+						admin_url( 'widgets.php' )
+					),
+					array(
+						'a' => array(
+							'href' => true,
+						),
+					)
+				) . '</p>';
+				echo $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 			return;
 		}
 
-		echo $args['before_widget'];
-		if ( ! empty( $title ) )
-			echo $args['before_title'] . $title . $args['after_title'];
+		echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		if ( ! empty( $title ) ) {
+			echo $args['before_title'] . $title . $args['after_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
 
 		$profile = $this->get_profile( $instance['email'] );
 
-		if( ! empty( $profile ) ) {
-			$profile = wp_parse_args( $profile, array(
-				'thumbnailUrl' => '',
-				'profileUrl'   => '',
-				'displayName'  => '',
-				'aboutMe'      => '',
-				'urls'         => array(),
-				'accounts'     => array(),
-			) );
-			$gravatar_url = add_query_arg( 's', 320, $profile['thumbnailUrl'] ); // the default grav returned by grofiles is super small
+		if ( ! empty( $profile ) ) {
+			$profile      = wp_parse_args(
+				$profile,
+				array(
+					'thumbnailUrl' => '',
+					'profileUrl'   => '',
+					'displayName'  => '',
+					'aboutMe'      => '',
+					'urls'         => array(),
+					'accounts'     => array(),
+				)
+			);
+			$gravatar_url = add_query_arg( 's', 320, $profile['thumbnailUrl'] ); // The default grav returned by grofiles is super small.
 
 			// Enqueue front end assets.
 			$this->enqueue_scripts();
@@ -99,16 +129,19 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 
 			<?php
 
-			if( $instance['show_personal_links'] )
+			if ( $instance['show_personal_links'] ) {
 				$this->display_personal_links( (array) $profile['urls'] );
+			}
 
-			if( $instance['show_account_links'] )
+			if ( $instance['show_account_links'] ) {
 				$this->display_accounts( (array) $profile['accounts'] );
+			}
 
 			?>
 
 			<p><a href="<?php echo esc_url( $profile['profileUrl'] ); ?>" class="grofile-full-link">
-				<?php echo esc_html(
+				<?php
+				echo esc_html(
 					/**
 					 * Filter the Gravatar Profile widget's profile link title.
 					 *
@@ -122,25 +155,32 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 						'jetpack_gravatar_full_profile_title',
 						__( 'View Full Profile &rarr;', 'jetpack' )
 					)
-				); ?>
+				);
+				?>
 			</a></p>
 
 			<?php
-		} else {
-			if ( current_user_can( 'edit_theme_options' ) ) {
-				echo '<p>' . esc_html__( 'Error loading profile', 'jetpack' ) . '</p>';
-			}
+		} elseif ( current_user_can( 'edit_theme_options' ) ) {
+			echo '<p>' . esc_html__( 'Error loading profile', 'jetpack' ) . '</p>';
 		}
 
-		echo $args['after_widget'];
+		echo $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
-	function display_personal_links( $personal_links = array() ) {
-		if ( empty( $personal_links ) )
+	/**
+	 * Displays the "Personal Links" section.
+	 *
+	 * @param array $personal_links Array of links.
+	 */
+	public function display_personal_links( $personal_links = array() ) {
+		if ( empty( $personal_links ) ) {
 			return;
+		}
 		?>
 
-			<h4><?php echo esc_html(
+			<h4>
+			<?php
+			echo esc_html(
 				apply_filters(
 					/**
 					 * Filter the Gravatar Profile widget's "Personal Links" section title.
@@ -153,11 +193,13 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 					 */
 					'jetpack_gravatar_personal_links_title',
 					__( 'Personal Links', 'jetpack' )
-					)
-				); ?></h4>
+				)
+			);
+			?>
+				</h4>
 			<ul class="grofile-urls grofile-links">
 
-			<?php foreach( $personal_links as $personal_link ) : ?>
+			<?php foreach ( $personal_links as $personal_link ) : ?>
 				<li>
 					<a href="<?php echo esc_url( $personal_link['value'] ); ?>">
 						<?php
@@ -172,37 +214,55 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 		<?php
 	}
 
-	function display_accounts( $accounts = array() ) {
-		if ( empty( $accounts ) )
+	/**
+	 * Displays the "Verified Services" accounts.
+	 *
+	 * @param array $accounts Array of social accounts.
+	 */
+	public function display_accounts( $accounts = array() ) {
+		if ( empty( $accounts ) ) {
 			return;
+		}
 		?>
 
-		<h4><?php echo esc_html(
-				/**
-				 * Filter the Gravatar Profile widget's "Verified Services" section title.
-				 *
-				 * @module widgets
-				 *
-				 * @since 2.8.0
-				 *
-				 * @param string $str "Verified Services" section title.
-				 */
-				apply_filters(
-					'jetpack_gravatar_verified_services_title',
-					__( 'Verified Services', 'jetpack' )
-				)
-			); ?></h4>
+		<h4>
+		<?php
+		echo esc_html(
+			/**
+			 * Filter the Gravatar Profile widget's "Verified Services" section title.
+			 *
+			 * @module widgets
+			 *
+			 * @since 2.8.0
+			 *
+			 * @param string $str "Verified Services" section title.
+			 */
+			apply_filters(
+				'jetpack_gravatar_verified_services_title',
+				__( 'Verified Services', 'jetpack' )
+			)
+		);
+		?>
+			</h4>
 		<ul class="grofile-urls grofile-accounts">
 
-		<?php foreach( $accounts as $account ) :
-			if( $account['verified'] != 'true' )
+		<?php
+		foreach ( $accounts as $account ) :
+			if ( 'true' !== $account['verified'] ) {
 				continue;
+			}
 
 			$sanitized_service_name = $this->get_sanitized_service_name( $account['shortname'] );
+			$link_title             = sprintf(
+				/* translators: %1$s: service username. %2$s: service name ( Facebook, Twitter, etc.) */
+				_x( '%1$s on %2$s', '1: User Name, 2: Service Name (Facebook, Twitter, ...)', 'jetpack' ),
+				esc_html( $account['display'] ),
+				esc_html( $sanitized_service_name )
+			);
 			?>
 
 			<li>
-				<a href="<?php echo esc_url( $account['url'] ); ?>" title="<?php echo sprintf( _x( '%1$s on %2$s', '1: User Name, 2: Service Name (Facebook, Twitter, ...)', 'jetpack' ), esc_html( $account['display'] ), esc_html( $sanitized_service_name ) ); ?>">
+				<a href="<?php echo esc_url( $account['url'] ); ?>" title="<?php echo esc_html( $link_title ); ?>">
 					<span class="grofile-accounts-logo grofile-accounts-<?php echo esc_attr( $account['shortname'] ); ?> accounts_<?php echo esc_attr( $account['shortname'] ); ?>"></span>
 				</a>
 			</li>
@@ -218,7 +278,7 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 	 *
 	 * @since 4.0.0
 	 */
-	function enqueue_scripts() {
+	public function enqueue_scripts() {
 		wp_enqueue_style(
 			'gravatar-profile-widget',
 			plugins_url( 'gravatar-profile.css', __FILE__ ),
@@ -234,7 +294,12 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 		);
 	}
 
-	function form( $instance ) {
+	/**
+	 * Outputs the widget settings form.
+	 *
+	 * @param array $instance Current settings.
+	 */
+	public function form( $instance ) {
 		$title               = isset( $instance['title'] ) ? $instance['title'] : '';
 		$email               = isset( $instance['email'] ) ? $instance['email'] : '';
 		$email_user          = isset( $instance['email_user'] ) ? $instance['email_user'] : get_current_user_id();
@@ -245,41 +310,45 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 		if ( defined( 'IS_WPCOM' ) && IS_WPCOM ) {
 			$profile_url = admin_url( 'profile.php' );
 
-			if ( isset( $_REQUEST['calypso'] ) ) {
+			if ( isset( $_REQUEST['calypso'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$profile_url = 'https://wordpress.com/me';
 			}
 		}
 		?>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'title' ); ?>">
-				<?php esc_html_e( 'Title', 'jetpack' ); ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
+			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>">
+				<?php esc_html_e( 'Title', 'jetpack' ); ?> <input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 			</label>
 		</p>
 
 		<p>
-			<label for="<?php echo $this->get_field_id( 'email_user' ); ?>">
+			<label for="<?php echo esc_attr( $this->get_field_id( 'email_user' ) ); ?>">
 				<?php esc_html_e( 'Select a user or pick "custom" and enter a custom email address.', 'jetpack' ); ?>
 				<br />
 
-				<?php wp_dropdown_users( array(
-					'show_option_none' => __( 'Custom', 'jetpack' ),
-					'selected'         => $email_user,
-					'name'             => $this->get_field_name( 'email_user' ),
-					'id'               => $this->get_field_id( 'email_user' ),
-					'class'            => 'gravatar-profile-user-select',
-				) );?>
+				<?php
+				wp_dropdown_users(
+					array(
+						'show_option_none' => __( 'Custom', 'jetpack' ),
+						'selected'         => $email_user,
+						'name'             => $this->get_field_name( 'email_user' ),
+						'id'               => $this->get_field_id( 'email_user' ),
+						'class'            => 'gravatar-profile-user-select',
+					)
+				);
+				?>
 			</label>
 		</p>
 
-		<p class="gprofile-email-container <?php echo empty( $email_user ) || $email_user == -1 ? '' : 'hidden'; ?>">
-			<label for="<?php echo $this->get_field_id( 'email' ); ?>"><?php esc_html_e( 'Custom Email Address', 'jetpack' ); ?>
-				<input class="widefat" id="<?php echo $this->get_field_id('email'); ?>" name="<?php echo $this->get_field_name( 'email' ); ?>" type="text" value="<?php echo esc_attr( $email ); ?>" />
+		<p class="gprofile-email-container <?php echo empty( $email_user ) || -1 === (int) $email_user ? '' : 'hidden'; ?>">
+			<label for="<?php echo esc_attr( $this->get_field_id( 'email' ) ); ?>"><?php esc_html_e( 'Custom Email Address', 'jetpack' ); ?>
+				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'email' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'email' ) ); ?>" type="text" value="<?php echo esc_attr( $email ); ?>" />
 			</label>
 		</p>
 
 		<p>
-			<label for="<?php echo $this->get_field_id( 'show_personal_links' ); ?>">
-				<input type="checkbox" name="<?php echo $this->get_field_name( 'show_personal_links' ); ?>" id="<?php echo $this->get_field_id( 'show_personal_links' ); ?>" <?php checked( $show_personal_links ); ?> />
+			<label for="<?php echo esc_attr( $this->get_field_id( 'show_personal_links' ) ); ?>">
+				<input type="checkbox" name="<?php echo esc_attr( $this->get_field_name( 'show_personal_links' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'show_personal_links' ) ); ?>" <?php checked( $show_personal_links ); ?> />
 				<?php esc_html_e( 'Show Personal Links', 'jetpack' ); ?>
 				<br />
 				<small><?php esc_html_e( 'Links to your websites, blogs, or any other sites that help describe who you are.', 'jetpack' ); ?></small>
@@ -287,20 +356,23 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 		</p>
 
 		<p>
-			<label for="<?php echo $this->get_field_id( 'show_account_links' ); ?>">
-				<input type="checkbox" name="<?php echo $this->get_field_name( 'show_account_links' ); ?>" id="<?php echo $this->get_field_id( 'show_account_links' ); ?>" <?php checked( $show_account_links ); ?> />
+			<label for="<?php echo esc_attr( $this->get_field_id( 'show_account_links' ) ); ?>">
+				<input type="checkbox" name="<?php echo esc_attr( $this->get_field_name( 'show_account_links' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'show_account_links' ) ); ?>" <?php checked( $show_account_links ); ?> />
 				<?php esc_html_e( 'Show Account Links', 'jetpack' ); ?>
 				<br />
 				<small><?php esc_html_e( 'Links to services that you use across the web.', 'jetpack' ); ?></small>
 			</label>
 		</p>
 
-		<p><a href="<?php echo esc_url( $profile_url ); ?>" target="_blank" title="<?php esc_attr_e( 'Opens in new window', 'jetpack' ); ?>"><?php esc_html_e( 'Edit Your Profile', 'jetpack' )?></a> | <a href="https://gravatar.com" target="_blank" title="<?php esc_attr_e( 'Opens in new window', 'jetpack' ); ?>"><?php esc_html_e( "What's a Gravatar?", 'jetpack' ); ?></a></p>
+		<p><a href="<?php echo esc_url( $profile_url ); ?>" target="_blank" title="<?php esc_attr_e( 'Opens in new window', 'jetpack' ); ?>"><?php esc_html_e( 'Edit Your Profile', 'jetpack' ); ?></a> | <a href="https://gravatar.com" target="_blank" title="<?php esc_attr_e( 'Opens in new window', 'jetpack' ); ?>"><?php esc_html_e( "What's a Gravatar?", 'jetpack' ); ?></a></p>
 
 		<?php
 	}
 
-	function admin_script() {
+	/**
+	 * Inline admin script.
+	 */
+	public function admin_script() {
 		?>
 		<script>
 		jQuery( function( $ ) {
@@ -317,52 +389,70 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 		<?php
 	}
 
-	function update( $new_instance, $old_instance ) {
-
+	/**
+	 * Update widget.
+	 *
+	 * @see WP_Widget::update()
+	 *
+	 * @param array $new_instance New widget instance data.
+	 * @param array $old_instance Old widget instance data.
+	 */
+	public function update( $new_instance, $old_instance ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$instance = array();
 
 		$instance['title']               = isset( $new_instance['title'] ) ? wp_kses( $new_instance['title'], array() ) : '';
 		$instance['email']               = isset( $new_instance['email'] ) ? wp_kses( $new_instance['email'], array() ) : '';
-		$instance['email_user']          = isset( $new_instance['email_user'] ) ? intval( $new_instance['email_user'] ) : -1;
+		$instance['email_user']          = isset( $new_instance['email_user'] ) ? (int) $new_instance['email_user'] : -1;
 		$instance['show_personal_links'] = isset( $new_instance['show_personal_links'] ) ? (bool) $new_instance['show_personal_links'] : false;
 		$instance['show_account_links']  = isset( $new_instance['show_account_links'] ) ? (bool) $new_instance['show_account_links'] : false;
 
 		if ( $instance['email_user'] > 0 ) {
-			$user = get_userdata( $instance['email_user'] );
+			$user              = get_userdata( $instance['email_user'] );
 			$instance['email'] = $user->user_email;
 		}
 
 		$hashed_email = md5( strtolower( trim( $instance['email'] ) ) );
-		$cache_key = 'grofile-' . $hashed_email;
+		$cache_key    = 'grofile-' . $hashed_email;
 		delete_transient( $cache_key );
 
 		return $instance;
 	}
 
+	/**
+	 * Get the Gravatar profile for a given email address.
+	 *
+	 * @param string $email Email address.
+	 */
 	private function get_profile( $email ) {
 		$hashed_email = md5( strtolower( trim( $email ) ) );
-		$cache_key = 'grofile-' . $hashed_email;
+		$cache_key    = 'grofile-' . $hashed_email;
+		$profile      = get_transient( $cache_key );
 
-		if( ! $profile = get_transient( $cache_key ) ) {
-			$profile_url = esc_url_raw( sprintf( '%s.gravatar.com/%s.json', ( is_ssl() ? 'https://secure' : 'http://www' ), $hashed_email ), array( 'http', 'https' ) );
+		if ( ! $profile ) {
+			$profile_url = sprintf(
+				'https://secure.gravatar.com/%s.json',
+				$hashed_email
+			);
 
-			$expire = 300;
-			$response = wp_remote_get( $profile_url, array( 'User-Agent' => 'WordPress.com Gravatar Profile Widget' ) );
+			$expire        = 300;
+			$response      = wp_remote_get(
+				esc_url_raw( $profile_url ),
+				array( 'User-Agent' => 'WordPress.com Gravatar Profile Widget' )
+			);
 			$response_code = wp_remote_retrieve_response_code( $response );
-			if ( 200 == $response_code ) {
+			if ( 200 === $response_code ) {
 				$profile = wp_remote_retrieve_body( $response );
 				$profile = json_decode( $profile, true );
 
 				if ( is_array( $profile ) && ! empty( $profile['entry'] ) && is_array( $profile['entry'] ) ) {
-					$expire = 900; // cache for 15 minutes
+					$expire  = 900; // Cache for 15 minutes.
 					$profile = $profile['entry'][0];
 				} else {
 					// Something strange happened.  Cache for 5 minutes.
 					$profile = array();
 				}
-
 			} else {
-				$expire = 900; // cache for 15 minutes
+				$expire  = 900; // Cache for 15 minutes.
 				$profile = array();
 			}
 
@@ -371,9 +461,16 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 		return $profile;
 	}
 
+	/**
+	 * Return properly capitalized service name.
+	 *
+	 * @param string $shortname The service.
+	 *
+	 * @return string
+	 */
 	private function get_sanitized_service_name( $shortname ) {
-		// Some services have stylized or mixed cap names *cough* WP *cough*
-		switch( $shortname ) {
+		// Some services have stylized or mixed cap names *cough* WP *cough*.
+		switch ( $shortname ) {
 			case 'friendfeed':
 				return 'FriendFeed';
 			case 'linkedin':
@@ -382,6 +479,7 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 				return 'Yahoo!';
 			case 'youtube':
 				return 'YouTube';
+			// phpcs:ignore WordPress.WP.CapitalPDangit
 			case 'wordpress':
 				return 'WordPress';
 			case 'tripit':
@@ -393,11 +491,9 @@ class Jetpack_Gravatar_Profile_Widget extends WP_Widget {
 			case 'google':
 				return 'Google+';
 			default:
-				// Others don't
+				// Others don't.
 				$shortname = ucwords( $shortname );
 		}
 		return $shortname;
 	}
 }
-
-// END

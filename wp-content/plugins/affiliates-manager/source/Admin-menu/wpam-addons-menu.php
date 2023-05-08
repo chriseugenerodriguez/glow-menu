@@ -26,7 +26,7 @@ function wpam_display_addons_menu()
 
     $addon_3 = array(
         'name' => 'Mailpoet Newsletter',
-        'thumbnail' => WPAM_URL . '/images/addons/mailpoet-integration.jpg',
+        'thumbnail' => WPAM_URL . '/images/addons/mailpoet-integration.png',
         'description' => 'You can automatically sign up your affiliates to a specific MailPoet newsletter list.',
         'page_url' => 'https://wpaffiliatemanager.com/sign-affiliates-to-mailpoet-list/',
     );
@@ -183,6 +183,30 @@ function wpam_display_addons_menu()
         'page_url' => 'https://wpaffiliatemanager.com/affiliates-manager-membermouse-plugin-integration/',
     );
     array_push($addons_data, $addon_22);
+    
+    $addon_23 = array(
+        'name' => 'AppThemes Integration',
+        'thumbnail' => WPAM_URL . '/images/addons/appthemes-integration.png',
+        'description' => 'Integrates with AppThemes apps so you can reward affiliates for sending customers.',
+        'page_url' => 'https://wpaffiliatemanager.com/affiliates-manager-appthemes-integration/',
+    );
+    array_push($addons_data, $addon_23);
+    
+    $addon_24 = array(
+        'name' => 'Checkout Referrals',
+        'thumbnail' => WPAM_URL . '/images/addons/checkout-referrals-addon.png',
+        'description' => 'Allow Visitors to Set the Referrer or Affiliate ID.',
+        'page_url' => 'https://wpaffiliatemanager.com/allow-visitors-to-set-the-referrer-or-affiliate-id/',
+    );
+    array_push($addons_data, $addon_24);
+    
+    $addon_25 = array(
+        'name' => 'GiveWP Integration',
+        'thumbnail' => WPAM_URL . '/images/addons/givewp-integration.png',
+        'description' => 'Integrates with GiveWP plugin so you can reward affiliates for sending customers.',
+        'page_url' => 'https://wpaffiliatemanager.com/affiliates-manager-givewp-integration/',
+    );
+    array_push($addons_data, $addon_25);
     
     //Display the list
     $output = '';

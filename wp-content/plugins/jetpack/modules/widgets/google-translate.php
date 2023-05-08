@@ -1,38 +1,51 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
+
+// phpcs:disable Universal.Files.SeparateFunctionsFromOO.Mixed -- TODO: Move classes to appropriately-named class files.
+
+use Automattic\Jetpack\Assets;
+
 /**
  * Plugin Name: Google Translate Widget for WordPress.com
- * Plugin URI: http://automattic.com
+ * Plugin URI: https://automattic.com
  * Description: Add a widget for automatic translation
  * Author: Artur Piszek
  * Version: 0.1
- * Author URI: http://automattic.com
+ * Author URI: https://automattic.com
  * Text Domain: jetpack
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Jetpack_Google_Translate_Widget main class.
+ */
 class Jetpack_Google_Translate_Widget extends WP_Widget {
-	static $instance = null;
+	/**
+	 * Singleton instance of the widget, not to show more than once.
+	 *
+	 * @var array
+	 */
+	public static $instance = null;
 
 	/**
 	 * Default widget title.
 	 *
 	 * @var string $default_title
 	 */
-	var $default_title;
+	public $default_title;
 
 	/**
 	 * Register widget with WordPress.
 	 */
-	function __construct() {
+	public function __construct() {
 		parent::__construct(
 			'google_translate_widget',
 			/** This filter is documented in modules/widgets/facebook-likebox.php */
 			apply_filters( 'jetpack_widget_name', __( 'Google Translate', 'jetpack' ) ),
 			array(
-				'description' => __( 'Provide your readers with the option to translate your site into their preferred language.', 'jetpack' ),
-				'customize_selective_refresh' => true
+				'description'                 => __( 'Provide your readers with the option to translate your site into their preferred language.', 'jetpack' ),
+				'customize_selective_refresh' => true,
 			)
 		);
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -44,11 +57,47 @@ class Jetpack_Google_Translate_Widget extends WP_Widget {
 	 * Enqueue frontend JS scripts.
 	 */
 	public function enqueue_scripts() {
-		wp_register_script( 'google-translate-init', plugins_url( 'google-translate/google-translate.js', __FILE__ ) );
-		wp_register_script( 'google-translate', '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit', array( 'google-translate-init' ) );
+		wp_register_script(
+			'google-translate-init',
+			Assets::get_file_url_for_environment(
+				'_inc/build/widgets/google-translate/google-translate.min.js',
+				'modules/widgets/google-translate/google-translate.js'
+			),
+			array(),
+			JETPACK__VERSION,
+			false
+		);
+		wp_register_script(
+			'google-translate',
+			'//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit',
+			array( 'google-translate-init' ),
+			JETPACK__VERSION,
+			false
+		);
 		// Admin bar is also displayed on top of the site which causes google translate bar to hide beneath.
+		// Overwrite position of body.admin-bar
 		// This is a hack to show google translate bar a bit lower.
-		wp_add_inline_style( 'admin-bar', '.goog-te-banner-frame { top:32px !important }' );
+		$lower_translate_bar = '
+			.admin-bar {
+				position: inherit !important;
+				top: auto !important;
+			}
+			.admin-bar .goog-te-banner-frame {
+				top: 32px !important
+			}
+			@media screen and (max-width: 782px) {
+				.admin-bar .goog-te-banner-frame {
+					top: 46px !important;
+				}
+			}
+			@media screen and (max-width: 480px) {
+				.admin-bar .goog-te-banner-frame {
+					position: absolute;
+				}
+			}
+		';
+		wp_add_inline_style( 'admin-bar', $lower_translate_bar );
+		wp_add_inline_style( 'wpcom-admin-bar', $lower_translate_bar );
 	}
 
 	/**
@@ -62,11 +111,47 @@ class Jetpack_Google_Translate_Widget extends WP_Widget {
 	public function widget( $args, $instance ) {
 		// We never should show more than 1 instance of this.
 		if ( null === self::$instance ) {
-			$instance = wp_parse_args( $instance, array(
-				'title' => $this->default_title,
-			) );
+			$instance = wp_parse_args(
+				$instance,
+				array(
+					'title' => $this->default_title,
+				)
+			);
 
-			wp_localize_script( 'google-translate-init', '_wp_google_translate_widget', array( 'lang' => get_locale() ) );
+			/**
+			 * Filter the layout of the Google Translate Widget.
+			 *
+			 * 3 different integers are accepted.
+			 *  0 for the vertical layout.
+			 *  1 for the horizontal layout.
+			 *  2 for the dropdown only.
+			 *
+			 * @see https://translate.google.com/manager/website/
+			 *
+			 * @module widgets
+			 *
+			 * @since 5.5.0
+			 *
+			 * @param string $layout layout of the Google Translate Widget.
+			 */
+			$button_layout = apply_filters( 'jetpack_google_translate_widget_layout', 0 );
+
+			if (
+				! is_int( $button_layout )
+				|| 0 > $button_layout
+				|| 2 < $button_layout
+			) {
+				$button_layout = 0;
+			}
+
+			wp_localize_script(
+				'google-translate-init',
+				'_wp_google_translate_widget',
+				array(
+					'lang'   => get_locale(),
+					'layout' => (int) $button_layout,
+				)
+			);
 			wp_enqueue_script( 'google-translate-init' );
 			wp_enqueue_script( 'google-translate' );
 
@@ -79,12 +164,12 @@ class Jetpack_Google_Translate_Widget extends WP_Widget {
 			/** This filter is documented in wp-includes/widgets/class-wp-widget-pages.php */
 			$title = apply_filters( 'widget_title', $title );
 
-			echo $args['before_widget'];
+			echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			if ( ! empty( $title ) ) {
-				echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
+				echo $args['before_title'] . $title . $args['after_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 			echo '<div id="google_translate_element"></div>';
-			echo $args['after_widget'];
+			echo $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			self::$instance = $instance;
 			/** This action is documented in modules/widgets/gravatar-profile.php */
 			do_action( 'jetpack_stats_extra', 'widget_view', 'google-translate' );
@@ -121,11 +206,11 @@ class Jetpack_Google_Translate_Widget extends WP_Widget {
 	 *
 	 * @return array $instance Updated safe values to be saved.
 	 */
-	public function update( $new_instance, $old_instance ) {
-		$instance = array();
+	public function update( $new_instance, $old_instance ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$instance          = array();
 		$instance['title'] = wp_kses( $new_instance['title'], array() );
 		if ( $instance['title'] === $this->default_title ) {
-			$instance['title'] = false; // Store as false in case of language change
+			$instance['title'] = false; // Store as false in case of language change.
 		}
 		return $instance;
 	}

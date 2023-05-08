@@ -1,85 +1,74 @@
 <?php
 
+/**
+ * Check whether the user is logged in or out
+ */
 class Login_Match extends Red_Match {
-	public $user_agent = '';
+	/**
+	 * Target URL when logged in.
+	 *
+	 * @var String
+	 */
+	public $logged_in = '';
 
-	function name() {
+	/**
+	 * Target URL when logged out.
+	 *
+	 * @var String
+	 */
+	public $logged_out = '';
+
+	public function name() {
 		return __( 'URL and login status', 'redirection' );
 	}
 
-	function show() {
-		?>
-		<tr>
-			<th></th>
-			<td>
-				<p>
-					<?php _e( 'The target URL will be chosen from one of the following URLs, depending if the user is logged in or out.  Leaving a URL blank means that the user is not redirected.', 'redirection' ); ?>
-				</p>
-			</td>
-		</tr>
-		<tr>
-			<th width="100" valign="top">
-				<?php if ( strlen( $this->url_loggedin ) > 0 ) : ?>
-					<a target="_blank" href="<?php echo esc_url( $this->url_loggedin ) ?>"><?php _e( 'Logged In', 'redirection' ); ?>:</a>
-				<?php else : ?>
-					<?php _e( 'Logged In', 'redirection' ); ?>:
-				<?php endif; ?>
-			</th>
-			<td valign="top">
-				<input style="width: 95%" type="text" name="url_loggedin" value="<?php echo esc_attr( $this->url_loggedin ); ?>"/>
-			</td>
-		</tr>
-		<tr>
-			<th width="100" valign="top">
-				<?php if ( strlen( $this->url_loggedout ) > 0 ) : ?>
-					<a target="_blank" href="<?php echo esc_url( $this->url_loggedout ) ?>"><?php _e( 'Logged Out', 'redirection' ); ?>:</a>
-				<?php else : ?>
-					<?php _e( 'Logged Out', 'redirection' ); ?>:
-				<?php endif; ?>
-			</th>
-			<td valign="top">
-				<input style="width: 95%" type="text" name="url_loggedout" value="<?php echo esc_attr( $this->url_loggedout ); ?>"/><br/>
-			</td>
-		</tr>
-		<?php
+	public function save( array $details, $no_target_url = false ) {
+		if ( $no_target_url ) {
+			return null;
+		}
+
+		return [
+			'logged_in' => isset( $details['logged_in'] ) ? $this->sanitize_url( $details['logged_in'] ) : '',
+			'logged_out' => isset( $details['logged_out'] ) ? $this->sanitize_url( $details['logged_out'] ) : '',
+		];
 	}
 
-	function save( $details ) {
-		if ( isset( $details['target'] ) )
-			$details['target'] = $this->sanitize_url( $details );
-
-		return array(
-			'url_loggedin' => isset( $details['url_loggedin'] ) ? $this->sanitize_url( $details['url_loggedin'] ) : false,
-			'url_loggedout' => isset( $details['url_loggedout'] ) ? $this->sanitize_url( $details['url_loggedout'] ) : false,
-		);
+	public function is_match( $url ) {
+		return is_user_logged_in();
 	}
 
-	function initialize( $url ) {
-		$this->url = array( $url, '' );
-	}
+	public function get_target_url( $requested_url, $source_url, Red_Source_Flags $flags, $match ) {
+		$target = false;
 
-	function get_target( $url, $matched_url, $regex ) {
-		if ( is_user_logged_in() === false )
-			$target = $this->url_loggedout;
-		else
-			$target = $this->url_loggedin;
+		if ( $match && $this->logged_in !== '' ) {
+			$target = $this->logged_in;
+		} elseif ( ! $match && $this->logged_out !== '' ) {
+			$target = $this->logged_out;
+		}
 
-		if ( $regex )
-			$target = preg_replace( '@'.str_replace( '@', '\\@', $matched_url ).'@', $target, $url );
+		if ( $flags->is_regex() && $target ) {
+			$target = $this->get_target_regex_url( $source_url, $target, $requested_url, $flags );
+		}
+
 		return $target;
 	}
 
-	function wants_it() {
-		if ( is_user_logged_in() && strlen( $this->url_loggedin ) > 0 )
-			return true;
-
-		if ( ! is_user_logged_in() && strlen( $this->url_loggedout ) > 0 )
-			return true;
-
-		return false;
+	public function get_data() {
+		return [
+			'logged_in' => $this->logged_in,
+			'logged_out' => $this->logged_out,
+		];
 	}
 
-	function match_name() {
-		return sprintf( 'login status', $this->user_agent );
+	/**
+	 * Load the match data into this instance.
+	 *
+	 * @param String $values Match values, as read from the database (plain text or serialized PHP).
+	 * @return void
+	 */
+	public function load( $values ) {
+		$values = unserialize( $values );
+		$this->logged_in = isset( $values['logged_in'] ) ? $values['logged_in'] : '';
+		$this->logged_out = isset( $values['logged_out'] ) ? $values['logged_out'] : '';
 	}
 }

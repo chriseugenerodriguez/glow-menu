@@ -1,35 +1,40 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
 
 /**
  * VideoPress Shortcode Handler
  *
  * This file may or may not be included from the Jetpack VideoPress module.
  */
-
 class VideoPress_Shortcode {
-	/** @var VideoPress_Shortcode */
+	/**
+	 * Singleton VideoPress_Shortcode instance.
+	 *
+	 * @var VideoPress_Shortcode
+	 */
 	protected static $instance;
 
+	/**
+	 * VideoPress_Shortcode constructor.
+	 */
 	protected function __construct() {
+		// Only add the shortcode if it hasn't already been added by the standalone VideoPress plugin.
+		if ( ! shortcode_exists( 'videopress' ) ) {
+			add_shortcode( 'videopress', array( $this, 'shortcode_callback' ) );
+			add_shortcode( 'wpvideo', array( $this, 'shortcode_callback' ) );
 
-		// By explicitly declaring the provider here, we can speed things up by not relying on oEmbed discovery.
-		wp_oembed_add_provider( '#^https?://videopress.com/v/.*#', 'http://public-api.wordpress.com/oembed/1.0/', true );
-
-		add_shortcode( 'videopress', array( $this, 'shortcode_callback' ) );
-		add_shortcode( 'wpvideo',    array( $this, 'shortcode_callback' ) );
-
-		add_filter('wp_video_shortcode_override', array( $this, 'video_shortcode_override' ), 10, 4);
-
-		add_filter( 'oembed_fetch_url', array( $this, 'add_oembed_for_parameter' ) );
+			add_filter( 'wp_video_shortcode_override', array( $this, 'video_shortcode_override' ), 10, 4 );
+		}
 
 		$this->add_video_embed_hander();
 	}
 
 	/**
+	 * VideoPress_Shortcode initialization.
+	 *
 	 * @return VideoPress_Shortcode
 	 */
 	public static function initialize() {
-		if ( ! isset ( self::$instance ) ) {
+		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self();
 		}
 
@@ -44,8 +49,8 @@ class VideoPress_Shortcode {
 	 * [videopress OcobLTqC]
 	 * [wpvideo OcobLTqC]
 	 *
-	 * @link http://codex.wordpress.org/Shortcode_API Shortcode API
-	 * @param array $attr shortcode attributes
+	 * @link https://codex.wordpress.org/Shortcode_API Shortcode API
+	 * @param array $attr shortcode attributes.
 	 * @return string HTML markup or blank string on fail
 	 */
 	public function shortcode_callback( $attr ) {
@@ -80,7 +85,24 @@ class VideoPress_Shortcode {
 			'permalink'       => true,  // Whether to display the permalink to the video
 			'flashonly'       => false, // Whether to support the Flash player exclusively
 			'defaultlangcode' => false, // Default language code
+			'cover'           => true,  // Whether to scale the video to its container.
+			'muted'           => false, // Whether the video should start without sound.
+			'controls'        => true,  // Whether the video should display controls.
+			'playsinline'     => false, // Whether the video should be allowed to play inline (for browsers that support this).
+			'useaveragecolor' => false, // Whether the video should use the seekbar automatic average color.
+			'preloadcontent'  => 'metadata', // Setting for how the browser should preload the video (none, metadata, auto).
 		);
+
+		// Make sure "false" will be actually false.
+		foreach ( $attr as $key => $value ) {
+			if ( is_string( $value ) && 'false' === strtolower( $value ) ) {
+				$attr[ $key ] = false;
+			}
+		}
+
+		if ( isset( $attr['preload'] ) ) {
+			$attr['preloadcontent'] = $attr['preload'];
+		}
 
 		$attr = shortcode_atts( $defaults, $attr, 'videopress' );
 
@@ -112,7 +134,7 @@ class VideoPress_Shortcode {
 		 * If the width isn't an even number, reduce it by one (making it even).
 		 */
 		if ( 1 === ( $attr['width'] % 2 ) ) {
-			$attr['width'] --;
+			--$attr['width'];
 		}
 
 		/**
@@ -124,31 +146,40 @@ class VideoPress_Shortcode {
 		 *
 		 * @param array $args Array of VideoPress shortcode options.
 		 */
-		$options = apply_filters( 'videopress_shortcode_options', array(
-			'at'              => (int) $attr['at'],
-			'hd'              => $attr['hd'],
-			'loop'            => $attr['autoplay'] || $attr['loop'],
-			'freedom'         => $attr['freedom'],
-			'autoplay'        => $attr['autoplay'],
-			'permalink'       => $attr['permalink'],
-			'force_flash'     => (bool) $attr['flashonly'],
-			'defaultlangcode' => $attr['defaultlangcode'],
-			'forcestatic'     => false, // This used to be a displayed option, but now is only
+		$options = apply_filters(
+			'videopress_shortcode_options',
+			array(
+				'at'              => (int) $attr['at'],
+				'hd'              => $attr['hd'],
+				'cover'           => (bool) $attr['cover'],
+				'loop'            => $attr['loop'],
+				'freedom'         => $attr['freedom'],
+				'autoplay'        => $attr['autoplay'],
+				'permalink'       => $attr['permalink'],
+				'force_flash'     => (bool) $attr['flashonly'],
+				'defaultlangcode' => $attr['defaultlangcode'],
+				'forcestatic'     => false, // This used to be a displayed option, but now is only.
+				'muted'           => $attr['muted'],
+				'controls'        => $attr['controls'],
+				'playsinline'     => $attr['playsinline'],
+				'useAverageColor' => (bool) $attr['useaveragecolor'], // The casing is intentional, shortcode params are lowercase, but player expects useAverageColor
+				'preloadContent'  => $attr['preloadcontent'], // The casing is intentional, shortcode params are lowercase, but player expects preloadContent
 			// accessible via the `videopress_shortcode_options` filter.
-		) );
+			)
+		);
 
 		// Register VideoPress scripts
-		wp_register_script( 'videopress', 'https://v0.wordpress.com/js/videopress.js', array( 'jquery', 'swfobject' ), '1.09' );
+		wp_register_script( 'videopress', 'https://v0.wordpress.com/js/videopress.js', array( 'jquery', 'swfobject' ), '1.09', false );
 
-		require_once( dirname( __FILE__ ) . '/class.videopress-video.php' );
-		require_once( dirname( __FILE__ ) . '/class.videopress-player.php' );
+		require_once __DIR__ . '/class.videopress-video.php';
+		require_once __DIR__ . '/class.videopress-player.php';
 
 		$player = new VideoPress_Player( $guid, $attr['width'], $options );
 
 		if ( is_feed() ) {
-			return $player->asXML();
+			return $player->as_xml();
 		} else {
-			return $player->asHTML();
+			return $player->as_html();
 		}
 	}
 
@@ -165,27 +196,30 @@ class VideoPress_Shortcode {
 	 *
 	 * @return string
 	 */
-	public function video_shortcode_override($html, $attr, $content, $instance) {
-
+	public function video_shortcode_override( $html, $attr, $content, $instance ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$videopress_guid = null;
 
 		if ( isset( $attr['videopress_guid'] ) ) {
 			$videopress_guid = $attr['videopress_guid'];
-
 		} else {
 			// Handle the different possible url attributes
 			$url_keys = array( 'src', 'mp4' );
 
 			foreach ( $url_keys as $key ) {
-				if ( isset ( $attr[ $key ] ) ) {
+				if ( isset( $attr[ $key ] ) ) {
 					$url = $attr[ $key ];
-
+					// phpcs:ignore WordPress.WP.CapitalPDangit
 					if ( preg_match( '@videos.(videopress\.com|files\.wordpress\.com)/([a-z0-9]{8})/@i', $url, $matches ) ) {
 						$videopress_guid = $matches[2];
 					}
 
 					// Also test for videopress oembed url, which is used by the Video Media Widget.
 					if ( ! $videopress_guid && preg_match( '@https://videopress.com/v/([a-z0-9]{8})@i', $url, $matches ) ) {
+						$videopress_guid = $matches[1];
+					}
+
+					// Also test for old v.wordpress.com oembed URL.
+					if ( ! $videopress_guid && preg_match( '|^https?://v\.wordpress\.com/([a-zA-Z\d]{8})(.+)?$|i', $url, $matches ) ) { // phpcs:ignore WordPress.WP.CapitalPDangit.Misspelled
 						$videopress_guid = $matches[1];
 					}
 
@@ -199,31 +233,23 @@ class VideoPress_Shortcode {
 			if ( isset( $attr['width'] ) ) {
 				$videopress_attr['w'] = (int) $attr['width'];
 			}
+			if ( isset( $attr['muted'] ) ) {
+				$videopress_attr['muted'] = $attr['muted'];
+			}
 			if ( isset( $attr['autoplay'] ) ) {
 				$videopress_attr['autoplay'] = $attr['autoplay'];
 			}
 			if ( isset( $attr['loop'] ) ) {
 				$videopress_attr['loop'] = $attr['loop'];
 			}
+			// The core video block doesn't support the cover attribute, setting it to false for consistency.
+			$videopress_attr['cover'] = false;
 
 			// Then display the VideoPress version of the stored GUID!
 			return $this->shortcode_callback( $videopress_attr );
 		}
 
 		return '';
-	}
-
-	/**
-	 * Adds a `for` query parameter to the oembed provider request URL.
-	 *
-	 * @param String $oembed_provider
-	 * @return String $ehnanced_oembed_provider
-	 */
-	public function add_oembed_for_parameter( $oembed_provider ) {
-		if ( false === stripos( $oembed_provider, 'videopress.com' ) ) {
-			return $oembed_provider;
-		}
-		return add_query_arg( 'for', parse_url( home_url(), PHP_URL_HOST ), $oembed_provider );
 	}
 
 	/**

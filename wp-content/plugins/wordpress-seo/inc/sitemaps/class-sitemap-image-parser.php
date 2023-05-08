@@ -1,5 +1,7 @@
 <?php
 /**
+ * WPSEO plugin file.
+ *
  * @package WPSEO\XML_Sitemaps
  */
 
@@ -8,19 +10,39 @@
  */
 class WPSEO_Sitemap_Image_Parser {
 
-	/** @var string $home_url Holds the home_url() value to speed up loops. */
+	/**
+	 * Holds the home_url() value to speed up loops.
+	 *
+	 * @var string
+	 */
 	protected $home_url = '';
 
-	/** @var string $host Holds site URL hostname. */
+	/**
+	 * Holds site URL hostname.
+	 *
+	 * @var string
+	 */
 	protected $host = '';
 
-	/** @var string $scheme Holds site URL protocol. */
+	/**
+	 * Holds site URL protocol.
+	 *
+	 * @var string
+	 */
 	protected $scheme = 'http';
 
-	/** @var array $attachments Cached set of attachments for multiple posts. */
-	protected $attachments = array();
+	/**
+	 * Cached set of attachments for multiple posts.
+	 *
+	 * @var array
+	 */
+	protected $attachments = [];
 
-	/** @var string $charset Holds blog charset value for use in DOM parsing.  */
+	/**
+	 * Holds blog charset value for use in DOM parsing.
+	 *
+	 * @var string
+	 */
 	protected $charset = 'UTF-8';
 
 	/**
@@ -51,7 +73,7 @@ class WPSEO_Sitemap_Image_Parser {
 	 */
 	public function get_images( $post ) {
 
-		$images = array();
+		$images = [];
 
 		if ( ! is_object( $post ) ) {
 			return $images;
@@ -62,31 +84,31 @@ class WPSEO_Sitemap_Image_Parser {
 		if ( $thumbnail_id ) {
 
 			$src      = $this->get_absolute_url( $this->image_url( $thumbnail_id ) );
-			$alt      = get_post_meta( $thumbnail_id, '_wp_attachment_image_alt', true );
-			$title    = get_post_field( 'post_title', $thumbnail_id );
-			$images[] = $this->get_image_item( $post, $src, $title, $alt );
+			$images[] = $this->get_image_item( $post, $src );
 		}
 
-		$unfiltered_images = $this->parse_html_images( $post->post_content );
+		/**
+		 * Filter: 'wpseo_sitemap_content_before_parse_html_images' - Filters the post content
+		 * before it is parsed for images.
+		 *
+		 * @param string $content The raw/unprocessed post content.
+		 */
+		$content = apply_filters( 'wpseo_sitemap_content_before_parse_html_images', $post->post_content );
+
+		$unfiltered_images = $this->parse_html_images( $content );
 
 		foreach ( $unfiltered_images as $image ) {
-			$images[] = $this->get_image_item( $post, $image['src'], $image['title'], $image['alt'] );
+			$images[] = $this->get_image_item( $post, $image['src'] );
 		}
 
-		foreach ( $this->parse_galleries( $post->post_content, $post->ID ) as $attachment ) {
-
-			$src = $this->get_absolute_url( $this->image_url( $attachment->ID ) );
-			$alt = get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
-
-			$images[] = $this->get_image_item( $post, $src, $attachment->post_title, $alt );
+		foreach ( $this->parse_galleries( $content, $post->ID ) as $attachment ) {
+			$src      = $this->get_absolute_url( $this->image_url( $attachment->ID ) );
+			$images[] = $this->get_image_item( $post, $src );
 		}
 
-		if ( 'attachment' === $post->post_type && wp_attachment_is_image( $post ) ) {
-
+		if ( $post->post_type === 'attachment' && wp_attachment_is_image( $post ) ) {
 			$src      = $this->get_absolute_url( $this->image_url( $post->ID ) );
-			$alt      = get_post_meta( $post->ID, '_wp_attachment_image_alt', true );
-
-			$images[] = $this->get_image_item( $post, $src, $post->post_title, $alt );
+			$images[] = $this->get_image_item( $post, $src );
 		}
 
 		foreach ( $images as $key => $image ) {
@@ -108,6 +130,8 @@ class WPSEO_Sitemap_Image_Parser {
 	}
 
 	/**
+	 * Get the images in the term description.
+	 *
 	 * @param object $term Term to get images from description for.
 	 *
 	 * @return array
@@ -118,11 +142,9 @@ class WPSEO_Sitemap_Image_Parser {
 
 		foreach ( $this->parse_galleries( $term->description ) as $attachment ) {
 
-			$images[] = array(
+			$images[] = [
 				'src'   => $this->get_absolute_url( $this->image_url( $attachment->ID ) ),
-				'title' => $attachment->post_title,
-				'alt'   => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
-			);
+			];
 		}
 
 		return $images;
@@ -137,7 +159,7 @@ class WPSEO_Sitemap_Image_Parser {
 	 */
 	private function parse_html_images( $content ) {
 
-		$images = array();
+		$images = [];
 
 		if ( ! class_exists( 'DOMDocument' ) ) {
 			return $images;
@@ -156,7 +178,11 @@ class WPSEO_Sitemap_Image_Parser {
 		// Clear the errors, so they don't get kept in memory.
 		libxml_clear_errors();
 
-		/** @var DOMElement $img */
+		/**
+		 * Image attribute.
+		 *
+		 * @var DOMElement $img
+		 */
 		foreach ( $post_dom->getElementsByTagName( 'img' ) as $img ) {
 
 			$src = $img->getAttribute( 'src' );
@@ -169,11 +195,16 @@ class WPSEO_Sitemap_Image_Parser {
 
 			if ( // This detects WP-inserted images, which we need to upsize. R.
 				! empty( $class )
-				&& false === strpos( $class, 'size-full' )
+				&& ( strpos( $class, 'size-full' ) === false )
 				&& preg_match( '|wp-image-(?P<id>\d+)|', $class, $matches )
 				&& get_post_status( $matches['id'] )
 			) {
-				$src = $this->image_url( $matches['id'] );
+				$query_params = wp_parse_url( $src, PHP_URL_QUERY );
+				$src          = $this->image_url( $matches['id'] );
+
+				if ( $query_params ) {
+					$src .= '?' . $query_params;
+				}
 			}
 
 			$src = $this->get_absolute_url( $src );
@@ -182,15 +213,13 @@ class WPSEO_Sitemap_Image_Parser {
 				continue;
 			}
 
-			if ( $src !== esc_url( $src ) ) {
+			if ( $src !== esc_url( $src, null, 'attribute' ) ) {
 				continue;
 			}
 
-			$images[] = array(
+			$images[] = [
 				'src'   => $src,
-				'title' => $img->getAttribute( 'title' ),
-				'alt'   => $img->getAttribute( 'alt' ),
-			);
+			];
 		}
 
 		return $images;
@@ -200,13 +229,13 @@ class WPSEO_Sitemap_Image_Parser {
 	 * Parse gallery shortcodes in a given content.
 	 *
 	 * @param string $content Content string.
-	 * @param int    $post_id Optional ID of post being parsed.
+	 * @param int    $post_id Optional. ID of post being parsed.
 	 *
 	 * @return array Set of attachment objects.
 	 */
-	private function parse_galleries( $content, $post_id = 0 ) {
+	protected function parse_galleries( $content, $post_id = 0 ) {
 
-		$attachments = array();
+		$attachments = [];
 		$galleries   = $this->get_content_galleries( $content );
 
 		foreach ( $galleries as $gallery ) {
@@ -222,40 +251,7 @@ class WPSEO_Sitemap_Image_Parser {
 				$gallery['include'] = $gallery['ids'];
 			}
 
-			$gallery_attachments = array();
-
-			if ( ! empty( $gallery['include'] ) ) {
-
-				$_attachments = get_posts( array(
-					'include'        => $gallery['include'],
-					'post_status'    => 'inherit',
-					'post_type'      => 'attachment',
-					'post_mime_type' => 'image',
-				) );
-
-				foreach ( $_attachments as $key => $val ) {
-					$gallery_attachments[ $val->ID ] = $_attachments[ $key ];
-				}
-			}
-			elseif ( ! empty( $gallery['exclude'] ) && ! empty( $id ) ) {
-
-				$gallery_attachments = get_children( array(
-					'post_parent'    => $id,
-					'exclude'        => $gallery['exclude'],
-					'post_status'    => 'inherit',
-					'post_type'      => 'attachment',
-					'post_mime_type' => 'image',
-				) );
-			}
-			elseif ( ! empty( $id ) ) {
-
-				$gallery_attachments = get_children( array(
-					'post_parent'    => $id,
-					'post_status'    => 'inherit',
-					'post_type'      => 'attachment',
-					'post_mime_type' => 'image',
-				) );
-			}
+			$gallery_attachments = $this->get_gallery_attachments( $id, $gallery );
 
 			$attachments = array_merge( $attachments, $gallery_attachments );
 		}
@@ -274,27 +270,21 @@ class WPSEO_Sitemap_Image_Parser {
 	 */
 	protected function get_content_galleries( $content ) {
 
-		if ( ! has_shortcode( $content, 'gallery' ) ) {
-			return array();
-		}
+		$galleries = [];
 
-		$galleries = array();
-
-		if ( ! preg_match_all( '/' . get_shortcode_regex() . '/s', $content, $matches, PREG_SET_ORDER ) ) {
+		if ( ! preg_match_all( '/' . get_shortcode_regex( [ 'gallery' ] ) . '/s', $content, $matches, PREG_SET_ORDER ) ) {
 			return $galleries;
 		}
 
 		foreach ( $matches as $shortcode ) {
-			if ( 'gallery' === $shortcode[2] ) {
 
-				$attributes = shortcode_parse_atts( $shortcode[3] );
+			$attributes = shortcode_parse_atts( $shortcode[3] );
 
-				if ( '' === $attributes ) { // Valid shortcode without any attributes. R.
-					$attributes = array();
-				}
-
-				$galleries[] = $attributes;
+			if ( $attributes === '' ) { // Valid shortcode without any attributes. R.
+				$attributes = [];
 			}
+
+			$galleries[] = $attributes;
 		}
 
 		return $galleries;
@@ -303,16 +293,14 @@ class WPSEO_Sitemap_Image_Parser {
 	/**
 	 * Get image item array with filters applied.
 	 *
-	 * @param WP_Post $post  Post object for the context.
-	 * @param string  $src   Image URL.
-	 * @param string  $title Optional image title.
-	 * @param string  $alt   Optional image alt text.
+	 * @param WP_Post $post Post object for the context.
+	 * @param string  $src  Image URL.
 	 *
 	 * @return array
 	 */
-	protected function get_image_item( $post, $src, $title = '', $alt = '' ) {
+	protected function get_image_item( $post, $src ) {
 
-		$image = array();
+		$image = [];
 
 		/**
 		 * Filter image URL to be included in XML sitemap for the post.
@@ -322,23 +310,13 @@ class WPSEO_Sitemap_Image_Parser {
 		 */
 		$image['src'] = apply_filters( 'wpseo_xml_sitemap_img_src', $src, $post );
 
-		if ( ! empty( $title ) ) {
-			$image['title'] = $title;
-		}
-
-		if ( ! empty( $alt ) ) {
-			$image['alt'] = $alt;
-		}
-
 		/**
 		 * Filter image data to be included in XML sitemap for the post.
 		 *
 		 * @param array  $image {
-		 *                      Array of image data.
+		 *     Array of image data.
 		 *
-		 * @type string  $src   Image URL.
-		 * @type string  $title Image title attribute (optional).
-		 * @type string  $alt   Image alt attribute (optional).
+		 *     @type string  $src   Image URL.
 		 * }
 		 *
 		 * @param object $post  Post object.
@@ -347,7 +325,7 @@ class WPSEO_Sitemap_Image_Parser {
 	}
 
 	/**
-	 * Get attached image URL. Adapted from core for speed.
+	 * Get attached image URL with filters applied. Adapted from core for speed.
 	 *
 	 * @param int $post_id ID of the post.
 	 *
@@ -361,7 +339,7 @@ class WPSEO_Sitemap_Image_Parser {
 			$uploads = wp_upload_dir();
 		}
 
-		if ( false !== $uploads['error'] ) {
+		if ( $uploads['error'] !== false ) {
 			return '';
 		}
 
@@ -372,17 +350,18 @@ class WPSEO_Sitemap_Image_Parser {
 		}
 
 		// Check that the upload base exists in the file location.
-		if ( 0 === strpos( $file, $uploads['basedir'] ) ) {
-			return str_replace( $uploads['basedir'], $uploads['baseurl'], $file );
+		if ( strpos( $file, $uploads['basedir'] ) === 0 ) {
+			$src = str_replace( $uploads['basedir'], $uploads['baseurl'], $file );
+		}
+		elseif ( strpos( $file, 'wp-content/uploads' ) !== false ) {
+			$src = $uploads['baseurl'] . substr( $file, ( strpos( $file, 'wp-content/uploads' ) + 18 ) );
+		}
+		else {
+			// It's a newly uploaded file, therefore $file is relative to the baseurl.
+			$src = $uploads['baseurl'] . '/' . $file;
 		}
 
-		// Replace file location with url location.
-		if ( false !== strpos( $file, 'wp-content/uploads' ) ) {
-			return $uploads['baseurl'] . substr( $file, ( strpos( $file, 'wp-content/uploads' ) + 18 ) );
-		}
-
-		// It's a newly uploaded file, therefore $file is relative to the baseurl.
-		return $uploads['baseurl'] . "/$file";
+		return apply_filters( 'wp_get_attachment_url', $src, $post_id );
 	}
 
 	/**
@@ -398,7 +377,7 @@ class WPSEO_Sitemap_Image_Parser {
 			return $src;
 		}
 
-		if ( WPSEO_Utils::is_url_relative( $src ) === true ) {
+		if ( YoastSEO()->helpers->url->is_relative( $src ) === true ) {
 
 			if ( $src[0] !== '/' ) {
 				return $src;
@@ -409,7 +388,7 @@ class WPSEO_Sitemap_Image_Parser {
 		}
 
 		if ( strpos( $src, 'http' ) !== 0 ) {
-			// Protocol relative url, we add the scheme as the standard requires a protocol.
+			// Protocol relative URL, we add the scheme as the standard requires a protocol.
 			return $this->scheme . ':' . $src;
 		}
 
@@ -417,12 +396,100 @@ class WPSEO_Sitemap_Image_Parser {
 	}
 
 	/**
-	 * Cache attached images and thumbnails for a set of posts.
+	 * Returns the attachments for a gallery.
 	 *
-	 * @deprecated 3.3 Blanket caching no longer makes sense with modern galleries. R.
+	 * @param int   $id      The post ID.
+	 * @param array $gallery The gallery config.
+	 *
+	 * @return array The selected attachments.
 	 */
-	public function cache_attachments() {
+	protected function get_gallery_attachments( $id, $gallery ) {
 
-		_deprecated_function( __METHOD__, '3.3' );
+		// When there are attachments to include.
+		if ( ! empty( $gallery['include'] ) ) {
+			return $this->get_gallery_attachments_for_included( $gallery['include'] );
+		}
+
+		// When $id is empty, just return empty array.
+		if ( empty( $id ) ) {
+			return [];
+		}
+
+		return $this->get_gallery_attachments_for_parent( $id, $gallery );
+	}
+
+	/**
+	 * Returns the attachments for the given ID.
+	 *
+	 * @param int   $id      The post ID.
+	 * @param array $gallery The gallery config.
+	 *
+	 * @return array The selected attachments.
+	 */
+	protected function get_gallery_attachments_for_parent( $id, $gallery ) {
+		$query = [
+			'posts_per_page' => -1,
+			'post_parent'    => $id,
+		];
+
+		// When there are posts that should be excluded from result set.
+		if ( ! empty( $gallery['exclude'] ) ) {
+			$query['post__not_in'] = wp_parse_id_list( $gallery['exclude'] );
+		}
+
+		return $this->get_attachments( $query );
+	}
+
+	/**
+	 * Returns an array with attachments for the post IDs that will be included.
+	 *
+	 * @param array $included_ids Array with IDs to include.
+	 *
+	 * @return array The found attachments.
+	 */
+	protected function get_gallery_attachments_for_included( $included_ids ) {
+		$ids_to_include = wp_parse_id_list( $included_ids );
+		$attachments    = $this->get_attachments(
+			[
+				'posts_per_page' => count( $ids_to_include ),
+				'post__in'       => $ids_to_include,
+			]
+		);
+
+		$gallery_attachments = [];
+		foreach ( $attachments as $key => $val ) {
+			$gallery_attachments[ $val->ID ] = $val;
+		}
+
+		return $gallery_attachments;
+	}
+
+	/**
+	 * Returns the attachments.
+	 *
+	 * @param array $args Array with query args.
+	 *
+	 * @return array The found attachments.
+	 */
+	protected function get_attachments( $args ) {
+		$default_args = [
+			'post_status'         => 'inherit',
+			'post_type'           => 'attachment',
+			'post_mime_type'      => 'image',
+
+			// Defaults taken from function get_posts.
+			'orderby'             => 'date',
+			'order'               => 'DESC',
+			'meta_key'            => '',
+			'meta_value'          => '',
+			'suppress_filters'    => true,
+			'ignore_sticky_posts' => true,
+			'no_found_rows'       => true,
+		];
+
+		$args = wp_parse_args( $args, $default_args );
+
+		$get_attachments = new WP_Query();
+		return $get_attachments->query( $args );
 	}
 }

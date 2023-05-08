@@ -20,6 +20,11 @@ sui.views.editAttributeSelect2Field = sui.views.editAttributeField.extend( {
 	inputChanged: function(e) {
 		var _selected = $( e.currentTarget ).val();
 
+		// Empty fields will have null values. We don't want to coerce that to the string "null".
+		if ( _selected === null ) {
+			_selected = '';
+		}
+
 		// Store multiple selections as comma-delimited list
 		if ( Array.isArray( _selected ) ) {
 			_selected = _selected.join( ',' );
@@ -86,7 +91,10 @@ sui.views.editAttributeSelect2Field = sui.views.editAttributeField.extend( {
 	render: function() {
 
 		var self = this,
-			defaults = { multiple: false };
+			defaults = { 
+				multiple: false,
+				allowClear: false
+			};
 
 		for ( var arg in defaults ) {
 			if ( ! this.model.get( arg ) ) {
@@ -106,6 +114,8 @@ sui.views.editAttributeSelect2Field = sui.views.editAttributeField.extend( {
 		var $fieldSelect2 = $field[ shortcodeUIData.select2_handle ]({
 			placeholder: "Search",
 			multiple: this.model.get( 'multiple' ),
+			allowClear: this.model.get( 'allowClear' ),
+			dropdownParent: this.$el,
 
 			ajax: {
 				url: ajaxurl,

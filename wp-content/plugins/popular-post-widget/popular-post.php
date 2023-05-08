@@ -1,11 +1,11 @@
 <?php
 /*
  * Plugin Name: Popular Post Widget
- * Plugin URI: http://mostafiz.me/popular-post-widget/
+ * Plugin URI: https://mostafizshamim.com/popular-post-widget/
  * Description: This is a simple widget plugin to show most popular posts of your WordPress website based on views.
- * Author: Mostafiz
- * Author URI: http://mostafiz.me/
- * Version: 1.0
+ * Author: Mostafiz Shamim
+ * Author URI: https://mostafizshamim.com
+ * Version: 1.0.1
  * License: GPL2
 **/
 

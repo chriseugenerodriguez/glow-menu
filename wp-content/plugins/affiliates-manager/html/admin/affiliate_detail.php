@@ -110,7 +110,8 @@ $user = $this->viewData['user'];
 		function showConfirmDialog(message, confirmText, confirmCallback)
 		{
 			var buttons = new Object;
-			buttons['Cancel'] = function() { jQuery(this).dialog('close'); };
+			var cancelText = "<?php _e( 'Cancel', 'affiliates-manager' ) ?>";
+			buttons[cancelText] = function() { jQuery(this).dialog('close'); };
 			buttons[confirmText] = function() {
 				jQuery(this).dialog('close');
 				confirmCallback();
@@ -156,7 +157,7 @@ $user = $this->viewData['user'];
 				  }
 				} ]
 			);
-			jQuery("#confirmMessage").html('<?php _e( 'Do you want to block all future applications from this email address, or allow them to sign up at a later date?', 'affiliates-manager' ) ?>');
+			jQuery("#confirmMessage").html("<?php _e( 'Do you want to block all future applications from this email address, or allow them to sign up at a later date?', 'affiliates-manager' ) ?>");
 			jQuery("#dialog-confirm").dialog('open');
 
 
@@ -380,7 +381,7 @@ $user = $this->viewData['user'];
 		});
 
 		jQuery("#unblockButton").click(function() {
-			showConfirmDialog('<?php _e( 'Are you sure you wish to unblock this affiliate?<br>User will become DECLINED.', 'affiliates-manager' ) ?>', '<?php _e( 'Yes, UNBLOCK.', 'affiliates-manager' ) ?>', function() {
+			showConfirmDialog("<?php _e( 'Are you sure you wish to unblock this affiliate?<br>User will become DECLINED.', 'affiliates-manager' ) ?>", '<?php _e( 'Yes, UNBLOCK.', 'affiliates-manager' ) ?>', function() {
 				doJsonRequest({
 					handler : 'declineApplication',
 					affiliateId : <?php echo $model->affiliateId?>
@@ -481,11 +482,11 @@ $user = $this->viewData['user'];
 			<td width="150" style="vertical-align:top"><label for="txtAdjustmentAmount"><?php _e( 'Payout Amount ', 'affiliates-manager' ) ?></label></td>
 			<td>
 				<input name="payoutAmountType" type="radio" id="rbPayoutCurrentBalance" value="currentBalance" checked="checked" />
-				<label for="rbPayoutCurrentBalance"><?php _e( 'Current balance', 'affiliates-manager' ) ?> (<?php echo WPAM_MoneyHelper::getDollarSign(), $this->viewData['accountStanding']?>)</label><br />
+				<label for="rbPayoutCurrentBalance"><?php _e( 'Current balance', 'affiliates-manager' ) ?> (<?php echo esc_html(WPAM_MoneyHelper::getDollarSign()), esc_html($this->viewData['accountStanding'])?>)</label><br />
 
 				<input name="payoutAmountType" type="radio" id="rbPayoutOtherAmount" value="otherAmount">
 				<label for="rbPayoutOtherAmount"><?php _e( 'Other amount', 'affiliates-manager' ) ?></label><br>
-				<input type="text" id="txtPayoutAmount" name="txtPayoutAmount" size="10" style="display: none;" value="<?php echo sprintf("%01.2f", $this->viewData['accountStanding'])?>"/>
+				<input type="text" id="txtPayoutAmount" name="txtPayoutAmount" size="10" style="display: none;" value="<?php echo sprintf("%01.2f", esc_attr($this->viewData['accountStanding']))?>"/>
 			</td>
 		</tr>
 		</tbody>
@@ -493,7 +494,7 @@ $user = $this->viewData['user'];
 </div>
 
 <div class="wrap">
-<h2><?php _e( 'Affiliate:', 'affiliates-manager' ) ?> <?php echo $model->firstName . " " . $model->lastName?></h2>
+<h2><?php _e( 'Affiliate:', 'affiliates-manager' ) ?> <?php echo esc_html($model->firstName) . " " . esc_html($model->lastName)?></h2>
 
 <br /><br/>
 
@@ -532,8 +533,8 @@ if ($model->isPending())
 				</tr>
 			</thead>
 			<tbody>
-				<tr><td width="200"><?php _e( 'Date Applied', 'affiliates-manager' ) ?></td><td><?php echo date("m/d/Y H:i:s", $model->dateCreated)?></td></tr>
-				<tr><td><?php _e( 'Affiliate Status', 'affiliates-manager' ) ?></td><td><span class="status_<?php echo $model->status?>"><?php echo wpam_format_status( $model->status ) ?></span><br /><?php echo wpam_get_status_desc($model->status)?></td></tr>
+				<tr><td width="200"><?php _e( 'Date Applied', 'affiliates-manager' ) ?></td><td><?php echo esc_html(date("m/d/Y H:i:s", $model->dateCreated))?></td></tr>
+				<tr><td><?php _e( 'Affiliate Status', 'affiliates-manager' ) ?></td><td><span class="status_<?php echo esc_attr($model->status)?>"><?php echo esc_html(wpam_format_status( $model->status )) ?></span><br /><?php echo esc_html(wpam_get_status_desc($model->status))?></td></tr>
 				<tr>
 					<td width="200">
 						<?php _e( 'Account Standing', 'affiliates-manager' ) ?>
@@ -564,15 +565,17 @@ if ($model->isPending())
 				</tr>
 			</thead>
 			<tbody>
-		<tr><td width="200"><?php _e( 'Bounty Type', 'affiliates-manager' ) ?></td><td><?php echo $model->getBountyType() ?></td></tr>
-				<tr><td><?php _e( 'Bounty Amount', 'affiliates-manager' ) ?></td><td><?php echo $model->bountyAmount?></td></tr>
+		<tr><td width="200"><?php _e( 'Bounty Type', 'affiliates-manager' ) ?></td><td><?php echo esc_html($model->getBountyType()) ?></td></tr>
+				<tr><td><?php _e( 'Bounty Amount', 'affiliates-manager' ) ?></td><td><?php echo esc_html($model->bountyAmount)?></td></tr>
 			<?php if ($model->isConfirmed() || $model->isActive()) { ?>
-			<tr><td><?php _e( 'Payment Method', 'affiliates-manager' ) ?></td><td><?php echo $model->getPaymentMethod() ?></td></tr>
+			<tr><td><?php _e( 'Payment Method', 'affiliates-manager' ) ?></td><td><?php echo esc_html($model->getPaymentMethod()) ?></td></tr>
 				<?php if ($model->paymentMethod === 'paypal') { ?>
-					<tr><td><?php _e( 'Paypal E-Mail', 'affiliates-manager' ) ?></td><td><?php echo $model->paypalEmail?></td></tr>
+					<tr><td><?php _e( 'Paypal E-Mail', 'affiliates-manager' ) ?></td><td><?php echo esc_html($model->paypalEmail)?></td></tr>
 				<?php } else if ($model->paymentMethod === 'check') { ?>
-					<tr><td><?php _e( 'Make Check Out To', 'affiliates-manager' ) ?></td><td><?php echo $model->nameOnCheck?></td></tr>
-				<?php } ?>
+					<tr><td><?php _e( 'Make Check Out To', 'affiliates-manager' ) ?></td><td><?php echo esc_html($model->nameOnCheck)?></td></tr>
+				<?php } else if ($model->paymentMethod === 'bank') { ?>
+					<tr><td><?php _e( 'Bank Account Details', 'affiliates-manager' ) ?></td><td><?php echo esc_html($model->bankDetails)?></td></tr>
+                                <?php }?>
 			<?php } ?>
 			</tbody>
 		</table>
@@ -586,10 +589,10 @@ if ($model->isPending())
 			</thead>
 			<tbody>
 				<?php if (get_option (WPAM_PluginConfig::$AffEnableImpressions)) { ?>
-				<tr><td width="200"><?php _e( 'Impressions', 'affiliates-manager' ) ?></td><td><?php echo $this->viewData['impressionCount'] ?></td></tr>
+				<tr><td width="200"><?php _e( 'Impressions', 'affiliates-manager' ) ?></td><td><?php echo esc_html($this->viewData['impressionCount']) ?></td></tr>
 				<?php } ?>
-				<tr><td width="200"><?php _e( 'Visits', 'affiliates-manager' ) ?></td><td><?php echo $this->viewData['visitCount'] ?></td></tr>
-				<tr><td width="200"><?php _e( 'Purchases', 'affiliates-manager' ) ?></td><td><?php echo $this->viewData['purchaseCount'] ?></td></tr>
+				<tr><td width="200"><?php _e( 'Visits', 'affiliates-manager' ) ?></td><td><?php echo esc_html($this->viewData['visitCount']) ?></td></tr>
+				<tr><td width="200"><?php _e( 'Purchases', 'affiliates-manager' ) ?></td><td><?php echo esc_html($this->viewData['purchaseCount']) ?></td></tr>
 			</tbody>
 		</table>
 		<br/><br/>
@@ -632,9 +635,9 @@ if ($model->isPending())
 				$linkBuilder = new WPAM_Tracking_TrackingLinkBuilder($model, $creative);
 				$link = $linkBuilder->getImpressionHtmlSnippet();
 				?>
-			<tr class="creative-<?php echo $creative->status?>">
-				<td><?php echo $creative->name?></td>
-				<td><?php echo $creative->type?></td>
+			<tr class="creative-<?php echo esc_attr($creative->status)?>">
+				<td><?php echo esc_html($creative->name)?></td>
+				<td><?php echo esc_html($creative->type)?></td>
 				<td><input type="text" size="50" value='<?php echo htmlentities( $link, ENT_QUOTES ) ?>' /></td>
 			</tr>
 			<?php } ?>

@@ -1,43 +1,65 @@
-<?php
-/*
-Copyright 2009-2016 John Blackbourn
+<?php declare(strict_types = 1);
+/**
+ * HTTP redirect collector.
+ *
+ * @package query-monitor
+ */
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
-
-class QM_Collector_Redirects extends QM_Collector {
+/**
+ * @extends QM_DataCollector<QM_Data_Redirect>
+ */
+class QM_Collector_Redirects extends QM_DataCollector {
 
 	public $id = 'redirects';
 
-	public function name() {
-		return __( 'Redirects', 'query-monitor' );
+	public function get_storage(): QM_Data {
+		return new QM_Data_Redirect();
 	}
 
-	public function __construct() {
-		parent::__construct();
-		add_filter( 'wp_redirect', array( $this, 'filter_wp_redirect' ), 999, 2 );
+	/**
+	 * @return void
+	 */
+	public function set_up() {
+		parent::set_up();
+		add_filter( 'wp_redirect', array( $this, 'filter_wp_redirect' ), 9999, 2 );
 	}
 
+	/**
+	 * @return void
+	 */
+	public function tear_down() {
+		remove_filter( 'wp_redirect', array( $this, 'filter_wp_redirect' ), 9999 );
+
+		parent::tear_down();
+	}
+
+	/**
+	 * @param string $location
+	 * @param int $status
+	 * @return string
+	 */
 	public function filter_wp_redirect( $location, $status ) {
 
-		if ( !$location ) {
+		if ( ! $location ) {
 			return $location;
 		}
 
-		$trace = new QM_Backtrace;
+		$trace = new QM_Backtrace( array(
+			'ignore_hook' => array(
+				current_filter() => true,
+			),
+			'ignore_func' => array(
+				'wp_redirect' => true,
+			),
+		) );
 
-		$this->data['trace']    = $trace;
-		$this->data['location'] = $location;
-		$this->data['status']   = $status;
+		$this->data->trace = $trace;
+		$this->data->location = $location;
+		$this->data->status = $status;
 
 		return $location;
 
@@ -46,4 +68,4 @@ class QM_Collector_Redirects extends QM_Collector {
 }
 
 # Load early in case a plugin is doing a redirect when it initialises instead of after the `plugins_loaded` hook
-QM_Collectors::add( new QM_Collector_Redirects );
+QM_Collectors::add( new QM_Collector_Redirects() );

@@ -70,8 +70,8 @@ class Gens_RAF_Public {
 	    $items = $order->get_items();
 		*/
 		if ( isset($_COOKIE["gens_raf"]) && $active != "yes" ) {
-			$rafID = $_COOKIE["gens_raf"];
-			update_post_meta( $order_id, '_raf_id', esc_attr($rafID));
+			$rafID = sanitize_text_field($_COOKIE["gens_raf"]);
+			update_post_meta( $order_id, '_raf_id', $rafID);
 		}
     	return $order_id;
 	}
@@ -83,7 +83,7 @@ class Gens_RAF_Public {
 	 * @since    1.0.0
 	 */
 	public function gens_create_send_coupon($order_id) {
-		$rafID = esc_attr(get_post_meta( $order_id, '_raf_id', true));
+		$rafID = sanitize_text_field(get_post_meta( $order_id, '_raf_id', true));
 		// Get id of user that made order so that user cant use his own ref link.
 		$order = new WC_Order( $order_id );
 		$order_user_id = $order->get_user_id();
@@ -125,7 +125,7 @@ class Gens_RAF_Public {
 		$subject = get_option( 'gens_raf_email_subject' );
 		// make sure user_message and subjects are not empty, should save on plugin install instead but ...
 		if($user_message == "" || $subject == "") {
-			$user_message = "You referred someone! Here is your coupone code reward: {{code}} .";
+			$user_message = "You referred someone! Here is your coupon code reward: {{code}} .";
 			$subject = "Hey there!";
 		}
 		ob_start();
@@ -205,7 +205,7 @@ class Gens_RAF_Public {
 	public function generate_coupons( $user_id ) {
 		$user_info = get_userdata($user_id);
 		$user_email = $user_info->user_email;
-		$coupon_code = substr( "abcdefghijklmnopqrstuvwxyz123456789", mt_rand(0, 50) , 1) .substr( md5( time() ), 1); // Code
+		$coupon_code = "RAF-".substr( str_shuffle(md5( time() )), 22);
 		$amount = get_option( 'gens_raf_coupon_amount' );
 		$duration = get_option( 'gens_raf_coupon_duration' );
 		$individual = get_option( 'gens_raf_individual_use' );
@@ -227,6 +227,7 @@ class Gens_RAF_Public {
 		update_post_meta( $new_coupon_id, 'individual_use', $individual );
 		update_post_meta( $new_coupon_id, 'product_ids', '' );
 		update_post_meta( $new_coupon_id, 'customer_email', $user_email );
+		update_post_meta( $new_coupon_id, 'usage_count', 0 );
 		update_post_meta( $new_coupon_id, 'exclude_product_ids', '' );
 		update_post_meta( $new_coupon_id, 'usage_limit', '1' ); // Only one coupon
 		update_post_meta( $new_coupon_id, 'expiry_date', '' );
@@ -306,6 +307,9 @@ class Gens_RAF_Public {
 				</tr>
 		<?php
 			foreach ( $coupons as $coupon ) {
+				if(substr( $coupon->post_title, 0, 3 ) != "RAF") {
+                    continue;
+                }
 				$discount = get_post_meta($coupon->ID, "coupon_amount" ,true);
 				$discount_type = get_post_meta($coupon->ID, "discount_type" ,true);
 				$usage_count = get_post_meta($coupon->ID, "usage_count" ,true);
@@ -334,7 +338,9 @@ class Gens_RAF_Public {
 	 */
 	public function show_admin_raf_notes($order) { 
 
-		$referralID = get_post_meta( $order->id, '_raf_id', true );
+		$order_id = ( version_compare( WC_VERSION, '2.7', '<' ) ) ? $order->id : $order->get_id(); 
+
+		$referralID = get_post_meta( $order_id, '_raf_id', true );
 
 		if (!empty($referralID)) {
 		

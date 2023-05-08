@@ -27,24 +27,24 @@ function wpam_format_bounty( $bountyType, $bountyAmount ) {
 }
 
 function wpam_html_state_code_options( $fieldValue ) {
-	echo '<option value="--"></option>';
+	echo '<option value="">'.__('Select an option', 'affiliates-manager').'</option>';
 	foreach ( WPAM_Validation_StateCodes::$stateCodes as $code => $name ) {
-		echo '<option value="'.$code.'"';
+		echo '<option value="'.esc_attr($code).'"';
 		if ( $fieldValue == $code ) {
 			echo ' selected="selected"';
 		}
-		echo '>' . $name . '</option>';
+		echo '>' . esc_html($name) . '</option>';
 	}
 }
 
 function wpam_html_country_code_options( $fieldValue ) {
-	echo '<option value="--"></option>';
+	echo '<option value="">'.__('Select an option', 'affiliates-manager').'</option>';
 
-	foreach ( WPAM_Validation_CountryCodes::$countryCodes as $code => $name ) {
-		echo '<option value="'.$code.'"';
+	foreach ( WPAM_Validation_CountryCodes::get_countries() as $code => $name ) {
+		echo '<option value="'.esc_attr($code).'"';
 		if ( $fieldValue == $code )
 			echo ' selected="selected"';
-		echo '>'.$name.'</option>';
+		echo '>'.esc_html($name).'</option>';
 	}
 }
 
@@ -144,13 +144,13 @@ endif;
 function wpam_format_money( $money, $add_span = true ) {
 	if ( $add_span ) {
 		if ( $money > 0 )
-			return '<span class="positiveMoney">' . wpam_money_format( '%n', $money ) . "</span>";
+			return '<span class="positiveMoney">' . esc_html(wpam_money_format( '%n', $money )) . "</span>";
 		else if ( $money < 0 )
-			return '<span class="negativeMoney">' . wpam_money_format( '%n', $money ) . "</span>";
+			return '<span class="negativeMoney">' . esc_html(wpam_money_format( '%n', $money )) . "</span>";
 		else
-			return '<span>' . wpam_money_format( '%n', $money ) . "</span>";
+			return '<span>' . esc_html(wpam_money_format( '%n', $money )) . "</span>";
 	} else {
-		return wpam_money_format( '%n', $money );
+		return esc_html(wpam_money_format( '%n', $money ));
 	}		
 }
 

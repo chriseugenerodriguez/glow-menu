@@ -5,9 +5,11 @@
  * Description: The next generation of Structured Data.
  * Author: Hesham
  * Author URI: http://zebida.com
- * Version: 1.6.5
+ * Version: 1.7.9.5
  * Text Domain: schema-wp
- * Domain Path: languages
+ * Domain Path: /languages
+ * License:         GPLv2 or later
+ * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
  *
  * Schema is distributed under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
@@ -31,7 +33,6 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( ! class_exists( 'Schema_WP' ) ) :
-
 /**
  * Main Schema_WP Class
  *
@@ -51,7 +52,7 @@ final class Schema_WP {
 	 *
 	 * @since 1.0
 	 */
-	private $version = '1.6.5';
+	private $version = '1.7.9.5';
 
 	/**
 	 * The settings instance variable
@@ -83,10 +84,15 @@ final class Schema_WP {
 	 * @return Schema_WP
 	 */
 	public static function instance() {
+		
 		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof SCHEMA_WP ) ) {
 			self::$instance = new SCHEMA_WP;
-
-			if( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+			
+			if ( class_exists( 'Schema_Premium' ) ) {
+				return self::$instance;
+			}
+			
+			if( version_compare( PHP_VERSION, '5.4', '<' ) ) {
 
 				add_action( 'admin_notices', array( 'SCHEMA_WP', 'below_php_version_notice' ) );
 
@@ -98,6 +104,9 @@ final class Schema_WP {
 
 			add_action( 'plugins_loaded', array( self::$instance, 'setup_objects' ), -1 );
 			add_action( 'plugins_loaded', array( self::$instance, 'load_textdomain' ) );
+			
+			// initialize the classes
+        	add_action( 'plugins_loaded', array( self::$instance, 'init_classes' ), 5 );
 		}
 		return self::$instance;
 	}
@@ -114,7 +123,7 @@ final class Schema_WP {
 	 */
 	public function __clone() {
 		// Cloning instances of the class is forbidden
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'schema-wp' ), '1.0' );
+		_doing_it_wrong( __FUNCTION__, __( 'You don’t have permission to do this', 'schema-wp' ), '1.0' );
 	}
 
 	/**
@@ -126,7 +135,7 @@ final class Schema_WP {
 	 */
 	public function __wakeup() {
 		// Unserializing instances of the class is forbidden
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'schema-wp' ), '1.0' );
+		_doing_it_wrong( __FUNCTION__, __( 'You don’t have permission to do this', 'schema-wp' ), '1.0' );
 	}
 
 	/**
@@ -137,9 +146,9 @@ final class Schema_WP {
 	 * @return void
 	 */
 	public function below_php_version_notice() {
-		echo '<div class="error"><p>' . __( 'Your version of PHP is below the minimum version of PHP required by Schema plugin. Please contact your host and request that your version be upgraded to 5.3 or later.', 'schema-wp' ) . '</p></div>';
+		echo '<div class="notice notice-error"><p>' . __( 'Your version of PHP is below the minimum version of PHP required by Schema plugin. Please contact your host and request that your version be upgraded to 5.4 or later.', 'schema-wp' ) . '</p></div>';
 	}
-
+	
 	/**
 	 * Setup plugin constants
 	 *
@@ -181,9 +190,11 @@ final class Schema_WP {
 		global $schema_wp_options;
 		
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/settings/register-settings.php';
+		
+		// get settings
 		$schema_wp_options = schema_wp_get_settings();
 		
-		require_once SCHEMAWP_PLUGIN_DIR . 'includes/class-capabilities.php';
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/class-capabilities.php';
 		
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/post-type/schema-post-type.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/post-type/schema-wp-submit.php';
@@ -195,8 +206,8 @@ final class Schema_WP {
 		if( is_admin() ) {
 		
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/meta/class-meta.php';
-			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/meta-tax/class-meta-tax.php';
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/meta.php';
+			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/meta-tax/class-meta-tax.php';
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/meta-tax.php';
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/meta-exclude.php';
 			
@@ -204,26 +215,34 @@ final class Schema_WP {
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/settings/contextual-help.php';
 			
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/admin-pages.php';
+			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/extensions.php';
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/scripts.php';
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/class-menu.php';
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/class-notices.php';
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/class-welcome.php';
+			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/class-setup-wizard.php';
 			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/class-feedback.php';
 			
+			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/post-type/class-columns.php';
+			require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/post-type/schema-columns.php';
 		}
 
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/misc-functions.php';
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/deprecated-functions.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/scripts.php';
 		
-		// Misc
-		require_once SCHEMAWP_PLUGIN_DIR . 'includes/misc/auto_featured_img.php';
-		
+		// Schema outputs
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/web-page-element.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/knowledge-graph.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/search-results.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/blog.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/category.php';
-		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/author.php';
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/tag.php';
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/post-type-archive.php';
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/taxonomy.php';
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/author-archive.php';
 		
+		// Schema main output
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/json/schema-output.php';
 		
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/admin/admin-bar-menu.php';
@@ -234,15 +253,17 @@ final class Schema_WP {
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/integrations/amp.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/integrations/wp-rich-snippets.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/integrations/seo-framework.php';
-		require_once SCHEMAWP_PLUGIN_DIR . 'includes/integrations/visual-composer.php';
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/integrations/thirstyaffiliates.php';
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/integrations/woocommerce.php';
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/integrations/edd.php';
 		
 		// Theme Integrations
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/integrations/genesis.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/integrations/thesis.php';
-		require_once SCHEMAWP_PLUGIN_DIR . 'includes/integrations/divi.php';
 		
 		// Core Extensions
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/extensions/post-meta-generator.php';
+		require_once SCHEMAWP_PLUGIN_DIR . 'includes/extensions/breadcrumbs.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/extensions/author.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/extensions/page-about.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/extensions/page-contact.php';
@@ -251,9 +272,21 @@ final class Schema_WP {
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/extensions/sameAs.php';
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/extensions/comment.php';
 		
+		// Install
 		require_once SCHEMAWP_PLUGIN_DIR . 'includes/install.php';
 	}
-
+	
+	/**
+     * Init all the classes
+     *
+     * @return void
+     */
+    function init_classes() {
+		if ( is_admin() && class_exists( 'Schema_WP_Setup_Wizard' ) ) { 
+            new Schema_WP_Setup_Wizard();
+        }
+    }
+	
 	/**
 	 * Setup all objects
 	 *
@@ -266,7 +299,6 @@ final class Schema_WP {
 		//self::$instance->settings       = new Schema_WP_Settings;
 	}
 
-	
 	/**
 	 * Loads the plugin language files
 	 *
@@ -275,7 +307,10 @@ final class Schema_WP {
 	 * @return void
 	 */
 	public function load_textdomain() {
-
+        
+        load_plugin_textdomain( 'schema-wp', FALSE, basename( dirname( __FILE__ ) ) . '/languages/' );
+        
+        /*
 		// Set filter for plugin's languages directory
 		$lang_dir = dirname( plugin_basename( SCHEMAWP_PLUGIN_FILE ) ) . '/languages/';
 		$lang_dir = apply_filters( 'schema_wp_languages_directory', $lang_dir );
@@ -297,7 +332,7 @@ final class Schema_WP {
 		} else {
 			// Load the default language files
 			load_plugin_textdomain( 'schema-wp', false, $lang_dir );
-		}
+		}*/
 	}
 }
 
@@ -317,6 +352,7 @@ endif; // End if class_exists check
  * @return Schema_WP The one true Schema_WP Instance
  */
 function schema_wp() {
+	
 	return Schema_WP::instance();
 }
 schema_wp();

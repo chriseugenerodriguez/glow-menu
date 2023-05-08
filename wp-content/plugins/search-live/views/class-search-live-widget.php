@@ -28,6 +28,11 @@ if ( !defined( 'ABSPATH' ) ) {
  */
 class Search_Live_Widget extends WP_Widget {
 
+	/**
+	 * Widget name.
+	 *
+	 * @var string
+	 */
 	static $the_name = '';
 
 	/**
@@ -45,7 +50,7 @@ class Search_Live_Widget extends WP_Widget {
 	/**
 	 * Initialize.
 	 */
-	static function init() {
+	public static function init() {
 		add_action( 'widgets_init', array( __CLASS__, 'widgets_init' ) );
 		self::$the_name = __( 'Search Live', 'search-live' );
 	}
@@ -53,14 +58,14 @@ class Search_Live_Widget extends WP_Widget {
 	/**
 	 * Registers the widget.
 	 */
-	static function widgets_init() {
+	public static function widgets_init() {
 		register_widget( 'Search_Live_Widget' );
 	}
 
 	/**
 	 * Creates the widget.
 	 */
-	function __construct() {
+	public function __construct() {
 		parent::__construct(
 			self::$cache_id,
 			self::$the_name,
@@ -73,17 +78,17 @@ class Search_Live_Widget extends WP_Widget {
 	/**
 	 * Clears cached widget.
 	 */
-	static function cache_delete() {
+	public static function cache_delete() {
 		wp_cache_delete( self::$cache_id, self::$cache_flag );
 	}
 
 	/**
 	 * Widget output
-	 * 
+	 *
 	 * @see WP_Widget::widget()
 	 * @link http://codex.wordpress.org/Class_Reference/WP_Object_Cache
 	 */
-	function widget( $args, $instance ) {
+	public function widget( $args, $instance ) {
 
 		// This is done within the shortcode but the required scripts can
 		// go missing if we don't do it here, too.
@@ -97,6 +102,11 @@ class Search_Live_Widget extends WP_Widget {
 			echo $cache[$args['widget_id']];
 			return;
 		}
+
+		$before_widget = '';
+		$after_widget  = '';
+		$before_title  = '';
+		$after_title   = '';
 
 		extract( $args );
 
@@ -136,10 +146,10 @@ class Search_Live_Widget extends WP_Widget {
 
 	/**
 	 * Save widget options
-	 * 
+	 *
 	 * @see WP_Widget::update()
 	 */
-	function update( $new_instance, $old_instance ) {
+	public function update( $new_instance, $old_instance ) {
 
 		global $wpdb;
 
@@ -188,7 +198,6 @@ class Search_Live_Widget extends WP_Widget {
 		$settings['submit_button_label'] = strip_tags( $new_instance['submit_button_label'] );
 		$settings['navigable']     = !empty( $new_instance['navigable'] ) ? 'yes' : 'no';
 		$settings['no_results']    = trim( strip_tags( $new_instance['no_results'] ) );
-		$settings['auto_adjust']   = !empty( $new_instance['auto_adjust'] ) ? 'yes' : 'no';
 
 		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
 			$settings['wpml']   = !empty( $new_instance['wpml'] ) ? 'yes' : 'no';
@@ -208,10 +217,10 @@ class Search_Live_Widget extends WP_Widget {
 
 	/**
 	 * Output admin widget options form
-	 * 
+	 *
 	 * @see WP_Widget::form()
 	 */
-	function form( $instance ) {
+	public function form( $instance ) {
 
 		extract( self::$defaults );
 
@@ -479,21 +488,6 @@ class Search_Live_Widget extends WP_Widget {
 		echo __( 'No results', 'search-live' );
 		echo ' ';
 		echo '<input id="' . $this->get_field_id( 'no_results' ) . '" name="' . $this->get_field_name( 'no_results' ) . '" type="text" value="' . esc_attr( $no_results ) . '" />';
-		echo '</label>';
-		echo '</p>';
-
-		// auto adjust the results width
-		$auto_adjust = isset( $instance['auto_adjust'] ) ? $instance['auto_adjust'] : 'yes';
-		echo '<p>';
-		echo sprintf( '<label title="%s">', sprintf( __( 'Automatically adjust the width of the results to match that of the search field.', 'search-live' ) ) );
-		printf(
-			'<input type="checkbox" id="%s" name="%s" %s />',
-			$this->get_field_id( 'auto_adjust' ),
-			$this->get_field_name( 'auto_adjust' ),
-			$auto_adjust == 'yes' ? ' checked="checked" ' : ''
-		);
-		echo ' ';
-		echo __( 'Auto-adjust results width', 'search-live' );
 		echo '</label>';
 		echo '</p>';
 

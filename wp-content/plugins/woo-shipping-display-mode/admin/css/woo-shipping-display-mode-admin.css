@@ -51,7 +51,17 @@ width: 80% !important;
 #shipping_display_table td{
 width: 20%;
 }
-
+#shipping_display_table th img.help_tip {
+    margin: 0 0 0 3px;
+}
+.shipping_display_table_note p {
+    font-size: 14px;
+    margin: 0;
+}
+.shipping_display_table_note p span {
+    font-weight: 600;
+    color: #dc3232;
+}
 span.shipping-display-woocommerce-help-tip::after {
     content: "?";
     float: right;
@@ -79,4 +89,11 @@ span.shipping-display-woocommerce-help-tip{
     right: 0;
     top: 22%;
     width: 14px;
+}
+p.shipping_display_mode_overview {
+    max-width: 100% !important;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 15px;
+    line-height: 1.5;
 }

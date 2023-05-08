@@ -1,63 +1,112 @@
-<?php
-/*
-Copyright 2009-2016 John Blackbourn
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
+<?php declare(strict_types = 1);
+/**
+ * Container for data collectors.
+ *
+ * @package query-monitor
+ */
 
 if ( ! class_exists( 'QM_Collectors' ) ) {
+/**
+ * @implements \IteratorAggregate<string, QM_Collector>
+ */
 class QM_Collectors implements IteratorAggregate {
 
+	/**
+	 * @var array<string, QM_Collector>
+	 */
 	private $items = array();
+
+	/**
+	 * @var boolean
+	 */
 	private $processed = false;
 
+	/**
+	 * @return ArrayIterator<string, QM_Collector>
+	 */
+	#[\ReturnTypeWillChange]
 	public function getIterator() {
 		return new ArrayIterator( $this->items );
 	}
 
+	/**
+	 * @param QM_Collector $collector
+	 * @return void
+	 */
 	public static function add( QM_Collector $collector ) {
 		$collectors = self::init();
+
+		$collector->set_up();
+
 		$collectors->items[ $collector->id ] = $collector;
 	}
 
+	/**
+	 * Fetches a collector instance.
+	 *
+	 * @param string $id The collector ID.
+	 * @return QM_Collector|null The collector object.
+	 */
 	public static function get( $id ) {
 		$collectors = self::init();
-		if ( isset( $collectors->items[ $id ] ) ) {
-			return $collectors->items[ $id ];
-		}
-		return false;
+
+		return $collectors->items[ $id ] ?? null;
 	}
 
+	/**
+	 * @return self
+	 */
 	public static function init() {
 		static $instance;
 
-		if ( !$instance ) {
-			$instance = new QM_Collectors;
+		if ( ! $instance ) {
+			$instance = new QM_Collectors();
 		}
 
 		return $instance;
 
 	}
 
+	/**
+	 * @return void
+	 */
 	public function process() {
 		if ( $this->processed ) {
 			return;
 		}
+
 		foreach ( $this as $collector ) {
 			$collector->tear_down();
+
+			$timer = new QM_Timer();
+			$timer->start();
+
 			$collector->process();
+			$collector->process_concerns();
+
+			$collector->set_timer( $timer->stop() );
 		}
+
+		foreach ( $this as $collector ) {
+			$collector->post_process();
+		}
+
 		$this->processed = true;
 	}
 
+	/**
+	 * @return void
+	 */
+	public static function cease() {
+		$collectors = self::init();
+
+		$collectors->processed = true;
+
+		/** @var QM_Collector $collector */
+		foreach ( $collectors as $collector ) {
+			$collector->tear_down();
+			$collector->discard_data();
+		}
+	}
 }
 }

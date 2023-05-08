@@ -22,7 +22,7 @@
  * @since      1.0.0
  * @package    Applyonline
  * @subpackage Applyonline/includes
- * @author     Farhan Noor <farhan.noor@yahoo.com>
+ * @author     Farhan Noor <profiles.wordpress.org/farhannoor>
  */
 class Applyonline_i18n {
 

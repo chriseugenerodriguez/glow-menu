@@ -21,22 +21,24 @@ define( 'MARKDOWNEXTRA_VERSION',  "1.2.8" ); # 29 Nov 2013
 # Global default settings:
 #
 
+// phpcs:disable WordPress.PHP.NoSilencedErrors.Discouraged
+
 # Change to ">" for HTML output
 @define( 'MARKDOWN_EMPTY_ELEMENT_SUFFIX',  " />");
 
 # Define the width of a tab for code blocks.
 @define( 'MARKDOWN_TAB_WIDTH',     4 );
 
-# Optional title attribute for footnote links and backlinks.
-@define( 'MARKDOWN_FN_LINK_TITLE',         "" );
-@define( 'MARKDOWN_FN_BACKLINK_TITLE',     "" );
+// Optional title attribute for footnote links and backlinks.
+@define( 'MARKDOWN_FN_LINK_TITLE', esc_attr__( 'Read footnote.', 'jetpack' ) );
+@define( 'MARKDOWN_FN_BACKLINK_TITLE', esc_attr__( 'Return to main content.', 'jetpack' ) );
 
 # Optional class attribute for footnote links and backlinks.
 @define( 'MARKDOWN_FN_LINK_CLASS',         "jetpack-footnote" );
 @define( 'MARKDOWN_FN_BACKLINK_CLASS',     "" );
 
 # Optional class prefix for fenced code block.
-@define( 'MARKDOWN_CODE_CLASS_PREFIX',     "" );
+@define( 'MARKDOWN_CODE_CLASS_PREFIX',     "language-" );
 
 # Class attribute for code blocks goes on the `code` tag;
 # setting this to true will put attributes on the `pre` tag instead.
@@ -47,6 +49,8 @@ define( 'MARKDOWNEXTRA_VERSION',  "1.2.8" ); # 29 Nov 2013
 ### Standard Function Interface ###
 
 @define( 'MARKDOWN_PARSER_CLASS',  'MarkdownExtra_Parser' );
+
+// phpcs:enable WordPress.PHP.NoSilencedErrors.Discouraged
 
 function Markdown($text) {
 #
@@ -61,6 +65,19 @@ function Markdown($text) {
 
 	# Transform text using parser.
 	return $parser->transform($text);
+}
+
+/**
+ * Returns the length of $text loosely counting the number of UTF-8 characters with regular expression.
+ * Used by the Markdown_Parser class when mb_strlen is not available.
+ *
+ * @since 5.9
+ *
+ * @return string Length of the multibyte string
+ *
+ */
+function jetpack_utf8_strlen( $text ) {
+	return preg_match_all( "/[\\x00-\\xBF]|[\\xC0-\\xFF][\\x80-\\xBF]*/", $text, $m );
 }
 
 #
@@ -793,7 +810,7 @@ class Markdown_Parser {
 		if ($matches[2] == '-' && preg_match('{^-(?: |$)}', $matches[1]))
 			return $matches[0];
 
-		$level = $matches[2]{0} == '=' ? 1 : 2;
+		$level = $matches[2][0] == '=' ? 1 : 2;
 		$block = "<h$level>".$this->runSpanGamut($matches[1])."</h$level>";
 		return "\n" . $this->hashBlock($block) . "\n\n";
 	}
@@ -1089,7 +1106,7 @@ class Markdown_Parser {
 				} else {
 					# Other closing marker: close one em or strong and
 					# change current token state to match the other
-					$token_stack[0] = str_repeat($token{0}, 3-$token_len);
+					$token_stack[0] = str_repeat($token[0], 3-$token_len);
 					$tag = $token_len == 2 ? "strong" : "em";
 					$span = $text_stack[0];
 					$span = $this->runSpanGamut($span);
@@ -1114,7 +1131,7 @@ class Markdown_Parser {
 				} else {
 					# Reached opening three-char emphasis marker. Push on token
 					# stack; will be handled by the special condition above.
-					$em = $token{0};
+					$em = $token[0];
 					$strong = "$em$em";
 					array_unshift($token_stack, $token);
 					array_unshift($text_stack, '');
@@ -1454,9 +1471,9 @@ class Markdown_Parser {
 	# Handle $token provided by parseSpan by determining its nature and
 	# returning the corresponding value that should replace it.
 	#
-		switch ($token{0}) {
+		switch ($token[0]) {
 			case "\\":
-				return $this->hashPart("&#". ord($token{1}). ";");
+				return $this->hashPart("&#". ord($token[1]). ";");
 			case "`":
 				# Search for end marker in remaining text.
 				if (preg_match('/^(.*?[^`])'.preg_quote($token).'(?!`)(.*)$/sm',
@@ -1515,17 +1532,17 @@ class Markdown_Parser {
 		}
 		return $line;
 	}
+
+	/**
+	 * Check for the availability of the function in the `utf8_strlen` property
+	 * (initially `mb_strlen`). If the function is not available, use jetpack_utf8_strlen
+	 * that will loosely count the number of UTF-8 characters with a regular expression.
+	 */
 	function _initDetab() {
-	#
-	# Check for the availability of the function in the `utf8_strlen` property
-	# (initially `mb_strlen`). If the function is not available, create a
-	# function that will loosely count the number of UTF-8 characters with a
-	# regular expression.
-	#
-		if (function_exists($this->utf8_strlen)) return;
-		$this->utf8_strlen = create_function('$text', 'return preg_match_all(
-			"/[\\\\x00-\\\\xBF]|[\\\\xC0-\\\\xFF][\\\\x80-\\\\xBF]*/",
-			$text, $m);');
+		if ( function_exists( $this->utf8_strlen ) )  {
+			return;
+		}
+		$this->utf8_strlen = 'jetpack_utf8_strlen';
 	}
 
 
@@ -1677,9 +1694,9 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 		$classes = array();
 		$id = false;
 		foreach ($elements as $element) {
-			if ($element{0} == '.') {
+			if ($element[0] == '.') {
 				$classes[] = substr($element, 1);
-			} else if ($element{0} == '#') {
+			} else if ($element[0] == '#') {
 				if ($id === false) $id = substr($element, 1);
 			}
 		}
@@ -1942,7 +1959,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			#
 			# Check for: Indented code block.
 			#
-			else if ($tag{0} == "\n" || $tag{0} == " ") {
+			else if ($tag[0] == "\n" || $tag[0] == " ") {
 				# Indented code block: pass it unchanged, will be handled
 				# later.
 				$parsed .= $tag;
@@ -1951,7 +1968,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			# Check for: Code span marker
 			# Note: need to check this after backtick fenced code blocks
 			#
-			else if ($tag{0} == "`") {
+			else if ($tag[0] == "`") {
 				# Find corresponding end marker.
 				$tag_re = preg_quote($tag);
 				if (preg_match('{^(?>.+?|\n(?!\n))*?(?<!`)'.$tag_re.'(?!`)}',
@@ -1989,7 +2006,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			#            HTML Comments, processing instructions.
 			#
 			else if (preg_match('{^<(?:'.$this->clean_tags_re.')\b}', $tag) ||
-				$tag{1} == '!' || $tag{1} == '?')
+				$tag[1] == '!' || $tag[1] == '?')
 			{
 				# Need to parse tag and following text using the HTML parser.
 				# (don't check for markdown attribute)
@@ -2008,8 +2025,8 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 				#
 				# Increase/decrease nested tag count.
 				#
-				if ($tag{1} == '/')						$depth--;
-				else if ($tag{strlen($tag)-2} != '/')	$depth++;
+				if ($tag[1] == '/')						$depth--;
+				else if ($tag[strlen($tag)-2] != '/')	$depth++;
 
 				if ($depth < 0) {
 					#
@@ -2113,7 +2130,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 				# first character as filtered to prevent an infinite loop in the
 				# parent function.
 				#
-				return array($original_text{0}, substr($original_text, 1));
+				return array($original_text[0], substr($original_text, 1));
 			}
 
 			$block_text .= $parts[0]; # Text before current tag.
@@ -2125,7 +2142,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			#			 Comments and Processing Instructions.
 			#
 			if (preg_match('{^</?(?:'.$this->auto_close_tags_re.')\b}', $tag) ||
-				$tag{1} == '!' || $tag{1} == '?')
+				$tag[1] == '!' || $tag[1] == '?')
 			{
 				# Just add the tag to the block as if it was text.
 				$block_text .= $tag;
@@ -2136,8 +2153,8 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 				# the tag's name match base tag's.
 				#
 				if (preg_match('{^</?'.$base_tag_name_re.'\b}', $tag)) {
-					if ($tag{1} == '/')						$depth--;
-					else if ($tag{strlen($tag)-2} != '/')	$depth++;
+					if ($tag[1] == '/')						$depth--;
+					else if ($tag[strlen($tag)-2] != '/')	$depth++;
 				}
 
 				#
@@ -2495,7 +2512,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 	function _doHeaders_callback_setext($matches) {
 		if ($matches[3] == '-' && preg_match('{^- }', $matches[1]))
 			return $matches[0];
-		$level = $matches[3]{0} == '=' ? 1 : 2;
+		$level = $matches[3][0] == '=' ? 1 : 2;
 		$attr  = $this->doExtraAttributes("h$level", $dummy =& $matches[2]);
 		$block = "<h$level$attr>".$this->runSpanGamut($matches[1])."</h$level>";
 		return "\n" . $this->hashBlock($block) . "\n\n";
@@ -2813,7 +2830,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			array(&$this, '_doFencedCodeBlocks_newlines'), $codeblock);
 
 		if ($classname != "") {
-			if ($classname{0} == '.')
+			if ($classname[0] == '.')
 				$classname = substr($classname, 1);
 			$attr_str = ' class="'.$this->code_class_prefix.$classname.'"';
 		} else {

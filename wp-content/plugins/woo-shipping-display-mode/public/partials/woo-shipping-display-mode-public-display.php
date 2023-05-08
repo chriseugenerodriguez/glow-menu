@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly
+}
 /**
  * Provide a public-facing view for the plugin
  *
@@ -11,4 +13,3 @@
  * @package    Woo_Shipping_Display_Mode
  * @subpackage Woo_Shipping_Display_Mode/public/partials
  */
-?>

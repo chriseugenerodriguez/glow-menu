@@ -1,62 +1,111 @@
-<?php
-/*
-Copyright 2009-2016 John Blackbourn
+<?php declare(strict_types = 1);
+/**
+ * Transient storage collector.
+ *
+ * @package query-monitor
+ */
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
-
-class QM_Collector_Transients extends QM_Collector {
+/**
+ * @extends QM_DataCollector<QM_Data_Transients>
+ */
+class QM_Collector_Transients extends QM_DataCollector {
 
 	public $id = 'transients';
 
-	public function name() {
-		return __( 'Transients', 'query-monitor' );
+	public function get_storage(): QM_Data {
+		return new QM_Data_Transients();
 	}
 
-	public function __construct() {
-		parent::__construct();
-		# See http://core.trac.wordpress.org/ticket/24583
+	/**
+	 * @return void
+	 */
+	public function set_up() {
+		parent::set_up();
+
 		add_action( 'setted_site_transient', array( $this, 'action_setted_site_transient' ), 10, 3 );
-		add_action( 'setted_transient',      array( $this, 'action_setted_blog_transient' ), 10, 3 );
+		add_action( 'setted_transient', array( $this, 'action_setted_blog_transient' ), 10, 3 );
 	}
 
+	/**
+	 * @return void
+	 */
 	public function tear_down() {
-		parent::tear_down();
 		remove_action( 'setted_site_transient', array( $this, 'action_setted_site_transient' ), 10 );
-		remove_action( 'setted_transient',      array( $this, 'action_setted_blog_transient' ), 10 );
+		remove_action( 'setted_transient', array( $this, 'action_setted_blog_transient' ), 10 );
+		parent::tear_down();
 	}
 
-	public function action_setted_site_transient( $transient, $value = null, $expiration = null ) {
+	/**
+	 * @param string $transient
+	 * @param mixed $value
+	 * @param int $expiration
+	 * @return void
+	 */
+	public function action_setted_site_transient( $transient, $value, $expiration ) {
 		$this->setted_transient( $transient, 'site', $value, $expiration );
 	}
 
-	public function action_setted_blog_transient( $transient, $value = null, $expiration = null ) {
+	/**
+	 * @param string $transient
+	 * @param mixed $value
+	 * @param int $expiration
+	 * @return void
+	 */
+	public function action_setted_blog_transient( $transient, $value, $expiration ) {
 		$this->setted_transient( $transient, 'blog', $value, $expiration );
 	}
 
-	public function setted_transient( $transient, $type, $value = null, $expiration = null ) {
+	/**
+	 * @param string $transient
+	 * @param string $type
+	 * @param mixed $value
+	 * @param int $expiration
+	 * @phpstan-param 'site'|'blog' $value
+	 * @return void
+	 */
+	public function setted_transient( $transient, $type, $value, $expiration ) {
 		$trace = new QM_Backtrace( array(
-			'ignore_items' => 1 # Ignore the action_setted_(site|blog)_transient method
+			'ignore_hook' => array(
+				current_filter() => true,
+			),
+			'ignore_func' => array(
+				'set_transient' => true,
+				'set_site_transient' => true,
+			),
 		) );
-		$this->data['trans'][] = array(
-			'transient'  => $transient,
-			'trace'      => $trace,
-			'type'       => $type,
-			'value'      => $value,
+
+		$name = str_replace( array(
+			'_site_transient_',
+			'_transient_',
+		), '', $transient );
+
+		$size = strlen( (string) maybe_serialize( $value ) );
+
+		$this->data->trans[] = array(
+			'name' => $name,
+			'filtered_trace' => $trace->get_filtered_trace(),
+			'component' => $trace->get_component(),
+			'type' => $type,
+			'value' => $value,
 			'expiration' => $expiration,
+			'exp_diff' => ( $expiration ? human_time_diff( 0, $expiration ) : '' ),
+			'size' => $size,
+			'size_formatted' => (string) size_format( $size ),
 		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function process() {
+		$this->data->has_type = is_multisite();
 	}
 
 }
 
 # Load early in case a plugin is setting transients when it initialises instead of after the `plugins_loaded` hook
-QM_Collectors::add( new QM_Collector_Transients );
+QM_Collectors::add( new QM_Collector_Transients() );

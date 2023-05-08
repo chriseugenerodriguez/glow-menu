@@ -2,6 +2,11 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+.aol_app_form input[type="file"] {
+    height: auto;
+    width: auto;
+}
+.aol-ad-taxonomy{text-transform: capitalize;}
 table.aol_ads_features{
     border-bottom: 1px solid #ededed;
     border-collapse: collapse;
@@ -20,93 +25,116 @@ table.aol_ads_features td{
 
 ol.aol_ads_list li{padding-bottom: 10px;}
 ol.aol_ads_list p{padding: 0px; margin: 0}
-.form-group {
-    margin-bottom: 15px;
-}
-.form-control {
-    display: block;
-    width: 100%;
-    min-height: 34px;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.42857143;
-    color: #555;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-         -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-  }
-  .form-group > input[type='file']{
-      display: block;
-      width: auto;
-  }
-  .form-control:focus {
-    border-color: #66afe9;
-    outline: 0;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
-            box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
-  }
-  .form-control::-moz-placeholder {
-    color: #999;
-    opacity: 1;
-  }
-  .form-control:-ms-input-placeholder {
-    color: #999;
-  }
-  .form-control::-webkit-input-placeholder {
-    color: #999;
-  }
-  .form-control[disabled],
-  .form-control[readonly],
-  fieldset[disabled] .form-control {
-    background-color: #eee;
-    opacity: 1;
-  }
-  .form-control[disabled],
-  fieldset[disabled] .form-control {
-    cursor: not-allowed;
-  }
-  textarea.form-control {
-    height: auto;
-  }
-  input[type="search"] {
-    -webkit-appearance: none;
-  }
-  
-input[type="checkbox"],
-input[type="radio"] {
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-  padding: 0;
-}
+
 
 #aol_form_status.success{color: #0E0}
 #aol_form_status.error{color: #E00}
 
 .aol_ad_list p{margin: 0px;}
 .aol_ad_list li{margin-bottom: 20px;}
-.alert {padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px;}
-.alert h4 { margin-top: 0; color: inherit;}
-.alert .alert-link {font-weight: bold;}
-.alert > p, .alert > ul { margin-bottom: 0;}
-.alert > p + p { margin-top: 5px; }
-.alert-dismissable { padding-right: 35px; }
-.alert-dismissable .close { position: relative; top: -2px; right: -21px; color: inherit;}
-.alert-success { color: #3c763d; background-color: #dff0d8; border-color: #d6e9c6;}
-.alert-success hr { border-top-color: #c9e2b3;}
-.alert-success .alert-link { color: #2b542c;}
-.alert-info { color: #31708f; background-color: #d9edf7; border-color: #bce8f1;}
-.alert-info hr { border-top-color: #a6e1ec; }
-.alert-info .alert-link { color: #245269;}
-.alert-warning { color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc;}
-.alert-warning hr { border-top-color: #f7e1b5;}
-.alert-warning .alert-link { color: #66512c;}
-.alert-danger { color: #a94442; background-color: #f2dede; border-color: #ebccd1;}
-.alert-danger hr { border-top-color: #e4b9c0;}
-.alert-danger .alert-link { color: #843534;}
+.ui-datepicker .ui-datepicker-title input,
+.ui-datepicker .ui-datepicker-title select,
+.ui-datepicker .ui-datepicker-title textarea{padding: 0px;}
+.form-control.selected {	border-color: #66afe9; outline: 0; -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);	box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);}
+.aol_app_form .help-block { display: inline-block; margin-bottom: 10px; color: #737373; font-style: italic;}
+.aol_app_form fieldset{ margin-top: 20px;}
+/*Textarea Charchter Counter*/
+.the-count {display: inline-block; float: right;}
+.aol-textbox {overflow-y: auto; border: 1px solid #eee; color: #555; border-radius: 4px; padding: 0px 10px; }
+.aol_multistep .dashicons{vertical-align: middle; }
+#aol_ad_form{margin-bottom: 0}
+
+/*V 2.4 */
+/*
+* {
+  box-sizing: border-box;
+}
+
+.aol-row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+[class*="aol-"] {
+  float: left;
+  padding: 15px;
+}
+
+.header {
+  background-color: #9933cc;
+  color: #ffffff;
+  padding: 15px;
+}
+
+.menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu li {
+  padding: 8px;
+  margin-bottom: 7px;
+  background-color: #33b5e5;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.menu li:hover {
+  background-color: #0099cc;
+}
+
+.aside {
+  background-color: #33b5e5;
+  padding: 15px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.footer {
+  background-color: #0099cc;
+  color: #ffffff;
+  text-align: center;
+  font-size: 12px;
+  padding: 15px;
+}
+
+/* For mobile phones: */
+/*
+[class*="aol-"] {
+  width: 100%;
+}
+
+@media only screen and (min-width: 600px) {
+  /* For tablets: *//*
+  .aol-s-1 {width: 8.33%;}
+  .aol-s-2 {width: 16.66%;}
+  .aol-s-3 {width: 25%;}
+  .aol-s-4 {width: 33.33%;}
+  .aol-s-5 {width: 41.66%;}
+  .aol-s-6 {width: 50%;}
+  .aol-s-7 {width: 58.33%;}
+  .aol-s-8 {width: 66.66%;}
+  .aol-s-9 {width: 75%;}
+  .aol-s-10 {width: 83.33%;}
+  .aol-s-11 {width: 91.66%;}
+  .aol-s-12 {width: 100%;}
+}
+@media only screen and (min-width: 768px) {
+  /* For desktop: *//*
+  .aol-1 {width: 8.33%;}
+  .aol-2 {width: 16.66%;}
+  .aol-3 {width: 25%;}
+  .aol-4 {width: 33.33%;}
+  .aol-5 {width: 41.66%;}
+  .aol-6 {width: 50%;}
+  .aol-7 {width: 58.33%;}
+  .aol-8 {width: 66.66%;}
+  .aol-9 {width: 75%;}
+  .aol-10 {width: 83.33%;}
+  .aol-11 {width: 91.66%;}
+  .aol-12 {width: 100%;}
+}*/

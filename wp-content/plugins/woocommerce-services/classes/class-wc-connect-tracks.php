@@ -16,7 +16,7 @@ if ( ! class_exists( 'WC_Connect_Tracks' ) ) {
 		protected $logger;
 
 		public function __construct( WC_Connect_Logger $logger, $plugin_file ) {
-			$this->logger = $logger;
+			$this->logger      = $logger;
 			$this->plugin_file = $plugin_file;
 		}
 
@@ -66,13 +66,14 @@ if ( ! class_exists( 'WC_Connect_Tracks' ) ) {
 		}
 
 		public function record_user_event( $event_type, $data = array() ) {
-			if ( ! function_exists( 'jetpack_tracks_record_event' ) ) {
+			if ( ! function_exists( 'jetpack_tracks_record_event' ) && ! class_exists( 'Automattic\\Jetpack\\Tracking' ) ) {
 				$this->debug( 'Error. jetpack_tracks_record_event is not defined.' );
 				return;
 			}
-
-			$user = wp_get_current_user();
+			$user     = wp_get_current_user();
 			$site_url = get_option( 'siteurl' );
+
+			$wcs_version = WC_Connect_Loader::get_wcs_version();
 
 			// Check for WooCommerce
 			$wc_version = 'unavailable';
@@ -85,6 +86,7 @@ if ( ! class_exists( 'WC_Connect_Tracks' ) ) {
 			if ( defined( 'JETPACK__VERSION' ) ) {
 				$jp_version = JETPACK__VERSION;
 			}
+			$is_atomic = WC_Connect_Jetpack::is_atomic_site();
 
 			$jetpack_blog_id = -1;
 			if ( class_exists( 'Jetpack_Options' ) && method_exists( 'Jetpack_Options', 'get_option' ) ) {
@@ -95,24 +97,26 @@ if ( ! class_exists( 'WC_Connect_Tracks' ) ) {
 				$data = array();
 			}
 
-			$data['_via_ua'] = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
-			$data['_via_ip'] = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
-			$data['_lg'] = isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
-			$data['blog_url'] = $site_url;
-			$data['blog_id'] = $jetpack_blog_id;
+			$data['_via_ua']         = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
+			$data['_via_ip']         = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
+			$data['_lg']             = isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
+			$data['blog_url']        = $site_url;
+			$data['blog_id']         = $jetpack_blog_id;
+			$data['wcs_version']     = $wcs_version;
 			$data['jetpack_version'] = $jp_version;
-			$data['wc_version'] = $wc_version;
-			$data['wp_version'] = get_bloginfo( 'version' );
+			$data['is_atomic']       = $is_atomic;
+			$data['wc_version']      = $wc_version;
+			$data['wp_version']      = get_bloginfo( 'version' );
 
 			$event_type = self::$product_name . '_' . $event_type;
 
 			$this->debug( 'Tracked the following event: ' . $event_type );
-			jetpack_tracks_record_event( $user, $event_type, $data );
+			WC_Connect_Jetpack::tracks_record_event( $user, $event_type, $data );
 		}
 
 		protected function debug( $message ) {
 			if ( ! is_null( $this->logger ) ) {
-				$this->logger->debug( $message );
+				$this->logger->log( $message );
 			}
 		}
 

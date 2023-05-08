@@ -7,10 +7,11 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
 ?>
 
 <form method="post" id="infoForm" class="pure-form">
+    <?php wp_nonce_field('wpam_add_affiliate'); ?>
     <table class="pure-table wpam-contact-info">
         <thead>
             <tr>
-                <th colspan="2"><?php echo isset($this->viewData['infoLabel']) ? $this->viewData['infoLabel'] : __('Contact Information', 'affiliates-manager'); ?></th>
+                <th colspan="2"><?php echo isset($this->viewData['infoLabel']) ? esc_html($this->viewData['infoLabel']) : __('Contact Information', 'affiliates-manager'); ?></th>
             </tr>
         </thead>
         <tbody>
@@ -21,14 +22,16 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
                 if (isset($this->viewData['request']['_' . $field->databaseField])) {
                     $value = $this->viewData['request']['_' . $field->databaseField];
                 } elseif (isset($model)) {
-                    if ($field->type == 'base')
+                    if ($field->type == 'base'){
                         $value = $model->{$field->databaseField};
-                    else
-                        $value = $model->userData[$field->databaseField];
+                    }
+                    else{
+                        $value = isset($model->userData[$field->databaseField]) ? $model->userData[$field->databaseField] : '';
+                    }
                 }
                 ?>
                 <tr>
-                    <td><label for="_<?php echo $field->databaseField; ?>">
+                    <td><label for="_<?php echo esc_attr($field->databaseField); ?>">
                             <?php _e($field->name, 'affiliates-manager'); ?>
 
                             <?php
@@ -46,12 +49,17 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
                             case 'number':
                             case 'zipCode':
                                 ?>
-                                <input type="text" size="20" id="_<?php echo $field->databaseField; ?>" name="_<?php echo $field->databaseField; ?>" value="<?php echo $value; ?>" />
+                                <input type="text" size="20" id="_<?php echo esc_attr($field->databaseField); ?>" name="_<?php echo esc_attr($field->databaseField); ?>" value="<?php echo esc_attr($value); ?>" />
+                                <?php
+                                break;
+                            case 'textarea':
+                                ?>
+                                <textarea <?php echo (is_admin() ? 'class="large-text"' : '');?> id="_<?php echo esc_attr($field->databaseField); ?>" name="_<?php echo esc_attr($field->databaseField); ?>"><?php echo esc_textarea($value); ?></textarea>
                                 <?php
                                 break;
                             case 'email':
                                 ?>
-                                <input type="text" size="20" id="_<?php echo $field->databaseField; ?>" name="_<?php echo $field->databaseField; ?>" value="<?php echo $value; ?>" <?php
+                                <input type="text" size="20" id="_<?php echo esc_attr($field->databaseField); ?>" name="_<?php echo esc_attr($field->databaseField); ?>" value="<?php echo esc_attr($value); ?>" <?php
                                 if (isset($value) && !empty($value)) {
                                     echo ' readonly';
                                 }
@@ -60,23 +68,36 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
                                        break;
                                    case 'phoneNumber':
                                        ?>							
-                                <input type="text" size="20" maxlength="14" id="_<?php echo $field->databaseField; ?>" name="_<?php echo $field->databaseField; ?>" value="<?php echo $value; ?>" />
+                                <input type="text" size="20" maxlength="14" id="_<?php echo esc_attr($field->databaseField); ?>" name="_<?php echo esc_attr($field->databaseField); ?>" value="<?php echo esc_attr($value); ?>" />
                                     <?php
                                     break;
                                 case 'stateCode':
                                     ?>
-                                <select id="_<?php echo $field->databaseField; ?>" name="_<?php echo $field->databaseField; ?>">
+                                <select id="_<?php echo esc_attr($field->databaseField); ?>" name="_<?php echo esc_attr($field->databaseField); ?>">
                                 <?php wpam_html_state_code_options($value); ?>
                                 </select>
                                     <?php
                                     break;
                                 case 'countryCode':
                                     ?>
-                                <select id="_<?php echo $field->databaseField; ?>" name="_<?php echo $field->databaseField; ?>">
+                                <select id="_<?php echo esc_attr($field->databaseField); ?>" name="_<?php echo esc_attr($field->databaseField); ?>">
                                 <?php wpam_html_country_code_options($value); ?>
                                 </select>
-                        <?php
-                        break;
+                                <?php
+                                break;
+                                case 'ssn':
+                                $ssn = array('', '', '');    
+                                if(is_string($value) && strlen($value) >= 9){                                 
+                                    $ssn[0] = substr($value, 0, 3);
+                                    $ssn[1] = substr($value, 3, 2);
+                                    $ssn[2] = substr($value, 5);
+                                }
+                                ?>
+                                <input type="password" size="3" maxlength="3" id="_<?php echo esc_attr($field->databaseField)?>[0]" name="_<?php echo esc_attr($field->databaseField)?>[0]" value="<?php echo esc_attr($ssn[0]);?>" /> -
+				<input type="password" size="2" maxlength="2" id="_<?php echo esc_attr($field->databaseField)?>[1]" name="_<?php echo esc_attr($field->databaseField)?>[1]" value="<?php echo esc_attr($ssn[1]);?>" /> -
+				<input type="password" size="4" maxlength="4" id="_<?php echo esc_attr($field->databaseField)?>[2]" name="_<?php echo esc_attr($field->databaseField)?>[2]" value="<?php echo esc_attr($ssn[2]);?>" />
+                                <?php
+                                break;
                     default: break;
                 }
                 ?>
@@ -91,7 +112,7 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
                             ?>
                 <tr>
                     <td><label for="_aff_New_Password">
-    <?php _e('New Password', 'affiliates-manager'); ?>
+                    <?php _e('New Password', 'affiliates-manager'); ?>
                         </label>	
                     </td>
                     <td>
@@ -123,7 +144,7 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
         <?php
         foreach ($this->viewData['paymentMethods'] as $key => $val) {
             $selected_html = $this->viewData['paymentMethod'] == $key ? ' selected="selected"' : '';
-            echo "<option value='{$key}'{$selected_html}>{$val}</option>";
+            echo "<option value='".esc_attr($key)."'{$selected_html}>".esc_html($val)."</option>";
         }
         ?>
                             </select></td>
@@ -133,6 +154,7 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
                     if ($this->viewData['paymentMethod'] == 'paypal') {
                         $pp_email_field_style = '';
                     }
+                    
                     if (count($this->viewData['paymentMethods']) == 1) {//Admin supports only one available payment method
                         if (array_key_exists('paypal', $this->viewData['paymentMethods'])) {//Supports paypal only
                             $pp_email_field_style = '';
@@ -140,15 +162,49 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
                             $pp_email_field_style = ' style="display: none;"';
                         }
                     }
+                    /*
+                    if (count($this->viewData['paymentMethods']) == 2) {//Admin supports two available payment methods
+                        if (array_key_exists('paypal', $this->viewData['paymentMethods']) && array_key_exists('manual', $this->viewData['paymentMethods']) && empty($this->viewData['paymentMethod'])) {//Supports both paypal and manual options
+                            $pp_email_field_style = '';
+                        }
+                    }
+                    */
+                    if (count($this->viewData['paymentMethods']) > 1) {//Admin supports multiple payment methods
+                        if (array_key_exists('paypal', $this->viewData['paymentMethods']) && !array_key_exists('check', $this->viewData['paymentMethods'])) {
+                            if(empty($this->viewData['paymentMethod']) || $this->viewData['paymentMethod'] == 'check'){
+                                $pp_email_field_style = '';
+                            }
+                        }
+                    }
                     ?>
                     <tr id="rowPaypalEmail" <?php echo $pp_email_field_style; ?>>
                         <td><label for="txtPaypalEmail"><?php _e('PayPal E-Mail Address', 'affiliates-manager') ?></label> *</td>
                         <td>
-                            <input id="txtPaypalEmail" type="text" name="txtPaypalEmail" size="30" value="<?php echo $this->viewData['paypalEmail'] ?>"/>
+                            <input id="txtPaypalEmail" type="text" name="txtPaypalEmail" size="30" value="<?php echo esc_attr($this->viewData['paypalEmail']); ?>"/>
+                        </td>
+                    </tr>
+                    <?php
+                    $bank_details_field_style = ' style="display: none;"';
+                    if ($this->viewData['paymentMethod'] == 'bank') {
+                        $bank_details_field_style = '';
+                    }
+                    
+                    if (count($this->viewData['paymentMethods']) == 1) {//Admin supports only one available payment method
+                        if (array_key_exists('bank', $this->viewData['paymentMethods'])) {//Supports bank only
+                            $bank_details_field_style = '';
+                        } else {//Supports a non-bank method so don't show the field
+                            $bank_details_field_style = ' style="display: none;"';
+                        }
+                    }
+                    ?>
+                    <tr id="rowBankDetails" <?php echo $bank_details_field_style; ?>>
+                        <td><label for="txtBankDetails"><?php echo esc_html(get_option(WPAM_PluginConfig::$BankTransferInstructions)) ?></label> *</td>
+                        <td>
+                            <textarea id="txtBankDetails" name="txtBankDetails" class="large-text"><?php echo esc_textarea($this->viewData['bankDetails'])?></textarea>
                         </td>
                     </tr>
     <?php endif; ?>
-                            <?php if (is_admin()): ?>					  
+                    <?php if (is_admin()): ?>					  
                     <tr>
                         <td>
                             <label for="ddBountyType"><?php _e('Bounty Type *', 'affiliates-manager') ?></label>
@@ -162,7 +218,7 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
                                 $selected = isset($this->viewData['bountyType']) ? $this->viewData['bountyType'] : NULL;
                                 foreach ($select as $value => $name) {
                                     $selected_html = $value == $selected ? ' selected="selected"' : '';
-                                    echo "<option value='{$value}'{$selected_html}>{$name}</option>\n";
+                                    echo "<option value='".esc_attr($value)."'{$selected_html}>".esc_html($name)."</option>\n";
                                 }
 
                                 $currency = WPAM_MoneyHelper::getDollarSign();
@@ -176,8 +232,8 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
                         </td>
                     </tr>
                     <tr>
-                        <td><label id='lblBountyAmount' for='txtBountyAmount'><?php echo $label; ?></label></td>
-                        <td><input type='text' id='txtBountyAmount' name='txtBountyAmount' size='5' value='<?php echo $bountyAmount; ?>'/></td>
+                        <td><label id='lblBountyAmount' for='txtBountyAmount'><?php echo esc_html($label); ?></label></td>
+                        <td><input type='text' id='txtBountyAmount' name='txtBountyAmount' size='5' value='<?php echo esc_attr($bountyAmount); ?>'/></td>
                     </tr>
         <?php endif; //is_admin   ?>
     <?php endif; //not pending, blocked or declined  ?>
@@ -189,6 +245,6 @@ if (!isset($model) && isset($this->viewData['affiliate'])) {
 <?php } ?>
     <div class="wpam-save-profile">			
         <input type="hidden" name="action" value="saveInfo"/>
-        <input type="submit" id="saveInfoButton" class="pure-button pure-button-active" name="wpam-add-affiliate" value="<?php echo isset($this->viewData['saveLabel']) ? $this->viewData['saveLabel'] : __('Save Changes', 'affiliates-manager'); ?>" />
+        <input type="submit" id="saveInfoButton" class="pure-button pure-button-active" name="wpam_add_affiliate" value="<?php echo isset($this->viewData['saveLabel']) ? esc_attr($this->viewData['saveLabel']) : __('Save Changes', 'affiliates-manager'); ?>" />
     </div>
 </form>

@@ -28,25 +28,31 @@ if ( ! class_exists( 'WC_Connect_Payment_Methods_Store' ) ) {
 
 		}
 
+		/**
+		 * Fetch stored payment methods from server and store in options.
+		 *
+		 * @return bool Were payment methods successfully retrieved?
+		 */
 		public function fetch_payment_methods_from_connect_server() {
 
 			$response_body = $this->api_client->get_payment_methods();
 
 			if ( is_wp_error( $response_body ) ) {
-				$this->logger->debug( $response_body, __FUNCTION__ );
-				return;
+				$this->logger->log( $response_body, __FUNCTION__ );
+				return false;
 			}
 
 			$payment_methods = $this->get_payment_methods_from_response_body( $response_body );
 			if ( is_wp_error( $payment_methods ) ) {
-				$this->logger->debug( $payment_methods, __FUNCTION__ );
-				return;
+				$this->logger->log( $payment_methods, __FUNCTION__ );
+				return false;
 			}
 
-			// If we made it this far, it is safe to store the object
+			// If we made it this far, it is safe to store the object.
 			$this->update_payment_methods( $payment_methods );
 
 			$this->potentially_update_selected_payment_method_from_payment_methods( $payment_methods );
+			return true;
 		}
 
 		protected function potentially_update_selected_payment_method_from_payment_methods( $payment_methods ) {
@@ -60,19 +66,19 @@ if ( ! class_exists( 'WC_Connect_Payment_Methods_Store' ) ) {
 				}
 			}
 
-			// No payment methods at all? Clear anything we have stored
+			// No payment methods at all? Clear anything we have stored.
 			if ( 0 === count( $payment_method_ids ) ) {
 				$this->service_settings_store->set_selected_payment_method_id( 0 );
 				return;
 			}
 
-			// Has the stored method ID been removed? Select the first available one
+			// Has the stored method ID been removed, or is there only one available? Select the first available one.
 			$selected_payment_method_id = $this->service_settings_store->get_selected_payment_method_id();
 			if (
-				$selected_payment_method_id &&
+				( $selected_payment_method_id || 1 === count( $payment_method_ids ) ) &&
 				! in_array( $selected_payment_method_id, $payment_method_ids )
 			) {
-				$this->service_settings_store->set_selected_payment_method_id( $payment_method_ids[ 0 ] );
+				$this->service_settings_store->set_selected_payment_method_id( $payment_method_ids[0] );
 			}
 		}
 
@@ -98,11 +104,11 @@ if ( ! class_exists( 'WC_Connect_Payment_Methods_Store' ) ) {
 				return new WP_Error( 'payment_methods_type', 'Expected but did not receive array for payment_methods.' );
 			}
 
-			foreach ( (array) $payment_methods as $payment_method ) {
+			foreach ( $payment_methods as $payment_method ) {
 				$required_keys = array( 'payment_method_id', 'name', 'card_type', 'card_digits', 'expiry' );
-				foreach ( (array) $required_keys as $required_key ) {
-					if ( ! array_key_exists( $required_key, $payment_method ) ) {
-						return new WP_Error( 'payment_methods_key_missing', 'Payment method array element is missing a required key' );
+				foreach ( $required_keys as $required_key ) {
+					if ( ! property_exists( $payment_method, $required_key ) ) {
+						return new WP_Error( 'payment_methods_key_missing', 'Payment method is missing a required property' );
 					}
 				}
 			}

@@ -3,7 +3,7 @@
 Contributors: itzmostafiz
 Tags: popular post, popular posts, most popular posts, widget, popular post widget.
 Requires at least: 4.0
-Tested up to: 4.5.2
+Tested up to: 4.9.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,3 +61,6 @@ See the description and also you can see the description over the Frequently Ask
 
 = 1.0 =
 * Initial Release.
+
+= 1.0.1 =
+* Test for the new version (4.9.1) of WordPress.

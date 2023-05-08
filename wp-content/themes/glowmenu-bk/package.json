@@ -1,0 +1,35 @@
+{
+    "name": "glowmenu",
+    "title": "GlowMenu",
+    "description": "Give your menu a glow.",
+    "version": "1.0.19",
+    "author": "Chris Rodriguez",
+    "license": "MIT",
+    "main": "gulpfile.js",
+    "dependencies": {
+        "grunt": "^1.0.1",
+        "gulp": "^3.9.1"
+    },
+    "devDependencies": {
+        "gulp-jshint": "^1.12.0",
+        "gulp-sass": "^2.3.2",
+        "gulp-dependencies": "^0.1.1",
+        "gulp-concat": "^2.6.0",
+        "gulp-uglify": "^2.0.0",
+        "gulp-rename": "^1.2.2",
+        "gulp-minify-css": "^1.2.4",
+        "gulp-util": "^3.0.0",
+        "gulp-header": "^1.8.8",
+        "gulp-sourcemaps": "^1.6.0",
+        "gulp-rimraf": "^0.2",
+        "gulp-bump": "^2.5",
+        "browser-sync": "^2.17",
+        "gulp-notify": "^2.2",
+        "gulp-newer": "^1.3",
+        "gulp-tinypng": "^1.0.2"
+    },
+    "scripts": {
+        "gulp": "gulp",
+        "minify": "gulp minify"
+    }
+}

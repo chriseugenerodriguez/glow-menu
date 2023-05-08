@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Fired only when the DCL is uninstalled.
+ * Fired only when the DCL is uninstalled 😞.
  *
  * Removes everything that DCL added to your db.
  * Please note that we are not deleting Disqus core settings from database.
@@ -9,25 +9,38 @@
  * plugin they are keeping settings in db even after the plugin removal.
  *
  *
- * @link		http://dclwp.com
- * @since		10.0.0
- * @author		Joel James
- * @package		DCL
+ * @category   Core
+ * @package    DCL
+ * @subpackage Uninstall
+ * @author     Joel James <mail@cjoel.com>
+ * @license    http://www.gnu.org/licenses/ GNU General Public License
+ * @link       https://dclwp.com
  */
+// If uninstall not called from WordPress, kill.
+defined( 'ABSPATH' ) || die( 'K. Bye.' );
 
-// If uninstall not called from WordPress, then exit. That's it!
+// Do not clear setting if Pro version is already active.
+if ( ! is_plugin_active( 'disqus-conditional-load-pro/disqus-conditional-load-pro.php' ) ) {
 
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	exit;
-}
-if( get_option( 'dcl_gnrl_options' ) ) {
-	delete_option( 'dcl_gnrl_options' );
-}
-if( get_option( 'dcl_do_activation_redirect' ) ) {
-	delete_option( 'dcl_do_activation_redirect' );
-}
-if( get_option( 'dcl_version_no' ) ) {
-	delete_option( 'dcl_version_no' );
+	// Attempts to uninstall Disqus official plugin settings.
+	// @todo Check if official plugin is installed independently.
+	if ( ! is_plugin_active( 'disqus-comment-system/disqus.php' )
+	     && file_exists( DCL_DIR . 'vendor/disqus/disqus/uninstall.php' )
+	) {
+		require_once DCL_DIR . 'vendor/disqus/disqus/uninstall.php';
+	}
+
+	// Options registered by DCL.
+	$dcl_options = array(
+		'dcl_gnrl_options',
+		'dcl_do_activation_redirect',
+		'dcl_version_no',
+	);
+
+	// Loop through each options.
+	foreach ( $dcl_options as $option ) {
+		delete_option( $option );
+	}
 }
 
-/******* The end. Thanks for using DCL plugin ********/
+/******* What if I told you, this is the end of Disqus Conditional Load ********/

@@ -30,21 +30,21 @@ class Search_Live_Notice {
 
 	/**
 	 * Time mark.
-	 * 
+	 *
 	 * @var string
 	 */
 	const INIT_TIME = 'search-live-init-time';
 
 	/**
 	 * Used to store user meta and hide the notice asking to review.
-	 * 
+	 *
 	 * @var string
 	 */
 	const HIDE_REVIEW_NOTICE = 'search-live-hide-review-notice';
 
 	/**
 	 * The number of seconds in seven days, since init date to show the notice.
-	 * 
+	 *
 	 * @var int
 	 */
 	const SHOW_LAPSE = 604800;
@@ -77,6 +77,8 @@ class Search_Live_Notice {
 
 	/**
 	 * Initializes if necessary and returns the init time.
+	 *
+	 * @return int
 	 */
 	public static function get_init_time() {
 		$init_time = get_site_option( self::INIT_TIME, null );
@@ -95,7 +97,17 @@ class Search_Live_Notice {
 		$current_url = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		$current_url = add_query_arg( self::HIDE_REVIEW_NOTICE, true, $current_url );
 
-		$output = '<div class="updated">';
+		$output = '';
+
+		$output .= '<style type="text/css">';
+		$output .= 'div.search-live-rating {';
+		$output .= sprintf( 'background: url(%s) #fff no-repeat 8px 8px;', SEARCH_LIVE_PLUGIN_URL . '/images/search-live-256x256.png' );
+		$output .= 'padding-left: 76px ! important;';
+		$output .= 'background-size: 64px 64px;';
+		$output .= '}';
+		$output .= '</style>';
+
+		$output .= '<div class="updated search-live-rating">';
 		$output .= '<p>';
 		$output .= __( 'Many thanks for using <strong>Search Live</strong>!', 'search-live' );
 		$output .= ' ';
@@ -104,7 +116,7 @@ class Search_Live_Notice {
 		$output .= '<p>';
 		$output .= sprintf(
 			'<a class="button button-primary" href="%s" target="_blank">%s</a>',
-			esc_url( 'http://wordpress.org/support/view/plugin-reviews/search-live?filter=5#postform' ),
+			esc_url( 'https://wordpress.org/support/view/plugin-reviews/search-live?filter=5#postform' ),
 			__( 'Yes, here we go!', 'search-live' )
 		);
 		$output .= ' ';

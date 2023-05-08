@@ -4,14 +4,15 @@
  *
  * Functions for displaying the order actions meta box.
  *
- * @author      WooThemes
- * @category    Admin
- * @package     WooCommerce/Admin/Meta Boxes
+ * @package     WooCommerce\Admin\Meta Boxes
  * @version     2.1.0
  */
 
+use Automattic\WooCommerce\Internal\Admin\Orders\PageController;
+use Automattic\WooCommerce\Utilities\OrderUtil;
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -22,119 +23,140 @@ class WC_Meta_Box_Order_Actions {
 	/**
 	 * Output the metabox.
 	 *
-	 * @param WP_Post $post
+	 * @param WP_Post|WC_Order $post Post or order object.
 	 */
 	public static function output( $post ) {
 		global $theorder;
 
-		// This is used by some callbacks attached to hooks such as woocommerce_order_actions which rely on the global to determine if actions should be displayed for certain orders.
-		if ( ! is_object( $theorder ) ) {
-			$theorder = wc_get_order( $post->ID );
-		}
+		OrderUtil::init_theorder_object( $post );
+		$order = $theorder;
+
+		$order_id      = $order->get_id();
+		$order_actions = self::get_available_order_actions_for_order( $order );
 		?>
 		<ul class="order_actions submitbox">
 
-			<?php do_action( 'woocommerce_order_actions_start', $post->ID ); ?>
+			<?php
+			/**
+			 * Fires at the start of order actions meta box rendering.
+			 *
+			 * @since 2.1.0
+			 */
+			do_action( 'woocommerce_order_actions_start', $order_id );
+			?>
+
 
 			<li class="wide" id="actions">
 				<select name="wc_order_action">
-					<option value=""><?php _e( 'Actions', 'woocommerce' ); ?></option>
-						<?php
-						$mailer           = WC()->mailer();
-						$available_emails = apply_filters( 'woocommerce_resend_order_emails_available', array( 'new_order', 'cancelled_order', 'customer_processing_order', 'customer_completed_order', 'customer_invoice' ) );
-						$mails            = $mailer->get_emails();
-
-						if ( ! empty( $mails ) && ! empty( $available_emails ) ) { ?>
-							<optgroup label="<?php esc_attr_e( 'Resend order emails', 'woocommerce' ); ?>">
-							<?php
-							foreach ( $mails as $mail ) {
-								if ( in_array( $mail->id, $available_emails ) && 'no' !== $mail->enabled ) {
-									echo '<option value="send_email_' . esc_attr( $mail->id ) . '">' . sprintf( __( 'Resend %s', 'woocommerce' ), esc_html( $mail->title ) ) . '</option>';
-								}
-							} ?>
-							</optgroup>
-							<?php
-						}
-						?>
-
-					<option value="regenerate_download_permissions"><?php _e( 'Regenerate download permissions', 'woocommerce' ); ?></option>
-
-					<?php foreach ( apply_filters( 'woocommerce_order_actions', array() ) as $action => $title ) { ?>
-						<option value="<?php echo $action; ?>"><?php echo $title; ?></option>
+					<option value=""><?php esc_html_e( 'Choose an action...', 'woocommerce' ); ?></option>
+					<?php foreach ( $order_actions as $action => $title ) { ?>
+						<option value="<?php echo esc_attr( $action ); ?>"><?php echo esc_html( $title ); ?></option>
 					<?php } ?>
 				</select>
-
-				<button class="button wc-reload"><span><?php _e( 'Apply', 'woocommerce' ); ?></span></button>
+				<button class="button wc-reload"><span><?php esc_html_e( 'Apply', 'woocommerce' ); ?></span></button>
 			</li>
 
 			<li class="wide">
-				<div id="delete-action"><?php
-
-					if ( current_user_can( 'delete_post', $post->ID ) ) {
+				<div id="delete-action">
+					<?php
+					if ( current_user_can( 'delete_post', $order_id ) ) {
 
 						if ( ! EMPTY_TRASH_DAYS ) {
 							$delete_text = __( 'Delete permanently', 'woocommerce' );
 						} else {
-							$delete_text = __( 'Move to trash', 'woocommerce' );
+							$delete_text = __( 'Move to Trash', 'woocommerce' );
 						}
-						?><a class="submitdelete deletion" href="<?php echo esc_url( get_delete_post_link( $post->ID ) ); ?>"><?php echo $delete_text; ?></a><?php
+						?>
+						<a class="submitdelete deletion" href="<?php echo esc_url( self::get_trash_or_delete_order_link( $order_id ) ); ?>"><?php echo esc_html( $delete_text ); ?></a>
+						<?php
 					}
-				?></div>
+					?>
+				</div>
 
-				<input type="submit" class="button save_order button-primary" name="save" value="<?php echo 'auto-draft' === $post->post_status ? esc_attr__( 'Create', 'woocommerce' ) : esc_attr__( 'Update', 'woocommerce' ); ?>" />
+				<button type="submit" class="button save_order button-primary" name="save" value="<?php echo 'auto-draft' === $order->get_status() ? esc_attr__( 'Create', 'woocommerce' ) : esc_attr__( 'Update', 'woocommerce' ); ?>"><?php echo 'auto-draft' === $order->get_status() ? esc_html__( 'Create', 'woocommerce' ) : esc_html__( 'Update', 'woocommerce' ); ?></button>
 			</li>
 
-			<?php do_action( 'woocommerce_order_actions_end', $post->ID ); ?>
+			<?php
+			/**
+			 * Fires at the end of order actions meta box rendering.
+			 *
+			 * @since 2.1.0
+			 */
+			do_action( 'woocommerce_order_actions_end', $order_id );
+			?>
 
 		</ul>
 		<?php
 	}
 
 	/**
+	 * Forms a trash/delete order URL.
+	 *
+	 * @param int $order_id The order ID for which we want a trash/delete URL.
+	 *
+	 * @return string
+	 */
+	private static function get_trash_or_delete_order_link( int $order_id ): string {
+		if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+			$order_type      = wc_get_order( $order_id )->get_type();
+			$order_list_url  = wc_get_container()->get( PageController::class )->get_base_page_url( $order_type );
+			$trash_order_url = add_query_arg(
+				array(
+					'action'           => 'trash',
+					'order'            => array( $order_id ),
+					'_wp_http_referer' => $order_list_url,
+				),
+				$order_list_url
+			);
+
+			return wp_nonce_url( $trash_order_url, 'bulk-orders' );
+		}
+
+		return get_delete_post_link( $order_id );
+	}
+
+	/**
 	 * Save meta box data.
 	 *
-	 * @param int $post_id
-	 * @param WP_Post $post
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post Post Object.
 	 */
 	public static function save( $post_id, $post ) {
-		// Order data saved, now get it so we can manipulate status
+		// Order data saved, now get it so we can manipulate status.
 		$order = wc_get_order( $post_id );
 
-		// Handle button actions
-		if ( ! empty( $_POST['wc_order_action'] ) ) {
+		// Handle button actions.
+		if ( ! empty( $_POST['wc_order_action'] ) ) { // @codingStandardsIgnoreLine
 
-			$action = wc_clean( $_POST['wc_order_action'] );
+			$action = wc_clean( wp_unslash( $_POST['wc_order_action'] ) ); // @codingStandardsIgnoreLine
 
-			if ( strstr( $action, 'send_email_' ) ) {
+			if ( 'send_order_details' === $action ) {
+				do_action( 'woocommerce_before_resend_order_emails', $order, 'customer_invoice' );
 
-				// Switch back to the site locale.
-				wc_switch_to_site_locale();
-
-				do_action( 'woocommerce_before_resend_order_emails', $order );
-
-				// Ensure gateways are loaded in case they need to insert data into the emails.
+				// Send the customer invoice email.
 				WC()->payment_gateways();
 				WC()->shipping();
+				WC()->mailer()->customer_invoice( $order );
 
-				// Load mailer.
-				$mailer = WC()->mailer();
-				$email_to_send = str_replace( 'send_email_', '', $action );
-				$mails = $mailer->get_emails();
+				// Note the event.
+				$order->add_order_note( __( 'Order details manually sent to customer.', 'woocommerce' ), false, true );
 
-				if ( ! empty( $mails ) ) {
-					foreach ( $mails as $mail ) {
-						if ( $mail->id == $email_to_send ) {
-							$mail->trigger( $order->get_id(), $order );
-							/* translators: %s: email title */
-							$order->add_order_note( sprintf( __( '%s email notification manually sent.', 'woocommerce' ), $mail->title ), false, true );
-						}
-					}
-				}
+				do_action( 'woocommerce_after_resend_order_email', $order, 'customer_invoice' );
 
-				do_action( 'woocommerce_after_resend_order_email', $order, $email_to_send );
+				// Change the post saved message.
+				add_filter( 'redirect_post_location', array( __CLASS__, 'set_email_sent_message' ) );
 
-				// Restore user locale.
-				wc_restore_locale();
+			} elseif ( 'send_order_details_admin' === $action ) {
+
+				do_action( 'woocommerce_before_resend_order_emails', $order, 'new_order' );
+
+				WC()->payment_gateways();
+				WC()->shipping();
+				add_filter( 'woocommerce_new_order_email_allows_resend', '__return_true' );
+				WC()->mailer()->emails['WC_Email_New_Order']->trigger( $order->get_id(), $order, true );
+				remove_filter( 'woocommerce_new_order_email_allows_resend', '__return_true' );
+
+				do_action( 'woocommerce_after_resend_order_email', $order, 'new_order' );
 
 				// Change the post saved message.
 				add_filter( 'redirect_post_location', array( __CLASS__, 'set_email_sent_message' ) );
@@ -157,15 +179,41 @@ class WC_Meta_Box_Order_Actions {
 	/**
 	 * Set the correct message ID.
 	 *
-	 * @param string $location
-	 *
+	 * @param string $location Location.
 	 * @since  2.3.0
-	 *
 	 * @static
-	 *
 	 * @return string
 	 */
 	public static function set_email_sent_message( $location ) {
 		return add_query_arg( 'message', 11, $location );
+	}
+
+	/**
+	 * Get the available order actions for a given order.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param WC_Order|null $order The order object or null if no order is available.
+	 *
+	 * @return array
+	 */
+	private static function get_available_order_actions_for_order( $order ) {
+		$actions = array(
+			'send_order_details'              => __( 'Email invoice / order details to customer', 'woocommerce' ),
+			'send_order_details_admin'        => __( 'Resend new order notification', 'woocommerce' ),
+			'regenerate_download_permissions' => __( 'Regenerate download permissions', 'woocommerce' ),
+		);
+
+		/**
+		 * Filter: woocommerce_order_actions
+		 * Allows filtering of the available order actions for an order.
+		 *
+		 * @since 2.1.0 Filter was added.
+		 * @since 5.8.0 The $order param was added.
+		 *
+		 * @param array         $actions The available order actions for the order.
+		 * @param WC_Order|null $order   The order object or null if no order is available.
+		 */
+		return apply_filters( 'woocommerce_order_actions', $actions, $order );
 	}
 }

@@ -4,7 +4,6 @@ class Apache_Module extends Red_Module {
 	const MODULE_ID = 2;
 
 	private $location  = '';
-	private $canonical = '';
 
 	public function get_id() {
 		return self::MODULE_ID;
@@ -18,12 +17,8 @@ class Apache_Module extends Red_Module {
 		return $this->location;
 	}
 
-	public function get_canonical() {
-		return $this->canonical;
-	}
-
 	protected function load( $data ) {
-		$mine = array( 'location', 'canonical' );
+		$mine = array( 'location' );
 
 		foreach ( $mine as $key ) {
 			if ( isset( $data[ $key ] ) ) {
@@ -33,39 +28,57 @@ class Apache_Module extends Red_Module {
 	}
 
 	protected function flush_module() {
-		include_once dirname( dirname( __FILE__ ) ).'/models/htaccess.php';
+		include_once dirname( dirname( __FILE__ ) ) . '/models/htaccess.php';
 
 		if ( empty( $this->location ) ) {
-			return;
+			return false;
 		}
 
-		$items = Red_Item::get_by_module( $this->get_id() );
+		$items = Red_Item::get_all_for_module( $this->get_id() );
 
 		// Produce the .htaccess file
 		$htaccess = new Red_Htaccess();
 		if ( is_array( $items ) && count( $items ) > 0 ) {
 			foreach ( $items as $item ) {
-				if ( $item->is_enabled() )
+				if ( $item->is_enabled() ) {
 					$htaccess->add( $item );
+				}
 			}
 		}
 
 		return $htaccess->save( $this->location );
 	}
 
-	public function update( array $data ) {
-		include_once dirname( dirname( __FILE__ ) ).'/models/htaccess.php';
+	public function can_save( $location ) {
+		$location = $this->sanitize_location( $location );
 
-		$save = array(
-			'location'  => isset( $data['moduleData_location'] ) ? trim( $data['moduleData_location'] ) : '',
-			'canonical' => isset( $data['moduleData_canonical'] ) ? trim( $data['moduleData_canonical'] ) : '',
-		);
-
-		if ( ! in_array( $save['canonical'], array( 'www', 'nowww' ), true ) ) {
-			$save['canonical'] = '';
+		if ( @fopen( $location, 'a' ) === false ) {
+			$error = error_get_last();
+			return new WP_Error( 'redirect', isset( $error['message'] ) ? $error['message'] : 'Unknown error' );
 		}
 
-		if ( ! empty( $this->location ) && $save['location'] !== $this->location ) {
+		return true;
+	}
+
+	private function sanitize_location( $location ) {
+		$location = str_replace( '.htaccess', '', $location );
+		$location = rtrim( $location, '/' ) . '/.htaccess';
+		return rtrim( dirname( $location ), '/' ) . '/.htaccess';
+	}
+
+	public function update( array $data ) {
+		include_once dirname( dirname( __FILE__ ) ) . '/models/htaccess.php';
+
+		$new_location = isset( $data['location'] ) ? $data['location'] : '';
+		if ( strlen( $new_location ) > 0 ) {
+			$new_location = $this->sanitize_location( trim( $data['location'] ) );
+		}
+
+		$save = [
+			'location' => $new_location,
+		];
+
+		if ( ! empty( $this->location ) && $save['location'] !== $this->location && $save['location'] !== '' ) {
 			// Location has moved. Remove from old location
 			$htaccess = new Red_Htaccess();
 			$htaccess->save( $this->location, '' );
@@ -77,10 +90,6 @@ class Apache_Module extends Red_Module {
 			$save['location'] = '';
 		}
 
-		$options = red_get_options();
-		$options['modules'][ self::MODULE_ID ] = $save;
-
-		update_option( 'redirection_options', $options );
-		return true;
+		return $save;
 	}
 }

@@ -270,19 +270,22 @@ div.tiny-bulk-optimization table.whitebox {
 	}
 }
 
+div.tiny-bulk-optimization table.whitebox th.column-primary {
+	width: 30%;
+}
+
+@media only screen and (max-width: 782px) {
+	div.tiny-bulk-optimization table.whitebox th.column-primary {
+		width: 100%;
+	}
+}
+
 div.tiny-bulk-optimization table.whitebox th.column-author {
 	/* WP 3.1-4.2 */ width: auto;
 }
 
 div.tiny-bulk-optimization table.whitebox thead th.thumbnail {
 	width: 30px;
-}
-
-div.tiny-bulk-optimization table.whitebox thead th.savings {
-	width: 70px;
-}
-
-div.tiny-bulk-optimization table.whitebox thead th.status {
 }
 
 div.tiny-bulk-optimization table.whitebox th.thumbnail {
@@ -319,6 +322,31 @@ div.tiny-bulk-optimization table.whitebox tr.failed button.toggle-row:before {
 	content: "\f158"; /* more compatibility*/
 }
 
+div.tiny-bulk-optimization table.whitebox tr.no-action button.toggle-row:before {
+	color: gray;
+	content: "\f158"; /* more compatibility*/
+}
+
 div.tiny-bulk-optimization table.whitebox tr.failed.is-expanded span.icon {
 	display: none;
+}
+
+div.tiny-bulk-optimization div.upgrade-account-notice {
+	padding: 22px 28px;
+	background-color: #F5F9FA;
+	text-align: center;
+}
+
+div.tiny-bulk-optimization div.upgrade-account-notice div.introduction {
+	padding-bottom: 10px;
+}
+
+div.tiny-bulk-optimization div.upgrade-account-notice p {
+	margin: 5px 0;
+}
+
+div.tiny-bulk-optimization div.upgrade-account-notice p a {
+	display: block;
+	margin-top: 10px;
+	color: #858A93;
 }

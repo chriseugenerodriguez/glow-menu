@@ -1,45 +1,85 @@
-<?php
-/*
-Copyright 2009-2016 John Blackbourn
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
+<?php declare(strict_types = 1);
+/**
+ * Abstract dispatcher.
+ *
+ * @package query-monitor
+ */
 
 if ( ! class_exists( 'QM_Dispatcher' ) ) {
 abstract class QM_Dispatcher {
 
+	/**
+	 * Outputter instances.
+	 *
+	 * @var array<string, QM_Output> Array of outputters.
+	 */
+	protected $outputters = array();
+
+	/**
+	 * Query Monitor plugin instance.
+	 *
+	 * @var QM_Plugin Plugin instance.
+	 */
+	protected $qm;
+
+	/**
+	 * @var string
+	 */
+	public $id = '';
+
+	/**
+	 * @var bool
+	 */
+	protected $ceased = false;
+
 	public function __construct( QM_Plugin $qm ) {
 		$this->qm = $qm;
 
-		if ( !defined( 'QM_COOKIE' ) ) {
-			define( 'QM_COOKIE', 'query_monitor_' . COOKIEHASH );
+		if ( ! defined( 'QM_COOKIE' ) ) {
+			define( 'QM_COOKIE', 'wp-query_monitor_' . COOKIEHASH );
+		}
+		if ( ! defined( 'QM_EDITOR_COOKIE' ) ) {
+			define( 'QM_EDITOR_COOKIE', 'wp-query_monitor_editor_' . COOKIEHASH );
 		}
 
 		add_action( 'init', array( $this, 'init' ) );
 
 	}
 
+	/**
+	 * @return bool
+	 */
 	abstract public function is_active();
 
+	/**
+	 * @return bool
+	 */
 	final public function should_dispatch() {
 
 		$e = error_get_last();
 
 		# Don't dispatch if a fatal has occurred:
-		if ( ! empty( $e ) and ( $e['type'] & ( E_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR ) ) ) {
+		if ( ! empty( $e ) && ( $e['type'] & QM_ERROR_FATALS ) ) {
 			return false;
 		}
 
-		# Allow users to disable this dispatcher
+		/**
+		 * Allows users to disable this dispatcher.
+		 *
+		 * The dynamic portion of the hook name, `$this->id`, refers to the dispatcher ID.
+		 *
+		 * Possible filter names include:
+		 *
+		 *  - `qm/dispatch/html`
+		 *  - `qm/dispatch/ajax`
+		 *  - `qm/dispatch/redirect`
+		 *  - `qm/dispatch/rest`
+		 *  - `qm/dispatch/wp_die`
+		 *
+		 * @since 2.8.0
+		 *
+		 * @param bool $true Whether or not the dispatcher is enabled.
+		 */
 		if ( ! apply_filters( "qm/dispatch/{$this->id}", true ) ) {
 			return false;
 		}
@@ -48,40 +88,74 @@ abstract class QM_Dispatcher {
 
 	}
 
+	/**
+	 * @return void
+	 */
+	public function cease() {
+		$this->ceased = true;
+
+		add_filter( "qm/dispatch/{$this->id}", '__return_false' );
+	}
+
+	/**
+	 * Processes and fetches the outputters for this dispatcher.
+	 *
+	 * @param string $outputter_id The outputter ID.
+	 * @return QM_Output[] Array of outputters.
+	 */
 	public function get_outputters( $outputter_id ) {
-
-		$out = array();
-
 		$collectors = QM_Collectors::init();
 		$collectors->process();
 
+		/**
+		 * Allows users to filter what outputs.
+		 *
+		 * The dynamic portion of the hook name, `$outputter_id`, refers to the outputter ID.
+		 *
+		 * @since 2.8.0
+		 *
+		 * @param array<string, QM_Output> $outputters Array of outputters.
+		 * @param QM_Collectors            $collectors List of collectors.
+		 */
 		$this->outputters = apply_filters( "qm/outputter/{$outputter_id}", array(), $collectors );
 
-		/* @var QM_Output[] */
-		foreach ( $this->outputters as $id => $outputter ) {
-			$out[ $id ] = $outputter;
+		return $this->outputters;
+	}
+
+	/**
+	 * @return void
+	 */
+	public function init() {
+		if ( ! self::user_can_view() ) {
+			do_action( 'qm/cease' );
+			return;
 		}
 
-		return $out;
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', 1 );
+		}
 
+		add_action( 'send_headers', 'nocache_headers' );
 	}
 
-	public function init() {
-		// @TODO should be abstract?
-		// nothing
-	}
-
+	/**
+	 * @return void
+	 */
 	protected function before_output() {
-		// nothing
 	}
 
+	/**
+	 * @return void
+	 */
 	protected function after_output() {
-		// nothing
 	}
 
-	public function user_can_view() {
+	/**
+	 * @return bool
+	 */
+	public static function user_can_view() {
 
-		if ( !did_action( 'plugins_loaded' ) ) {
+		if ( ! did_action( 'plugins_loaded' ) ) {
 			return false;
 		}
 
@@ -93,19 +167,73 @@ abstract class QM_Dispatcher {
 
 	}
 
+	/**
+	 * @return bool
+	 */
 	public static function user_verified() {
-		if ( isset( $_COOKIE[QM_COOKIE] ) ) {
-			return self::verify_cookie( wp_unslash( $_COOKIE[QM_COOKIE] ) );
+		if ( isset( $_COOKIE[QM_COOKIE] ) ) { // phpcs:ignore
+			return self::verify_cookie( wp_unslash( $_COOKIE[QM_COOKIE] ) ); // phpcs:ignore
 		}
 		return false;
 	}
 
+	/**
+	 * @return string
+	 */
+	public static function editor_cookie() {
+		if ( defined( 'QM_EDITOR_COOKIE' ) && isset( $_COOKIE[QM_EDITOR_COOKIE] ) ) { // phpcs:ignore
+			return $_COOKIE[QM_EDITOR_COOKIE]; // phpcs:ignore
+		}
+		return '';
+	}
+
+	/**
+	 * @param string $value
+	 * @return bool
+	 */
 	public static function verify_cookie( $value ) {
-		if ( $old_user_id = wp_validate_auth_cookie( $value, 'logged_in' ) ) {
+		$old_user_id = wp_validate_auth_cookie( $value, 'logged_in' );
+		if ( $old_user_id ) {
 			return user_can( $old_user_id, 'view_query_monitor' );
 		}
 		return false;
 	}
 
+	/**
+	 * Attempts to switch to the given locale.
+	 *
+	 * This is a wrapper around `switch_to_locale()` which is safe to call at any point, even
+	 * before the `$wp_locale_switcher` global is initialised or if the function does not exist.
+	 *
+	 * @param string $locale The locale.
+	 * @return bool True on success, false on failure.
+	 */
+	public static function switch_to_locale( $locale ) {
+		global $wp_locale_switcher;
+
+		if ( function_exists( 'switch_to_locale' ) && ( $wp_locale_switcher instanceof WP_Locale_Switcher ) ) {
+			return switch_to_locale( $locale );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Attempts to restore the previous locale.
+	 *
+	 * This is a wrapper around `restore_previous_locale()` which is safe to call at any point, even
+	 * before the `$wp_locale_switcher` global is initialised or if the function does not exist.
+	 *
+	 * @return string|false Locale on success, false on error.
+	 */
+	public static function restore_previous_locale() {
+		global $wp_locale_switcher;
+
+		if ( function_exists( 'restore_previous_locale' ) && ( $wp_locale_switcher instanceof WP_Locale_Switcher ) ) {
+			return restore_previous_locale();
+		}
+
+		return false;
+	}
 }
 }

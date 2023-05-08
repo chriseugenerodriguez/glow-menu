@@ -1,8 +1,11 @@
 <?php
 
-include_once('ListTable.php');
+//*****  Check WP_List_Table exists
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
+}
 
-class WPAM_List_Clicks_Table extends WPAM_List_Table {
+class WPAM_List_Clicks_Table extends WP_List_Table {
 
     function __construct() {
         global $status, $page;
@@ -17,12 +20,12 @@ class WPAM_List_Clicks_Table extends WPAM_List_Table {
 
     function column_default($item, $column_name) {
         //Just print the data for that column
-        return $item[$column_name];
+        return esc_attr($item[$column_name]);
     }
 
     function column_trackingTokenId($item) {
 
-        return $item['trackingTokenId'];       
+        return esc_attr($item['trackingTokenId']);       
     }
 
     /* Custom column output - only use if you have some columns that needs custom output */
@@ -36,7 +39,7 @@ class WPAM_List_Clicks_Table extends WPAM_List_Table {
     /* overridden function to show a custom message when no records are present */
 
     function no_items() {
-        echo '<br />No Clicks Found!';
+        echo '<br />'.__('No Clicks Found!', 'affiliates-manager');
     }
 
     function column_cb($item) {
@@ -70,7 +73,7 @@ class WPAM_List_Clicks_Table extends WPAM_List_Table {
 
     function get_bulk_actions() {
         $actions = array(
-            'delete' => 'Delete'
+            'delete' => __('Delete', 'affiliates-manager')
         );
         return $actions;
     }
@@ -78,10 +81,20 @@ class WPAM_List_Clicks_Table extends WPAM_List_Table {
     function process_bulk_action() {
         //Detect when a bulk action is being triggered... //print_r($_GET);
         if ('delete' === $this->current_action()) {
+            $nonce = '';
+            if(isset($_REQUEST['_wpnonce'])){
+                $nonce = sanitize_text_field($_REQUEST['_wpnonce']);
+            }
+            else{
+                wp_die(__('Error! Nonce is not present! Go to the Click Tracking page to delete the click.', 'affiliates-manager'));
+            }
+            if(!wp_verify_nonce($nonce, 'bulk-'.$this->_args['plural'])){
+                wp_die(__('Error! Nonce Security Check Failed! Go to the Click Tracking page to delete the click.', 'affiliates-manager'));
+            }
             $nvp_key = $this->_args['singular'];
-            $records_to_delete = $_GET[$nvp_key];
+            $records_to_delete = isset($_GET[$nvp_key]) ? $_GET[$nvp_key] : '';
             if (empty($records_to_delete)) {
-                echo '<div id="message" class="updated fade"><p>Error! You need to select multiple records to perform a bulk action!</p></div>';
+                echo '<div id="message" class="updated fade"><p>'.__('Error! You need to select records to perform a bulk action!', 'affiliates-manager').'</p></div>';
                 return;
             }
             global $wpdb;
@@ -90,7 +103,7 @@ class WPAM_List_Clicks_Table extends WPAM_List_Table {
                 $updatedb = "DELETE FROM $record_table_name WHERE trackingTokenId='$row'";
                 $results = $wpdb->query($updatedb);
             }
-            echo '<div id="message" class="updated fade"><p>Selected records deleted successfully!</p></div>';
+            echo '<div id="message" class="updated fade"><p>'.__('Selected records deleted successfully!', 'affiliates-manager').'</p></div>';
         }
     }
 
@@ -107,12 +120,25 @@ class WPAM_List_Clicks_Table extends WPAM_List_Table {
         $this->process_bulk_action();
 
         // This checks for sorting input and sorts the data.
-        $orderby_column = isset($_GET['orderby']) ? $_GET['orderby'] : '';
-        $sort_order = isset($_GET['order']) ? $_GET['order'] : '';
+        $orderby_column = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : '';
+        if("dateCreated" == $orderby_column){
+            $orderby_column = "dateCreated";
+        }
+        else{
+            $orderby_column = "trackingTokenId";
+        }
+        $sort_order = isset($_GET['order']) ? sanitize_text_field($_GET['order']) : '';
+        if("asc" == $sort_order){
+            $sort_order = "ASC";
+        }
+        else{
+            $sort_order = "DESC";
+        }
+        /*
         if (empty($orderby_column)) {
             $orderby_column = "trackingTokenId";
             $sort_order = "DESC";
-        }
+        }*/
         global $wpdb;
         $records_table_name = WPAM_TRACKING_TOKENS_TBL; //The table to query
 

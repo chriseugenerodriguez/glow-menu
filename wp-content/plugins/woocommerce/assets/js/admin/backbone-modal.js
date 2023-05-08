@@ -72,14 +72,14 @@
 			_.bindAll( this, 'render' );
 			this.render();
 
-			$( window ).resize(function() {
+			$( window ).on( 'resize', function() {
 				view.resizeContent();
 			});
 		},
 		render: function() {
 			var template = wp.template( this._target );
 
-			this.$el.attr( 'tabindex' , '0' ).append(
+			this.$el.append(
 				template( this._string )
 			);
 
@@ -88,7 +88,8 @@
 			}).append( this.$el );
 
 			this.resizeContent();
-			this.$el.focus();
+			this.$( '.wc-backbone-modal-content' ).attr( 'tabindex' , '0' ).trigger( 'focus' );
+
 			$( document.body ).trigger( 'init_tooltips' );
 
 			$( document.body ).trigger( 'wc_backbone_modal_loaded', this._target );
@@ -129,7 +130,10 @@
 			var button = e.keyCode || e.which;
 
 			// Enter key
-			if ( 13 === button && ! ( e.target.tagName && ( e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea' ) ) ) {
+			if (
+				13 === button &&
+				! ( e.target.tagName && ( e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea' ) )
+			) {
 				this.addButton( e );
 			}
 

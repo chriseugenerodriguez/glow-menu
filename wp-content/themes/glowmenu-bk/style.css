@@ -1,0 +1,18 @@
+/*
+Theme Name:         GlowMenu
+Theme URI:          https://glowmenu.co/
+Version:            1.0.0
+Author:             Chris Rodriguez
+Author URI:         https://glowmenu.co/
+Text Domain:        glowmenu
+
+*/
+.archive #theme-wrapper .product-wrapper #pageandresult #pagination ul span.show_all {
+	margin-left: 6px;
+}
+.archive #theme-wrapper .product-wrapper #pageandresult #pagination ul span.show_all a:hover {
+	text-decoration: none;
+}
+.archive #theme-wrapper .product-wrapper #pageandresult #pagination ul span.next {
+	margin-right: 8px;
+}

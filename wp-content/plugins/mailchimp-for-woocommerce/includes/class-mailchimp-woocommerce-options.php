@@ -4,11 +4,11 @@
  * Created by MailChimp.
  *
  * Name: Ryan Hungate
- * Email: ryan@mailchimp.com
+ * Email: ryan@vextras.com
  * Date: 2/22/16
  * Time: 3:45 PM
  */
-abstract class MailChimp_Woocommerce_Options
+abstract class MailChimp_WooCommerce_Options
 {
     /**
      * @var MailChimp_WooCommerce_MailChimpApi
@@ -25,11 +25,27 @@ abstract class MailChimp_Woocommerce_Options
      */
     public function adminReady()
     {
-        $this->is_admin = current_user_can('administrator');
+        $this->is_admin = current_user_can(mailchimp_get_allowed_capability());
         if (get_option('mailchimp_woocommerce_plugin_do_activation_redirect', false)) {
             delete_option('mailchimp_woocommerce_plugin_do_activation_redirect');
+
+            // don't do the redirect while activating the plugin through the rest API. ( Bartosz from Woo asked for this )
+            if ((defined( 'REST_REQUEST' ) && REST_REQUEST)) {
+                return;
+            }
+
+            // the woocommerce onboarding wizard will have a profile
+            $onboarding_profile = get_option('woocommerce_onboarding_profile');
+            // if the onboarding profile has business extensions
+            if (is_array($onboarding_profile) && array_key_exists('business_extensions', $onboarding_profile)) {
+                // if the business extensions contains our plugin, we just skip this.
+                if (is_array($onboarding_profile['business_extensions']) && in_array('mailchimp-for-woocommerce', $onboarding_profile['business_extensions'])) {
+                    return;
+                }
+            }
+
             if (!isset($_GET['activate-multi'])) {
-                wp_redirect("options-general.php?page=mailchimp-woocommerce");
+                wp_redirect("admin.php?page=mailchimp-woocommerce");
             }
         }
     }
@@ -44,10 +60,13 @@ abstract class MailChimp_Woocommerce_Options
 
     /**
      * @param $version
+     * @return $this
      */
     public function setVersion($version)
     {
         $this->version = $version;
+
+        return $this;
     }
 
     /**
@@ -58,9 +77,9 @@ abstract class MailChimp_Woocommerce_Options
         return $this->version;
     }
 
-    /**
-     * @return string
-     */
+	/**
+	 * @return mixed|string
+	 */
     public function getUniqueStoreID()
     {
         return mailchimp_get_store_id();
@@ -218,6 +237,14 @@ abstract class MailChimp_Woocommerce_Options
     }
 
     /**
+     * @return bool
+     */
+    protected function doingAjax()
+    {
+        return defined('DOING_AJAX') && DOING_AJAX;
+    }
+
+    /**
      * @return MailChimp_WooCommerce_MailChimpApi
      */
     public function api()
@@ -281,10 +308,7 @@ abstract class MailChimp_Woocommerce_Options
 
     public function removeSyncPointers()
     {
-        delete_option('mailchimp-woocommerce-sync.orders.prevent');
-        delete_option('mailchimp-woocommerce-sync.syncing');
-        delete_option('mailchimp-woocommerce-sync.started_at');
-        delete_option('mailchimp-woocommerce-sync.completed_at');
+        mailchimp_flush_sync_pointers();
     }
 
     public function removeMiscPointers()

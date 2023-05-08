@@ -8,6 +8,7 @@
  */
 class MC4WP_Container implements ArrayAccess {
 
+
 	/**
 	 * @var array
 	 */
@@ -19,7 +20,7 @@ class MC4WP_Container implements ArrayAccess {
 	protected $resolved_services = array();
 
 	/**
-	 * @param $name
+	 * @param string $name
 	 * @return boolean
 	 */
 	public function has( $name ) {
@@ -27,24 +28,23 @@ class MC4WP_Container implements ArrayAccess {
 	}
 
 	/**
-	 * @param $name
+	 * @param string $name
 	 *
 	 * @return mixed
 	 * @throws Exception
 	 */
 	public function get( $name ) {
-
-		if( ! $this->has( $name ) ) {
+		if ( ! $this->has( $name ) ) {
 			throw new Exception( sprintf( 'No service named %s was registered.', $name ) );
 		}
 
 		$service = $this->services[ $name ];
 
 		// is this a resolvable service?
-		if( is_callable( $service ) ) {
+		if ( is_callable( $service ) ) {
 
 			// resolve service if it's not resolved yet
-			if( ! isset( $this->resolved_services[ $name ] ) ) {
+			if ( ! isset( $this->resolved_services[ $name ] ) ) {
 				$this->resolved_services[ $name ] = call_user_func( $service );
 			}
 
@@ -68,6 +68,7 @@ class MC4WP_Container implements ArrayAccess {
 	 * <p>
 	 * The return value will be casted to boolean if non-boolean was returned.
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetExists( $offset ) {
 		return $this->has( $offset );
 	}
@@ -83,6 +84,7 @@ class MC4WP_Container implements ArrayAccess {
 	 *
 	 * @return mixed Can return all value types.
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetGet( $offset ) {
 		return $this->get( $offset );
 	}
@@ -101,6 +103,7 @@ class MC4WP_Container implements ArrayAccess {
 	 *
 	 * @return void
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetSet( $offset, $value ) {
 		$this->services[ $offset ] = $value;
 	}
@@ -116,6 +119,8 @@ class MC4WP_Container implements ArrayAccess {
 	 *
 	 * @return void
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetUnset( $offset ) {
 		unset( $this->services[ $offset ] );
-}}
+	}
+}

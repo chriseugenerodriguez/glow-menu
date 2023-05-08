@@ -1,307 +1,139 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
 /**
- * Module Name: Publicize
- * Module Description: Automated social marketing.
+ * Module Name: Jetpack Social
+ * Module Description: Jetpack Social makes it easy to share your site’s posts on several social media networks automatically when you publish a new post.
  * Sort Order: 10
  * Recommendation Order: 7
  * First Introduced: 2.0
  * Requires Connection: Yes
- * Auto Activate: Yes
+ * Requires User Connection: Yes
+ * Auto Activate: No
  * Module Tags: Social, Recommended
  * Feature: Engagement
- * Additional Search Queries: facebook, twitter, google+, googleplus, google, path, tumblr, linkedin, social, tweet, connections, sharing
+ * Additional Search Queries: facebook, jetpack publicize, twitter, tumblr, linkedin, social, tweet, connections, sharing, social media, automated, automated sharing, auto publish, auto tweet and like, auto tweet, facebook auto post, facebook posting
+ *
+ * @package automattic/jetpack
  */
 
+// phpcs:disable Universal.Files.SeparateFunctionsFromOO.Mixed -- TODO: Move classes to appropriately-named class files.
+
+/**
+ * Class Jetpack_Publicize
+ */
 class Jetpack_Publicize {
 
+	/**
+	 * If Publicize is executing within Jetpack.
+	 *
+	 * @var bool
+	 */
 	public $in_jetpack = true;
 
-	function __construct() {
+	/**
+	 * Jetpack_Publicize constructor.
+	 */
+	public function __construct() {
 		global $publicize_ui;
 
+		$this->modules    = new Automattic\Jetpack\Modules();
 		$this->in_jetpack = ( class_exists( 'Jetpack' ) && method_exists( 'Jetpack', 'enable_module_configurable' ) ) ? true : false;
 
-		if ( $this->in_jetpack && method_exists( 'Jetpack', 'module_configuration_load' ) ) {
+		if ( $this->in_jetpack ) {
 			Jetpack::enable_module_configurable( __FILE__ );
-			Jetpack::module_configuration_load( __FILE__, array( $this, 'jetpack_configuration_load' ) );
-		}
 
-		require_once dirname( __FILE__ ) . '/publicize/publicize.php';
-
-		if ( $this->in_jetpack )
-			require_once dirname( __FILE__ ) . '/publicize/publicize-jetpack.php';
-		else {
-			require_once dirname( dirname( __FILE__ ) ) . '/mu-plugins/keyring/keyring.php';
-			require_once dirname( __FILE__ ) . '/publicize/publicize-wpcom.php';
-		}
-
-		require_once dirname( __FILE__ ) . '/publicize/ui.php';
-		$publicize_ui = new Publicize_UI();
-		$publicize_ui->in_jetpack = $this->in_jetpack;
-
-		// Jetpack specific checks / hooks
-		if ( $this->in_jetpack) {
-			// if sharedaddy isn't active, the sharing menu hasn't been added yet
-			$active = Jetpack::get_active_modules();
-			if ( in_array( 'publicize', $active ) && !in_array( 'sharedaddy', $active ) )
+			// if sharedaddy isn't active, the sharing menu hasn't been added yet.
+			if ( $this->modules->is_active( 'publicize' ) && ! $this->modules->is_active( 'sharedaddy' ) ) {
 				add_action( 'admin_menu', array( &$publicize_ui, 'sharing_menu' ) );
-		}
-	}
-
-	function jetpack_configuration_load() {
-		wp_safe_redirect( menu_page_url( 'sharing', false ) );
-		exit;
-	}
-}
-
-global $publicize_ui;
-new Jetpack_Publicize;
-
-/**
-* Helper functions for shared use in the services files
-*/
-class Publicize_Util {
-	/**
-	 * Truncates a string to be shorter than or equal to the length specified
-	 * Attempts to truncate on word boundaries
-	 *
-	 * @param string $string
-	 * @param int $length
-	 * @return string
-	 */
-	public static function crop_str( $string, $length = 256 ) {
-		$string = Publicize_Util::sanitize_message( $string );
-		$length = absint( $length );
-
-		if ( mb_strlen( $string, 'UTF-8' ) <= $length ) {
-			return $string;
-		}
-
-		// @see wp_trim_words()
-		if ( 'characters' == _x( 'words', 'word count: words or characters?', 'jetpack' ) ) {
-			return trim( mb_substr( $string, 0, $length - 1, 'UTF-8' ) ) . "\xE2\x80\xA6"; // ellipsis
-		}
-
-		$words = explode( ' ', $string );
-
-		$return = '';
-		while ( strlen( $word = array_shift( $words ) ) ) {
-			$new_return = $return ? "$return $word" : $word;
-			$new_return_length = mb_strlen( $new_return, 'UTF-8' );
-			if ( $new_return_length < $length - 1 ) {
-				$return = $new_return;
-				continue;
-			} elseif ( $new_return_length == $length - 1 ) {
-				$return = $new_return;
-				break;
 			}
 
-			if ( !$return ) {
-				$return = mb_substr( $new_return, 0, $length - 1, 'UTF-8' );
-			}
+			/*
+			 * The Publicize Options array does not currently have UI since it is being added
+			 * for a specific purpose and not part of a broader Publicize sprint.
+			 *
+			 * In order to pass the settings up to WordPress.com, we are updating an option to Sync will pass it up.
+			 * To make it relatively easy for use, we are creating a filter that checks if the option and filter match.
+			 *
+			 * This only runs when a post is saved to avoid it running too much.
+			 */
+			add_action(
+				'save_post',
+				function () {
+					$publicize_options = get_option( 'jetpack_publicize_options', array() );
 
-			break;
+					/**
+					 * Filters the options for Publicize.
+					 *
+					 * As of Jetpack 8.5, the array keys could be:
+					 * attach_media bool If Publicize should send the image to the social media platform. Default false.
+					 *
+					 * @module publicize
+					 *
+					 * @since 8.5.0
+					 *
+					 * @param array $options Array of Publicize options.
+					 */
+					$filtered = (array) apply_filters( 'jetpack_publicize_options', $publicize_options );
+
+					if ( $publicize_options !== $filtered ) {
+						update_option( 'jetpack_publicize_options', $filtered, false );
+					}
+				}
+			);
+		} else {
+			global $publicize;
+			require_once WP_CONTENT_DIR . '/mu-plugins/keyring/keyring.php';
+			require_once WP_CONTENT_DIR . '/admin-plugins/publicize/publicize-wpcom.php';
+			$publicize    = new Publicize();
+			$publicize_ui = new Automattic\Jetpack\Publicize\Publicize_UI();
 		}
 
-		return "$return\xE2\x80\xA6"; // ellipsis
-	}
-
-
-	/**
-	 * Returns an array of DOMNodes that are comments (including recursing child nodes)
-	 *
-	 * @param DOMNode $node
-	 * @return array
-	 */
-
-	function get_comment_nodes( $node ) {
-		$comment_nodes = array();
-		foreach ( $node->childNodes as $child ) {
-
-			if ( XML_COMMENT_NODE === $child->nodeType ) {
-					$comment_nodes[] = $child;
+		add_action(
+			'jetpack_register_gutenberg_extensions',
+			function () {
+				global $publicize;
+				if ( $publicize->current_user_can_access_publicize_data() ) {
+					Jetpack_Gutenberg::set_extension_available( 'jetpack/publicize' );
+				} else {
+					Jetpack_Gutenberg::set_extension_unavailable( 'jetpack/publicize', 'unauthorized' );
+				}
 			}
-
-			if ( $child->hasChildNodes() ) {
-				$child_comment_nodes = self::get_comment_nodes( $child );
-				$comment_nodes = array_merge( $comment_nodes, $child_comment_nodes );
-			}
-		}
-
-		return $comment_nodes;
-	}
-
-	/**
-	 * Truncates HTML so that its textContent (text without markup) is shorter than or equal to the length specified.
-	 * The length of the returned string may be larger than the specified length due to the markup.
-	 * Attempts to truncate on word boundaries.
-	 *
-	 * @param string $string
-	 * @param int $length
-	 * @param array $allowed_tags KSES input
-	 * @return string
-	 */
-	function crop_html( $string, $length = 256, $allowed_tags = array() ) {
-		$tags = $GLOBALS['allowedtags']; // Markup allowed in comments...
-
-		$tags['img'] = array( // ... plus images ...
-			'alt' => true,
-			'height' => true,
-			'src' => true,
-			'width' => true,
 		);
-
-		// ... and some other basics
-		$tags['p'] = array();
-		$tags['ul'] = array();
-		$tags['ol'] = array();
-		$tags['li'] = array();
-		$tags['br'] = array();
-
-		$tags = array_merge( $tags, $allowed_tags );
-
-		// Clean up, then KSES to really lock it down
-		$string = trim( (string) $string );
-		$string = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $string );
-		$string = wp_kses( $string, $tags );
-
-		$string = mb_convert_encoding( $string, 'HTML-ENTITIES', 'UTF-8' );
-		$dom = new DOMDocument( '1.0', 'UTF-8' );
-		@$dom->loadHTML( "<html><body>$string</body></html>" ); // suppress parser warning
-
-		// Strip comment nodes, if any
-		$comment_nodes = self::get_comment_nodes( $dom->documentElement );
-		foreach ( $comment_nodes as &$comment_node ) {
-			$comment_node->parentNode->removeChild( $comment_node );
-		}
-		if ( $comment_nodes ) {
-			// Update the $string (some return paths work from just $string)
-			$string = $dom->saveHTML();
-			$string = preg_replace( '/^<!DOCTYPE.+?>/', '', $string );
-			$string = str_replace( array('<html>', '</html>', '<body>', '</body>' ), array( '', '', '', '' ), $string );
-			$string = trim( $string );
-		}
-
-		// Find the body
-		$body = false;
-		foreach ( $dom->childNodes as $child ) {
-			if ( XML_ELEMENT_NODE === $child->nodeType && 'html' === strtolower( $child->tagName ) ) {
-				$body = $child->firstChild;
-				break;
-			}
-		}
-
-		if ( !$body ) {
-			return self::crop_str( $string, $length );
-		}
-
-		// If the text (without the markup) is shorter than $length, just return
-		if ( mb_strlen( $body->textContent, 'UTF-8' ) <= $length ) {
-			return $string;
-		}
-
-		$node = false;
-		do {
-			$node = self::remove_innermost_last_child( $body, $node_removed_from );
-			$new_string_length = mb_strlen( $body->textContent, 'UTF-8' );
-		} while ( $new_string_length > $length );
-
-		$new_string = $dom->saveHTML( $body );
-		$new_string = mb_substr( $new_string, 6, -7, 'UTF-8' ); // 6: <body>, 7: </body>
-
-		if ( !$node ) {
-			return $new_string ? $new_string : self::crop_str( $string, $length );
-		}
-
-		$append_string_length = $length - $new_string_length;
-
-		if ( !$append_string_length ) {
-			return $new_string;
-		}
-
-		if ( $append_string_length > 1 && XML_TEXT_NODE === $node->nodeType ) { // 1: ellipsis
-			$append_string = self::crop_str( $node->textContent, $append_string_length ); // includes ellipsis
-			$append_node = $dom->createTextNode( $append_string );
-			$node_removed_from->appendChild( $append_node );
-			$new_string = $dom->saveHTML( $body );
-			$new_string = mb_substr( $new_string, 6, -7, 'UTF-8' );
-		} elseif ( $append_string_length > 9 && XML_ELEMENT_NODE === $node->nodeType && 'p' == strtolower( $node->nodeName ) ) { // 9: '<p>X{\xE2\x80\xA6}</p>'
-			$new_string .= '<p>' . self::crop_str( $node->textContent, $append_string_length - 8 ) . '</p>';
-		}
-
-		// Clean up any empty Paragraphs that might have occurred after removing their children
-		return trim( preg_replace( '#<p>\s*</p>#i', '', $new_string ) );
-	}
-
-	function remove_innermost_last_child( $node, &$node_removed_from ) {
-		$node_removed_from = $node;
-
-		if ( !$node->lastChild ) {
-			return false;
-		}
-
-		if ( $node->lastChild->hasChildNodes() ) {
-			return self::remove_innermost_last_child( $node->lastChild, $node_removed_from );
-		}
-
-		$innermost_last_child = $node->lastChild;
-		$node->removeChild( $innermost_last_child );
-
-		return $innermost_last_child;
-	}
-
-	function bump_stats_extras_publicize_url( $bin, $post_id ) {
-		static $done = array();
-		if ( isset( $done[$post_id] ) ) {
-			return;
-		}
-		$done[$post_id] = true;
-
-		/** This action is documented in modules/widgets/social-media-icons.php */
-		do_action( 'jetpack_bump_stats_extras', 'publicize_url', $bin );
-	}
-
-	public static function build_sprintf( $args ) {
-		$search = array();
-		$replace = array();
-		foreach ( $args as $k => $arg ) {
-			if ( 0 == $k ) {
-				$string = $arg;
-				continue;
-			}
-			$search[] = "%$arg%";
-			$replace[] = "%$k\$s";
-		}
-		return str_replace( $search, $replace, $string );
-	}
-
-	public static function sanitize_message( $message ) {
-		$message = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $message );
-		$message = wp_kses( $message, array() );
-		$message = preg_replace('/[\r\n\t ]+/', ' ', $message);
-		$message = trim( $message );
-		$message = htmlspecialchars_decode( $message, ENT_QUOTES );
-		return $message;
+		$publicize_ui->in_jetpack = $this->in_jetpack;
 	}
 }
 
-if( ! ( defined( 'IS_WPCOM' ) && IS_WPCOM ) && ! function_exists( 'publicize_init' ) ) {
-/**
- * Helper for grabbing a Publicize object from the "front-end" (non-admin) of
- * a site. Normally Publicize is only loaded in wp-admin, so there's a little
- * set up that you might need to do if you want to use it on the front end.
- * Just call this function and it returns a Publicize object.
- *
- * @return Publicize Object
- */
-function publicize_init() {
+// On Jetpack, we instantiate Jetpack_Publicize only if the Publicize module is active.
+if ( ! ( defined( 'IS_WPCOM' ) && IS_WPCOM ) ) {
 	global $publicize;
 
-	if ( ! class_exists( 'Publicize' ) ) {
-		require_once dirname( __FILE__ ) . '/publicize/publicize.php';
+	// None of this should be the case, but we can get here with a broken user connection. If that's the case
+	// then we want to stop loading any more of the module code.
+	if (
+		! ( new Automattic\Jetpack\Modules() )->is_active( 'publicize' )
+		|| ! Jetpack::connection()->has_connected_user()
+		|| ! $publicize
+	) {
+		return;
 	}
 
-	return $publicize;
-}
+	new Jetpack_Publicize();
 
+	if ( ! function_exists( 'publicize_init' ) ) {
+		/**
+		 * Helper for grabbing a Publicize object from the "front-end" (non-admin) of
+		 * a site. Normally Publicize is only loaded in wp-admin, so there's a little
+		 * set up that you might need to do if you want to use it on the front end.
+		 * Just call this function and it returns a Publicize object.
+		 *
+		 * @return Publicize Object
+		 */
+		function publicize_init() {
+			global $publicize;
+
+			return $publicize;
+		}
+	}
+} else {
+	// On wpcom, instantiate Jetpack_Publicize without any other checks.
+	new Jetpack_Publicize();
 }

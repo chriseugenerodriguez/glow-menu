@@ -93,7 +93,10 @@ function emlIsFilterBased( attrs ) {
 
 
     /**
-     * wp.media.view.Attachment.EditLibrary
+     *  wp.media.view.Attachment.EditLibrary
+     *
+     *  Enable/disable the deleting button for gallery media items
+     *  based on whether it's a filter-based gallery or not
      *
      */
     _.extend( media.view.Attachment.EditLibrary.prototype, {
@@ -157,6 +160,11 @@ function emlIsFilterBased( attrs ) {
             var content = this.controller.frame.content,
                 reverse = content.get().toolbar.get( 'reverse' );
 
+
+            if ( _.isUndefined( reverse ) ) {
+                return false;
+            }
+
             reverse.model.set( 'disabled', $( event.target ).is(':checked') );
         }
     });
@@ -211,12 +219,30 @@ function emlIsFilterBased( attrs ) {
 
             _.each( eml.l10n.taxonomies, function( attrs, taxonomy ) {
 
-                var ids = library.props.get( taxonomy ),
-                    taxonomy_string;
+                var terms = library.props.get( taxonomy ),
+                    taxonomy_string,
+                    terms_to_string = [],
+                    key;
 
-                if ( ids ) {
 
-                    taxonomy_string = attrs.singular_name + ': ' + _.values( _.pick( attrs.terms, ids ) ).join(', ');
+                if ( terms ) {
+
+                    if ( typeof terms !== 'object' ) {
+                        terms = [terms];
+                    }
+
+                    key = ! terms.some(isNaN) ? 'term_id' : 'slug';
+
+                    _.each( terms, function( term ) {
+
+                        var t = _.find( attrs.term_list, function( item ) {
+                            return item[key] == term;
+                        });
+
+                        terms_to_string.push( t.term_name );
+                    });
+
+                    taxonomy_string = attrs.singular_name + ': ' + terms_to_string.join(', ');
                     append += '<li>' + taxonomy_string + '</li>';
                 }
             });
@@ -256,11 +282,14 @@ function emlIsFilterBased( attrs ) {
         var reverse = browser.toolbar.get( 'reverse' );
 
 
-        reverse.model.set( 'disabled', 'rand' === library.props.get('orderby') );
+        if ( _.isUndefined( reverse ) ) {
+            return false;
+        }
 
         reverse.options.click = function() {
 
-            order = library.props.get( 'order' );
+            var order = library.props.get( 'order' );
+
 
             if ( 'ASC' === order ) {
                 order = 'DESC';
@@ -291,7 +320,7 @@ function emlIsFilterBased( attrs ) {
     _.extend( media.controller.GalleryEdit.prototype, {
 
         gallerySettings: function( browser ) {
-
+            
             var library = this.get('library');
 
             original.GalleryEdit.gallerySettings.apply( this, arguments );
@@ -303,7 +332,7 @@ function emlIsFilterBased( attrs ) {
 
 
     /**
-     * wp.media.controller.CollectionEdit
+     * wp.media.controller.CollectionEdit (Playlist)
      *
      */
     original.CollectionEdit = {

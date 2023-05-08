@@ -1,10 +1,44 @@
 <?php
 /**
- * Wishlist page template
+ * Wishlist page template - Standard Layout
  *
- * @author Your Inspiration Themes
- * @package YITH WooCommerce Wishlist
- * @version 2.0.12
+ * @author YITH
+ * @package YITH\Wishlist\Templates\Wishlist\View
+ * @version 3.0.0
+ */
+
+/**
+ * Template variables:
+ *
+ * @var $wishlist                      \YITH_WCWL_Wishlist Current wishlist
+ * @var $wishlist_items                array Array of items to show for current page
+ * @var $wishlist_token                string Current wishlist token
+ * @var $wishlist_id                   int Current wishlist id
+ * @var $users_wishlists               array Array of current user wishlists
+ * @var $pagination                    string yes/no
+ * @var $per_page                      int Items per page
+ * @var $current_page                  int Current page
+ * @var $page_links                    array Array of page links
+ * @var $is_user_owner                 bool Whether current user is wishlist owner
+ * @var $show_price                    bool Whether to show price column
+ * @var $show_dateadded                bool Whether to show item date of addition
+ * @var $show_stock_status             bool Whether to show product stock status
+ * @var $show_add_to_cart              bool Whether to show Add to Cart button
+ * @var $show_remove_product           bool Whether to show Remove button
+ * @var $show_price_variations         bool Whether to show price variation over time
+ * @var $show_variation                bool Whether to show variation attributes when possible
+ * @var $show_cb                       bool Whether to show checkbox column
+ * @var $show_quantity                 bool Whether to show input quantity or not
+ * @var $show_ask_estimate_button      bool Whether to show Ask an Estimate form
+ * @var $show_last_column              bool Whether to show last column (calculated basing on previous flags)
+ * @var $move_to_another_wishlist      bool Whether to show Move to another wishlist select
+ * @var $move_to_another_wishlist_type string Whether to show a select or a popup for wishlist change
+ * @var $additional_info               bool Whether to show Additional info textarea in Ask an estimate form
+ * @var $price_excl_tax                bool Whether to show price excluding taxes
+ * @var $enable_drag_n_drop            bool Whether to enable drag n drop feature
+ * @var $repeat_remove_button          bool Whether to repeat remove button in last column
+ * @var $available_multi_wishlist      bool Whether multi wishlist is enabled and available
+ * @var $no_interactions               bool
  */
 
 if ( ! defined( 'YITH_WCWL' ) ) {
@@ -12,303 +46,619 @@ if ( ! defined( 'YITH_WCWL' ) ) {
 } // Exit if accessed directly
 ?>
 
-<?php do_action( 'yith_wcwl_before_wishlist_form', $wishlist_meta ); ?>
+<!-- WISHLIST TABLE -->
+<table
+	class="shop_table cart wishlist_table wishlist_view traditional responsive <?php echo $no_interactions ? 'no-interactions' : ''; ?> <?php echo $enable_drag_n_drop ? 'sortable' : ''; ?> "
+	data-pagination="<?php echo esc_attr( $pagination ); ?>" data-per-page="<?php echo esc_attr( $per_page ); ?>" data-page="<?php echo esc_attr( $current_page ); ?>"
+	data-id="<?php echo esc_attr( $wishlist_id ); ?>" data-token="<?php echo esc_attr( $wishlist_token ); ?>">
 
-<form id="yith-wcwl-form" action="<?php echo $form_action ?>" method="post" class="woocommerce">
+	<?php $column_count = 2; ?>
 
-    <?php wp_nonce_field( 'yith-wcwl-form', 'yith_wcwl_form_nonce' ) ?>
+	<thead>
+	<tr>
+		<?php if ( $show_cb ) : ?>
+			<?php $column_count ++; ?>
+			<th class="product-checkbox">
+				<input type="checkbox" value="" name="" id="bulk_add_to_cart"/>
+			</th>
+		<?php endif; ?>
 
-    <!-- TITLE -->
-    <?php
-    do_action( 'yith_wcwl_before_wishlist_title' );
+		<?php if ( $show_remove_product ) : ?>
+			<?php $column_count ++; ?>
+			<th class="product-remove">
+				<span class="nobr">
+					<?php
+					/**
+					 * APPLY_FILTERS: yith_wcwl_wishlist_view_remove_heading
+					 *
+					 * Filter the heading of the column to remove the product from the wishlist in the wishlist table.
+					 *
+					 * @param string             $heading  Heading text
+					 * @param YITH_WCWL_Wishlist $wishlist Wishlist object
+					 *
+					 * @return string
+					 */
+					echo esc_html( apply_filters( 'yith_wcwl_wishlist_view_remove_heading', '', $wishlist ) );
+					?>
+				</span>
+			</th>
+		<?php endif; ?>
 
-    if( ! empty( $page_title ) ) :
-    ?>
-        <div class="wishlist-title <?php echo ( $is_custom_list ) ? 'wishlist-title-with-form' : ''?>">
-            <?php echo apply_filters( 'yith_wcwl_wishlist_title', '<h2>' . $page_title . '</h2>' ); ?>
-            <?php if( $is_custom_list ): ?>
-                <a class="btn button show-title-form">
-                    <?php echo apply_filters( 'yith_wcwl_edit_title_icon', '<i class="fa fa-pencil"></i>' )?>
-                    <?php _e( 'Edit title', 'yith-woocommerce-wishlist' ) ?>
-                </a>
-            <?php endif; ?>
-        </div>
-        <?php if( $is_custom_list ): ?>
-            <div class="hidden-title-form">
-                <input type="text" value="<?php echo $page_title ?>" name="wishlist_name"/>
-                <button>
-                    <?php echo apply_filters( 'yith_wcwl_save_wishlist_title_icon', '<i class="fa fa-check"></i>' )?>
-                    <?php _e( 'Save', 'yith-woocommerce-wishlist' )?>
-                </button>
-                <a class="hide-title-form btn button">
-                    <?php echo apply_filters( 'yith_wcwl_cancel_wishlist_title_icon', '<i class="fa fa-remove"></i>' )?>
-                    <?php _e( 'Cancel', 'yith-woocommerce-wishlist' )?>
-                </a>
-            </div>
-        <?php endif; ?>
-    <?php
-    endif;
+		<th class="product-thumbnail"></th>
 
-     do_action( 'yith_wcwl_before_wishlist' ); ?>
+		<th class="product-name">
+			<span class="nobr">
+				<?php
+				/**
+				 * APPLY_FILTERS: yith_wcwl_wishlist_view_name_heading
+				 *
+				 * Filter the heading of the column to show the product name in the wishlist table.
+				 *
+				 * @param string             $heading  Heading text
+				 * @param YITH_WCWL_Wishlist $wishlist Wishlist object
+				 *
+				 * @return string
+				 */
+				echo esc_html( apply_filters( 'yith_wcwl_wishlist_view_name_heading', __( 'Product name', 'yith-woocommerce-wishlist' ), $wishlist ) );
+				?>
+			</span>
+		</th>
 
-    <!-- WISHLIST TABLE -->
-	<table class="shop_table cart wishlist_table" data-pagination="<?php echo esc_attr( $pagination )?>" data-per-page="<?php echo esc_attr( $per_page )?>" data-page="<?php echo esc_attr( $current_page )?>" data-id="<?php echo $wishlist_id ?>" data-token="<?php echo $wishlist_token ?>">
+		<?php if ( $show_price || $show_price_variations ) : ?>
+			<?php $column_count ++; ?>
+			<th class="product-price">
+				<span class="nobr">
+					<?php
+					/**
+					 * APPLY_FILTERS: yith_wcwl_wishlist_view_price_heading
+					 *
+					 * Filter the heading of the column to show the product price in the wishlist table.
+					 *
+					 * @param string             $heading  Heading text
+					 * @param YITH_WCWL_Wishlist $wishlist Wishlist object
+					 *
+					 * @return string
+					 */
+					echo esc_html( apply_filters( 'yith_wcwl_wishlist_view_price_heading', __( 'Unit price', 'yith-woocommerce-wishlist' ), $wishlist ) );
+					?>
+				</span>
+			</th>
+		<?php endif; ?>
 
-	    <?php $column_count = 2; ?>
+		<?php if ( $show_quantity ) : ?>
+			<?php $column_count ++; ?>
+			<th class="product-quantity">
+				<span class="nobr">
+					<?php
+					/**
+					 * APPLY_FILTERS: yith_wcwl_wishlist_view_quantity_heading
+					 *
+					 * Filter the heading of the column to show the product quantity in the wishlist table.
+					 *
+					 * @param string             $heading  Heading text
+					 * @param YITH_WCWL_Wishlist $wishlist Wishlist object
+					 *
+					 * @return string
+					 */
+					echo esc_html( apply_filters( 'yith_wcwl_wishlist_view_quantity_heading', __( 'Quantity', 'yith-woocommerce-wishlist' ), $wishlist ) );
+					?>
+				</span>
+			</th>
+		<?php endif; ?>
 
-        <thead>
-        <tr>
-	        <?php if( $show_cb ) : ?>
+		<?php if ( $show_stock_status ) : ?>
+			<?php $column_count ++; ?>
+			<th class="product-stock-status">
+				<span class="nobr">
+					<?php
+					/**
+					 * APPLY_FILTERS: yith_wcwl_wishlist_view_stock_heading
+					 *
+					 * Filter the heading of the column to show the product stock status in the wishlist table.
+					 *
+					 * @param string             $heading  Heading text
+					 * @param YITH_WCWL_Wishlist $wishlist Wishlist object
+					 *
+					 * @return string
+					 */
+					echo esc_html( apply_filters( 'yith_wcwl_wishlist_view_stock_heading', __( 'Stock status', 'yith-woocommerce-wishlist' ), $wishlist ) );
+					?>
+				</span>
+			</th>
+		<?php endif; ?>
 
-		        <th class="product-checkbox">
-			        <input type="checkbox" value="" name="" id="bulk_add_to_cart"/>
-		        </th>
+		<?php if ( $show_last_column ) : ?>
+			<?php $column_count ++; ?>
+			<th class="product-add-to-cart">
+				<span class="nobr">
+					<?php
+					/**
+					 * APPLY_FILTERS: yith_wcwl_wishlist_view_cart_heading
+					 *
+					 * Filter the heading of the cart column in the wishlist table.
+					 *
+					 * @param string             $heading  Heading text
+					 * @param YITH_WCWL_Wishlist $wishlist Wishlist object
+					 *
+					 * @return string
+					 */
+					echo esc_html( apply_filters( 'yith_wcwl_wishlist_view_cart_heading', '', $wishlist ) );
+					?>
+				</span>
+			</th>
+		<?php endif; ?>
 
-	        <?php
-		        $column_count ++;
-            endif;
-	        ?>
+		<?php if ( $enable_drag_n_drop ) : ?>
+			<?php $column_count ++; ?>
+			<th class="product-arrange">
+				<span class="nobr">
+					<?php
+					/**
+					 * APPLY_FILTERS: yith_wcwl_wishlist_view_arrange_heading
+					 *
+					 * Filter the heading of the column to change order of the items in the wishlist table.
+					 *
+					 * @param string             $heading  Heading text
+					 * @param YITH_WCWL_Wishlist $wishlist Wishlist object
+					 *
+					 * @return string
+					 */
+					echo esc_html( apply_filters( 'yith_wcwl_wishlist_view_arrange_heading', __( 'Arrange', 'yith-woocommerce-wishlist' ), $wishlist ) );
+					?>
+				</span>
+			</th>
+		<?php endif; ?>
+	</tr>
+	</thead>
 
-	        <?php if( $is_user_owner ): ?>
-		        <th class="product-remove"></th>
-	        <?php
-	            $column_count ++;
-	        endif;
-	        ?>
+	<tbody class="wishlist-items-wrapper">
+	<?php
+	if ( $wishlist && $wishlist->has_items() ) :
+		foreach ( $wishlist_items as $item ) :
+			/**
+			 * Each of the wishlist items
+			 *
+			 * @var $item \YITH_WCWL_Wishlist_Item
+			 */
+			global $product;
 
-            <th class="product-thumbnail"></th>
+			$product = $item->get_product();
 
-            <th class="product-name">
-                <span class="nobr"><?php echo apply_filters( 'yith_wcwl_wishlist_view_name_heading', __( 'Product Name', 'yith-woocommerce-wishlist' ) ) ?></span>
-            </th>
+			if ( $product && $product->exists() ) :
+				?>
+				<tr id="yith-wcwl-row-<?php echo esc_attr( $item->get_product_id() ); ?>" data-row-id="<?php echo esc_attr( $item->get_product_id() ); ?>">
+					<?php if ( $show_cb ) : ?>
+						<td class="product-checkbox">
+							<input type="checkbox" value="yes" name="items[<?php echo esc_attr( $item->get_product_id() ); ?>][cb]"/>
+						</td>
+					<?php endif ?>
 
-            <?php if( $show_price ) : ?>
+					<?php if ( $show_remove_product ) : ?>
+						<td class="product-remove">
+							<div>
+								<?php
+								/**
+								 * APPLY_FILTERS: yith_wcwl_remove_product_wishlist_message_title
+								 *
+								 * Filter the title of the icon to remove the product from the wishlist.
+								 *
+								 * @param string $title Icon title
+								 *
+								 * @return string
+								 */
+								?>
+								<a href="<?php echo esc_url( $item->get_remove_url() ); ?>" class="remove remove_from_wishlist" title="<?php echo esc_html( apply_filters( 'yith_wcwl_remove_product_wishlist_message_title', __( 'Remove this product', 'yith-woocommerce-wishlist' ) ) ); ?>">&times;</a>
+							</div>
+						</td>
+					<?php endif; ?>
 
-                <th class="product-price">
-                    <span class="nobr">
-                        <?php echo apply_filters( 'yith_wcwl_wishlist_view_price_heading', __( 'Unit Price', 'yith-woocommerce-wishlist' ) ) ?>
-                    </span>
-                </th>
+					<td class="product-thumbnail">
+						<?php
+						/**
+						 * DO_ACTION: yith_wcwl_table_before_product_thumbnail
+						 *
+						 * Allows to render some content or fire some action before the product thumbnail in the wishlist table.
+						 *
+						 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+						 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+						 */
+						do_action( 'yith_wcwl_table_before_product_thumbnail', $item, $wishlist );
+						?>
 
-            <?php
-	            $column_count ++;
-            endif;
-            ?>
+						<a href="<?php echo esc_url( get_permalink( apply_filters( 'woocommerce_in_cart_product', $item->get_product_id() ) ) ); ?>">
+							<?php echo wp_kses_post( $product->get_image() ); ?>
+						</a>
 
-            <?php if( $show_stock_status ) : ?>
+						<?php
+						/**
+						 * DO_ACTION: yith_wcwl_table_after_product_thumbnail
+						 *
+						 * Allows to render some content or fire some action after the product thumbnail in the wishlist table.
+						 *
+						 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+						 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+						 */
+						do_action( 'yith_wcwl_table_after_product_thumbnail', $item, $wishlist );
+						?>
+					</td>
 
-                <th class="product-stock-status">
-                    <span class="nobr">
-                        <?php echo apply_filters( 'yith_wcwl_wishlist_view_stock_heading', __( 'Stock Status', 'yith-woocommerce-wishlist' ) ) ?>
-                    </span>
-                </th>
+					<td class="product-name">
+						<?php
+						/**
+						 * DO_ACTION: yith_wcwl_table_before_product_name
+						 *
+						 * Allows to render some content or fire some action before the product name in the wishlist table.
+						 *
+						 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+						 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+						 */
+						do_action( 'yith_wcwl_table_before_product_name', $item, $wishlist );
+						?>
 
-            <?php
-	            $column_count ++;
-            endif;
-            ?>
+						<a href="<?php echo esc_url( get_permalink( apply_filters( 'woocommerce_in_cart_product', $item->get_product_id() ) ) ); ?>">
+							<?php echo wp_kses_post( apply_filters( 'woocommerce_in_cartproduct_obj_title', $product->get_title(), $product ) ); ?>
+						</a>
 
-            <?php if( $show_last_column ) : ?>
+						<?php
+						if ( $show_variation && $product->is_type( 'variation' ) ) {
+							/**
+							 * Product is a Variation
+							 *
+							 * @var $product \WC_Product_Variation
+							 */
+							echo wp_kses_post( wc_get_formatted_variation( $product ) );
+						}
+						?>
 
-                <th class="product-add-to-cart"></th>
+						<?php
+						/**
+						 * DO_ACTION: yith_wcwl_table_after_product_name
+						 *
+						 * Allows to render some content or fire some action after the product name in the wishlist table.
+						 *
+						 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+						 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+						 */
+						do_action( 'yith_wcwl_table_after_product_name', $item, $wishlist );
+						?>
+					</td>
 
-            <?php
-	            $column_count ++;
-            endif;
-            ?>
-        </tr>
-        </thead>
+					<?php if ( $show_price || $show_price_variations ) : ?>
+						<td class="product-price">
+							<?php
+							/**
+							 * DO_ACTION: yith_wcwl_table_before_product_price
+							 *
+							 * Allows to render some content or fire some action before the product price in the wishlist table.
+							 *
+							 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+							 */
+							do_action( 'yith_wcwl_table_before_product_price', $item, $wishlist );
+							?>
 
-        <tbody>
-        <?php
-        if( count( $wishlist_items ) > 0 ) :
-	        $added_items = array();
-            foreach( $wishlist_items as $item ) :
-                global $product;
+							<?php
+							if ( $show_price ) {
+								echo wp_kses_post( $item->get_formatted_product_price() );
+							}
 
-	            $item['prod_id'] = yit_wpml_object_id ( $item['prod_id'], 'product', true );
+							if ( $show_price_variations ) {
+								echo wp_kses_post( $item->get_price_variation() );
+							}
+							?>
 
-	            if( in_array( $item['prod_id'], $added_items ) ){
-		            continue;
-	            }
+							<?php
+							/**
+							 * DO_ACTION: yith_wcwl_table_after_product_price
+							 *
+							 * Allows to render some content or fire some action after the product price in the wishlist table.
+							 *
+							 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+							 */
+							do_action( 'yith_wcwl_table_after_product_price', $item, $wishlist );
+							?>
+						</td>
+					<?php endif ?>
 
-	            $added_items[] = $item['prod_id'];
-	            $product = wc_get_product( $item['prod_id'] );
-	            $availability = $product->get_availability();
-	            $stock_status = $availability['class'];
+					<?php if ( $show_quantity ) : ?>
+						<td class="product-quantity">
+							<?php
+							/**
+							 * DO_ACTION: yith_wcwl_table_before_product_quantity
+							 *
+							 * Allows to render some content or fire some action before the product quantity in the wishlist table.
+							 *
+							 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+							 */
+							do_action( 'yith_wcwl_table_before_product_quantity', $item, $wishlist );
+							?>
 
-                if( $product && $product->exists() ) :
-	                ?>
-                    <tr id="yith-wcwl-row-<?php echo $item['prod_id'] ?>" data-row-id="<?php echo $item['prod_id'] ?>">
-	                    <?php if( $show_cb ) : ?>
-		                    <td class="product-checkbox">
-			                    <input type="checkbox" value="<?php echo esc_attr( $item['prod_id'] ) ?>" name="add_to_cart[]" <?php echo ( ! $product->is_type( 'simple' ) ) ? 'disabled="disabled"' : '' ?>/>
-		                    </td>
-	                    <?php endif ?>
+							<?php if ( ! $no_interactions && $wishlist->current_user_can( 'update_quantity' ) ) : ?>
+								<input type="number" min="1" step="1" name="items[<?php echo esc_attr( $item->get_product_id() ); ?>][quantity]" value="<?php echo esc_attr( $item->get_quantity() ); ?>"/>
+							<?php else : ?>
+								<?php echo esc_html( $item->get_quantity() ); ?>
+							<?php endif; ?>
 
-                        <?php if( $is_user_owner ): ?>
-                        <td class="product-remove">
-                            <div>
-                                <a href="<?php echo esc_url( add_query_arg( 'remove_from_wishlist', $item['prod_id'] ) ) ?>" class="remove remove_from_wishlist" title="<?php _e( 'Remove this product', 'yith-woocommerce-wishlist' ) ?>">&times;</a>
-                            </div>
-                        </td>
-                        <?php endif; ?>
+							<?php
+							/**
+							 * DO_ACTION: yith_wcwl_table_after_product_quantity
+							 *
+							 * Allows to render some content or fire some action after the product quantity in the wishlist table.
+							 *
+							 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+							 */
+							do_action( 'yith_wcwl_table_after_product_quantity', $item, $wishlist );
+							?>
+						</td>
+					<?php endif; ?>
 
-                        <td class="product-thumbnail">
-                            <a href="<?php echo esc_url( get_permalink( apply_filters( 'woocommerce_in_cart_product', $item['prod_id'] ) ) ) ?>">
-                                <?php echo $product->get_image() ?>
-                            </a>
-                        </td>
+					<?php if ( $show_stock_status ) : ?>
+						<td class="product-stock-status">
+							<?php
+							/**
+							 * DO_ACTION: yith_wcwl_table_before_product_stock
+							 *
+							 * Allows to render some content or fire some action before the product stock in the wishlist table.
+							 *
+							 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+							 */
+							do_action( 'yith_wcwl_table_before_product_stock', $item, $wishlist );
+							?>
 
-                        <td class="product-name">
-                            <a href="<?php echo esc_url( get_permalink( apply_filters( 'woocommerce_in_cart_product', $item['prod_id'] ) ) ) ?>"><?php echo apply_filters( 'woocommerce_in_cartproduct_obj_title', $product->get_title(), $product ) ?></a>
-                            <?php do_action( 'yith_wcwl_table_after_product_name', $item ); ?>
-                        </td>
+							<?php
+							/**
+							 * APPLY_FILTERS: yith_wcwl_out_of_stock_label
+							 *
+							 * Filter the label when the product in the wishlist is out of stock.
+							 *
+							 * @param string $label Label
+							 *
+							 * @return string
+							 */
+							/**
+							 * APPLY_FILTERS: yith_wcwl_in_stock_label
+							 *
+							 * Filter the label when the product in the wishlist is in stock.
+							 *
+							 * @param string $label Label
+							 *
+							 * @return string
+							 */
+							$stock_status_html = 'out-of-stock' === $item->get_stock_status() ? '<span class="wishlist-out-of-stock">' . esc_html( apply_filters( 'yith_wcwl_out_of_stock_label', __( 'Out of stock', 'yith-woocommerce-wishlist' ) ) ) . '</span>' : '<span class="wishlist-in-stock">' . esc_html( apply_filters( 'yith_wcwl_in_stock_label', __( 'In Stock', 'yith-woocommerce-wishlist' ) ) ) . '</span>';
 
-                        <?php if( $show_price ) : ?>
-                            <td class="product-price">
-                                <?php echo $product->get_price() ? $product->get_price_html() : apply_filters( 'yith_free_text', __( 'Free!', 'yith-woocommerce-wishlist' ) ); ?>
-                            </td>
-                        <?php endif ?>
+							/**
+							 * APPLY_FILTERS: yith_wcwl_stock_status
+							 *
+							 * Filters the HTML for the stock status label.
+							 *
+							 * @param string                  $stock_status_html Stock status HTML.
+							 * @param YITH_WCWL_Wishlist_Item $item              Wishlist item object.
+							 * @param YITH_WCWL_Wishlist      $wishlist          Wishlist object.
+							 *
+							 * @return string
+							 */
+							echo apply_filters( 'yith_wcwl_stock_status', $stock_status_html, $item, $wishlist );
+							?>
 
-                        <?php if( $show_stock_status ) : ?>
-                            <td class="product-stock-status">
-                                <?php echo $stock_status == 'out-of-stock' ? '<span class="wishlist-out-of-stock">' . __( 'Out of Stock', 'yith-woocommerce-wishlist' ) . '</span>' : '<span class="wishlist-in-stock">' . __( 'In Stock', 'yith-woocommerce-wishlist' ) . '</span>'; ?>
-                            </td>
-                        <?php endif ?>
+							<?php
+							/**
+							 * DO_ACTION: yith_wcwl_table_after_product_stock
+							 *
+							 * Allows to render some content or fire some action after the product stock in the wishlist table.
+							 *
+							 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+							 */
+							do_action( 'yith_wcwl_table_after_product_stock', $item, $wishlist );
+							?>
+						</td>
+					<?php endif ?>
 
-	                    <?php if( $show_last_column ): ?>
-                        <td class="product-add-to-cart">
-	                        <!-- Date added -->
-	                        <?php
-	                        if( $show_dateadded && isset( $item['dateadded'] ) ):
-								echo '<span class="dateadded">' . sprintf( __( 'Added on : %s', 'yith-woocommerce-wishlist' ), date_i18n( get_option( 'date_format' ), strtotime( $item['dateadded'] ) ) ) . '</span>';
-	                        endif;
-	                        ?>
+					<?php if ( $show_last_column ) : ?>
+						<td class="product-add-to-cart">
+							<?php
+							/**
+							 * DO_ACTION: yith_wcwl_table_before_product_cart
+							 *
+							 * Allows to render some content or fire some action before the product cart in the wishlist table.
+							 *
+							 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+							 */
+							do_action( 'yith_wcwl_table_before_product_cart', $item, $wishlist );
+							?>
 
-	                        <!-- Add to cart button -->
-                            <?php if( $show_add_to_cart && isset( $stock_status ) && $stock_status != 'out-of-stock' ): ?>
-                                <?php woocommerce_template_loop_add_to_cart(); ?>
-                            <?php endif ?>
+							<!-- Date added -->
+							<?php
+							if ( $show_dateadded && $item->get_date_added() ) :
+								// translators: date added label: 1 date added.
+								echo '<span class="dateadded">' . esc_html( sprintf( __( 'Added on: %s', 'yith-woocommerce-wishlist' ), $item->get_date_added_formatted() ) ) . '</span>';
+							endif;
+							?>
 
-	                        <!-- Change wishlist -->
-							<?php if( $available_multi_wishlist && is_user_logged_in() && count( $users_wishlists ) > 1 && $move_to_another_wishlist && $is_user_owner ): ?>
-	                        <select class="change-wishlist selectBox">
-		                        <option value=""><?php _e( 'Move', 'yith-woocommerce-wishlist' ) ?></option>
-		                        <?php
-		                        foreach( $users_wishlists as $wl ):
-			                        if( $wl['wishlist_token'] == $wishlist_meta['wishlist_token'] ){
-				                        continue;
-			                        }
+							<?php
+							/**
+							 * DO_ACTION: yith_wcwl_table_product_before_add_to_cart
+							 *
+							 * Allows to render some content or fire some action before the 'Add to cart' in the wishlist table.
+							 *
+							 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+							 */
+							do_action( 'yith_wcwl_table_product_before_add_to_cart', $item, $wishlist );
+							?>
 
-		                        ?>
-			                        <option value="<?php echo esc_attr( $wl['wishlist_token'] ) ?>">
-				                        <?php
-				                        $wl_title = ! empty( $wl['wishlist_name'] ) ? esc_html( $wl['wishlist_name'] ) : esc_html( $default_wishlsit_title );
-				                        if( $wl['wishlist_privacy'] == 1 ){
-					                        $wl_privacy = __( 'Shared', 'yith-woocommerce-wishlist' );
-				                        }
-				                        elseif( $wl['wishlist_privacy'] == 2 ){
-					                        $wl_privacy = __( 'Private', 'yith-woocommerce-wishlist' );
-				                        }
-				                        else{
-					                        $wl_privacy = __( 'Public', 'yith-woocommerce-wishlist' );
-				                        }
+							<!-- Add to cart button -->
+							<?php
+							/**
+							 * APPLY_FILTERS: yith_wcwl_table_product_show_add_to_cart
+							 *
+							 * Filter if show the 'Add to cart' button in the wishlist table for each product.
+							 *
+							 * @param bool                    $show_add_to_cart Show 'Add to cart' button or not
+							 * @param YITH_WCWL_Wishlist_Item $item             Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist         Wishlist object
+							 *
+							 * @return bool
+							 */
+							$show_add_to_cart = apply_filters( 'yith_wcwl_table_product_show_add_to_cart', $show_add_to_cart, $item, $wishlist );
+							?>
+							<?php if ( $show_add_to_cart && $item->is_purchasable() && 'out-of-stock' !== $item->get_stock_status() ) : ?>
+								<?php woocommerce_template_loop_add_to_cart( array( 'quantity' => $show_quantity ? $item->get_quantity() : 1 ) ); ?>
+							<?php endif ?>
 
-				                        echo sprintf( '%s - %s', $wl_title, $wl_privacy );
-				                        ?>
-			                        </option>
-		                        <?php
-		                        endforeach;
-		                        ?>
-	                        </select>
-	                        <?php endif; ?>
+							<?php
+							/**
+							 * DO_ACTION: yith_wcwl_table_product_after_add_to_cart
+							 *
+							 * Allows to render some content or fire some action after the 'Add to cart' in the wishlist table.
+							 *
+							 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+							 */
+							do_action( 'yith_wcwl_table_product_after_add_to_cart', $item, $wishlist );
+							?>
 
-	                        <!-- Remove from wishlist -->
-	                        <?php if( $is_user_owner && $repeat_remove_button ): ?>
-                                <a href="<?php echo esc_url( add_query_arg( 'remove_from_wishlist', $item['prod_id'] ) ) ?>" class="remove_from_wishlist button" title="<?php _e( 'Remove this product', 'yith-woocommerce-wishlist' ) ?>"><?php _e( 'Remove', 'yith-woocommerce-wishlist' ) ?></a>
-                            <?php endif; ?>
-                        </td>
-	                <?php endif; ?>
-                    </tr>
-                <?php
-                endif;
-            endforeach;
-        else: ?>
-            <tr>
-                <td colspan="<?php echo esc_attr( $column_count ) ?>" class="wishlist-empty"><?php echo apply_filters( 'yith_wcwl_no_product_to_remove_message', __( 'No products were added to the wishlist', 'yith-woocommerce-wishlist' ) ) ?></td>
-            </tr>
-        <?php
-        endif;
+							<!-- Change wishlist -->
+							<?php
+							/**
+							 * APPLY_FILTERS: yith_wcwl_table_product_move_to_another_wishlist
+							 *
+							 * Filter if show the 'Move to another wishlist' button in the wishlist table for each product.
+							 *
+							 * @param bool                    $move_to_another_wishlist Show 'Move to another wishlist' button or not
+							 * @param YITH_WCWL_Wishlist_Item $item                     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist                 Wishlist object
+							 *
+							 * @return bool
+							 */
+							$move_to_another_wishlist = apply_filters( 'yith_wcwl_table_product_move_to_another_wishlist', $move_to_another_wishlist, $item, $wishlist );
+							?>
+							<?php if ( $move_to_another_wishlist && $available_multi_wishlist && count( $users_wishlists ) > 1 ) : ?>
+								<?php if ( 'select' === $move_to_another_wishlist_type ) : ?>
+									<select class="change-wishlist selectBox">
+										<option value=""><?php esc_html_e( 'Move', 'yith-woocommerce-wishlist' ); ?></option>
+										<?php
+										foreach ( $users_wishlists as $wl ) :
+											/**
+											 * Each of customer's wishlists
+											 *
+											 * @var $wl \YITH_WCWL_Wishlist
+											 */
+											if ( $wl->get_token() === $wishlist_token ) {
+												continue;
+											}
+											?>
+											<option value="<?php echo esc_attr( $wl->get_token() ); ?>">
+												<?php echo sprintf( '%s - %s', esc_html( $wl->get_formatted_name() ), esc_html( $wl->get_formatted_privacy() ) ); ?>
+											</option>
+											<?php
+										endforeach;
+										?>
+									</select>
+								<?php else : ?>
+									<a href="#move_to_another_wishlist" class="move-to-another-wishlist-button" data-rel="prettyPhoto[move_to_another_wishlist]">
+										<?php
+										/**
+										 * APPLY_FILTERS: yith_wcwl_move_to_another_list_label
+										 *
+										 * Filter the label to move the product to another wishlist.
+										 *
+										 * @param string $label Label
+										 *
+										 * @return string
+										 */
+										echo esc_html( apply_filters( 'yith_wcwl_move_to_another_list_label', __( 'Move to another list &rsaquo;', 'yith-woocommerce-wishlist' ) ) );
+										?>
+									</a>
+								<?php endif; ?>
 
-        if( ! empty( $page_links ) ) : ?>
-            <tr class="pagination-row">
-                <td colspan="<?php echo esc_attr( $column_count ) ?>"><?php echo $page_links ?></td>
-            </tr>
-        <?php endif ?>
-        </tbody>
+								<?php
+								/**
+								 * DO_ACTION: yith_wcwl_table_product_after_move_to_another_wishlist
+								 *
+								 * Allows to render some content or fire some action after the 'Move to another wishlist' in the wishlist table.
+								 *
+								 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+								 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+								 */
+								do_action( 'yith_wcwl_table_product_after_move_to_another_wishlist', $item, $wishlist );
+								?>
 
-        <tfoot>
-        <tr>
-	        <td colspan="<?php echo esc_attr( $column_count ) ?>">
-	            <?php if( $show_cb ) : ?>
-		            <div class="custom-add-to-cart-button-cotaniner">
-		                <a href="<?php echo esc_url( add_query_arg( array( 'wishlist_products_to_add_to_cart' => '', 'wishlist_token' => $wishlist_token ) ) ) ?>" class="button alt" id="custom_add_to_cart"><?php echo apply_filters( 'yith_wcwl_custom_add_to_cart_text', __( 'Add the selected products to the cart', 'yith-woocommerce-wishlist' ) ) ?></a>
-		            </div>
-	            <?php endif; ?>
+							<?php endif; ?>
 
-	            <?php if ( $is_user_owner && $show_ask_estimate_button && $count > 0 ): ?>
-		            <div class="ask-an-estimate-button-container">
-	                    <a href="<?php echo ( $additional_info || ! is_user_logged_in() ) ? '#ask_an_estimate_popup' : $ask_estimate_url ?>" class="btn button ask-an-estimate-button" <?php echo ( $additional_info ) ? 'data-rel="prettyPhoto[ask_an_estimate]"' : '' ?> >
-	                    <?php echo apply_filters( 'yith_wcwl_ask_an_estimate_icon', '<i class="fa fa-shopping-cart"></i>' )?>
-	                    <?php echo apply_filters( 'yith_wcwl_ask_an_estimate_text', __( 'Ask for an estimate', 'yith-woocommerce-wishlist' ) ) ?>
-	                </a>
-		            </div>
-	            <?php endif; ?>
+							<!-- Remove from wishlist -->
+							<?php
+							if ( $repeat_remove_button ) :
+								/**
+								 * APPLY_FILTERS: yith_wcwl_remove_product_wishlist_message_title
+								 *
+								 * Filter the title of the button to remove the product from the wishlist.
+								 *
+								 * @param string $title Button title
+								 *
+								 * @return string
+								 */
+								?>
+								<a href="<?php echo esc_url( $item->get_remove_url() ); ?>" class="remove_from_wishlist button" title="<?php echo esc_html( apply_filters( 'yith_wcwl_remove_product_wishlist_message_title', __( 'Remove this product', 'yith-woocommerce-wishlist' ) ) ); ?>"><?php esc_html_e( 'Remove', 'yith-woocommerce-wishlist' ); ?></a>
+							<?php endif; ?>
 
-		        <?php
-		        do_action( 'yith_wcwl_before_wishlist_share' );
+							<?php
+							/**
+							 * DO_ACTION: yith_wcwl_table_after_product_cart
+							 *
+							 * Allows to render some content or fire some action after the product cart in the wishlist table.
+							 *
+							 * @param YITH_WCWL_Wishlist_Item $item     Wishlist item object
+							 * @param YITH_WCWL_Wishlist      $wishlist Wishlist object
+							 */
+							do_action( 'yith_wcwl_table_after_product_cart', $item, $wishlist );
+							?>
+						</td>
+					<?php endif; ?>
 
-		        if ( is_user_logged_in() && $is_user_owner && ! $is_private && $share_enabled ){
-			        yith_wcwl_get_template( 'share.php', $share_atts );
-		        }
+					<?php if ( $enable_drag_n_drop ) : ?>
+						<td class="product-arrange ">
+							<i class="fa fa-arrows"></i>
+							<input type="hidden" name="items[<?php echo esc_attr( $item->get_product_id() ); ?>][position]" value="<?php echo esc_attr( $item->get_position() ); ?>"/>
+						</td>
+					<?php endif; ?>
+				</tr>
+				<?php
+			endif;
+		endforeach;
+	else :
+		?>
+		<tr>
+			<?php
+			/**
+			 * APPLY_FILTERS: yith_wcwl_no_product_to_remove_message
+			 *
+			 * Filter the message shown when there are no products in the wishlist.
+			 *
+			 * @param string             $message  Message
+			 * @param YITH_WCWL_Wishlist $wishlist Wishlist object
+			 *
+			 * @return string
+			 */
+			?>
+			<td colspan="<?php echo esc_attr( $column_count ); ?>" class="wishlist-empty"><?php echo esc_html( apply_filters( 'yith_wcwl_no_product_to_remove_message', __( 'No products added to the wishlist', 'yith-woocommerce-wishlist' ), $wishlist ) ); ?></td>
+		</tr>
+		<?php
+	endif;
 
-		        do_action( 'yith_wcwl_after_wishlist_share' );
-		        ?>
-	        </td>
-        </tr>
-        </tfoot>
+	if ( ! empty( $page_links ) ) :
+		?>
+		<tr class="pagination-row wishlist-pagination">
+			<td colspan="<?php echo esc_attr( $column_count ); ?>">
+				<?php echo wp_kses_post( $page_links ); ?>
+			</td>
+		</tr>
+	<?php endif ?>
+	</tbody>
 
-    </table>
-
-    <?php wp_nonce_field( 'yith_wcwl_edit_wishlist_action', 'yith_wcwl_edit_wishlist' ); ?>
-
-    <?php if( ! $is_default ): ?>
-        <input type="hidden" value="<?php echo $wishlist_token ?>" name="wishlist_id" id="wishlist_id">
-    <?php endif; ?>
-
-    <?php do_action( 'yith_wcwl_after_wishlist' ); ?>
-
-</form>
-
-<?php do_action( 'yith_wcwl_after_wishlist_form', $wishlist_meta ); ?>
-
-<?php if( $show_ask_estimate_button && ( ! is_user_logged_in() || $additional_info ) ): ?>
-	<div id="ask_an_estimate_popup">
-		<form action="<?php echo $ask_estimate_url ?>" method="post" class="wishlist-ask-an-estimate-popup">
-			<?php if( ! is_user_logged_in() ): ?>
-				<label for="reply_email"><?php echo apply_filters( 'yith_wcwl_ask_estimate_reply_mail_label', __( 'Your email', 'yith-woocommerce-wishlist' ) ) ?></label>
-				<input type="email" value="" name="reply_email" id="reply_email">
-			<?php endif; ?>
-			<?php if( ! empty( $additional_info_label ) ):?>
-				<label for="additional_notes"><?php echo esc_html( $additional_info_label ) ?></label>
-			<?php endif; ?>
-			<textarea id="additional_notes" name="additional_notes"></textarea>
-
-			<button class="btn button ask-an-estimate-button ask-an-estimate-button-popup" >
-				<?php echo apply_filters( 'yith_wcwl_ask_an_estimate_icon', '<i class="fa fa-shopping-cart"></i>' )?>
-				<?php echo apply_filters( 'yith_wcwl_ask_an_estimate_text', __( 'Ask for an estimate', 'yith-woocommerce-wishlist' ) ) ?>
-			</button>
-		</form>
-	</div>
-<?php endif; ?>
+</table>

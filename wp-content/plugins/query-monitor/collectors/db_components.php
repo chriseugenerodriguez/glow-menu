@@ -1,45 +1,53 @@
-<?php
-/*
-Copyright 2009-2016 John Blackbourn
+<?php declare(strict_types = 1);
+/**
+ * Database query calling component collector.
+ *
+ * @package query-monitor
+ */
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
-
-class QM_Collector_DB_Components extends QM_Collector {
+/**
+ * @extends QM_DataCollector<QM_Data_DB_Components>
+ */
+class QM_Collector_DB_Components extends QM_DataCollector {
 
 	public $id = 'db_components';
 
-	public function name() {
-		return __( 'Queries by Component', 'query-monitor' );
+	public function get_storage(): QM_Data {
+		return new QM_Data_DB_Components();
 	}
 
+	/**
+	 * @return void
+	 */
 	public function process() {
+		/** @var QM_Collector_DB_Queries|null $dbq */
+		$dbq = QM_Collectors::get( 'db_queries' );
 
-		if ( $dbq = QM_Collectors::get( 'db_queries' ) ) {
-			if ( isset( $dbq->data['component_times'] ) ) {
-				$this->data['times'] = $dbq->data['component_times'];
-				usort( $this->data['times'], 'QM_Collector::sort_ltime' );
-			}
-			if ( isset( $dbq->data['types'] ) ) {
-				$this->data['types'] = $dbq->data['types'];
-			}
+		if ( $dbq ) {
+			/** @var QM_Data_DB_Queries $dbq_data */
+			$dbq_data = $dbq->get_data();
+
+			$this->data->times = $dbq_data->component_times;
+			QM_Util::rsort( $this->data->times, 'ltime' );
+
+			$this->data->types = $dbq_data->types;
 		}
 
 	}
 
 }
 
+/**
+ * @param array<string, QM_Collector> $collectors
+ * @param QueryMonitor $qm
+ * @return array<string, QM_Collector>
+ */
 function register_qm_collector_db_components( array $collectors, QueryMonitor $qm ) {
-	$collectors['db_components'] = new QM_Collector_DB_Components;
+	$collectors['db_components'] = new QM_Collector_DB_Components();
 	return $collectors;
 }
 

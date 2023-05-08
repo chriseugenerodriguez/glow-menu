@@ -1,10 +1,23 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
+/**
+ * Allows viewing posts on the frontend when the user is not logged in.
+ *
+ * @package automattic/jetpack
+ */
+
+// phpcs:disable WordPress.Security.NonceVerification.Recommended -- This is _implementing_ cross-site nonce handling, no need for WordPress's nonces.
 
 /**
  * Allows viewing posts on the frontend when the user is not logged in.
  */
 class Jetpack_Frame_Nonce_Preview {
-	static $instance = null;
+	/**
+	 * Static instance.
+	 *
+	 * @todo This should be private.
+	 * @var self
+	 */
+	public static $instance = null;
 
 	/**
 	 * Returns the single instance of the Jetpack_Frame_Nonce_Preview object
@@ -14,20 +27,25 @@ class Jetpack_Frame_Nonce_Preview {
 	 * @return Jetpack_Frame_Nonce_Preview
 	 **/
 	public static function get_instance() {
-		if ( ! is_null( self::$instance ) ) {
-			return self::$instance;
+		if ( null === self::$instance ) {
+			self::$instance = new Jetpack_Frame_Nonce_Preview();
 		}
 
-		return self::$instance = new Jetpack_Frame_Nonce_Preview();
+		return self::$instance;
 	}
 
-	function __construct() {
+	/**
+	 * Constructor.
+	 *
+	 * @todo This should be private.
+	 */
+	public function __construct() {
 		if ( isset( $_GET['frame-nonce'] ) && ! is_admin() ) {
 			add_filter( 'pre_get_posts', array( $this, 'maybe_display_post' ) );
 		}
 
-		// autosave previews are validated differently
-		if ( isset( $_GET[ 'frame-nonce' ] ) && isset( $_GET[ 'preview_id' ] ) && isset( $_GET[ 'preview_nonce' ] ) ) {
+		// autosave previews are validated differently.
+		if ( isset( $_GET['frame-nonce'] ) && isset( $_GET['preview_id'] ) && isset( $_GET['preview_nonce'] ) ) {
 			remove_action( 'init', '_show_post_preview' );
 			add_action( 'init', array( $this, 'handle_autosave_nonce_validation' ) );
 		}
@@ -41,11 +59,10 @@ class Jetpack_Frame_Nonce_Preview {
 	 * @return bool
 	 */
 	public function is_frame_nonce_valid() {
-		if ( empty( $_GET[ 'frame-nonce' ] ) ) {
+		if ( empty( $_GET['frame-nonce'] ) ) {
 			return false;
 		}
 
-		Jetpack::load_xml_rpc_client();
 		$xml = new Jetpack_IXR_Client();
 		$xml->query( 'jetpack.verifyFrameNonce', sanitize_key( $_GET['frame-nonce'] ) );
 
@@ -61,8 +78,7 @@ class Jetpack_Frame_Nonce_Preview {
 	 *
 	 * @since 4.3.0
 	 *
-	 * @param WP_Query $query
-	 *
+	 * @param WP_Query $query Query.
 	 * @return WP_Query
 	 */
 	public function maybe_display_post( $query ) {
@@ -82,8 +98,7 @@ class Jetpack_Frame_Nonce_Preview {
 	 *
 	 * @since 4.3.0
 	 *
-	 * @param array $posts
-	 *
+	 * @param array $posts Posts.
 	 * @return array
 	 */
 	public function set_post_to_publish( $posts ) {
@@ -106,11 +121,10 @@ class Jetpack_Frame_Nonce_Preview {
 	 * Handle validation for autosave preview request
 	 *
 	 * @since 4.7.0
-	 *
 	 */
 	public function handle_autosave_nonce_validation() {
 		if ( ! $this->is_frame_nonce_valid() ) {
-			wp_die( __( 'Sorry, you are not allowed to preview drafts.', 'jetpack' ) );
+			wp_die( esc_html__( 'Sorry, you are not allowed to preview drafts.', 'jetpack' ) );
 		}
 		add_filter( 'the_preview', '_set_preview' );
 	}

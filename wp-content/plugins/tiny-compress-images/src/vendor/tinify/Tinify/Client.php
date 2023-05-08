@@ -20,6 +20,17 @@ class Client {
     }
 
     function __construct($key, $appIdentifier = NULL, $proxy = NULL) {
+        $curl = curl_version();
+
+        if (!($curl["features"] & CURL_VERSION_SSL)) {
+            throw new ClientException("Your curl version does not support secure connections");
+        }
+
+        if ($curl["version_number"] < 0x071201) {
+            $version = $curl["version"];
+            throw new ClientException("Your curl version ${version} is outdated; please upgrade to 7.18.1 or higher");
+        }
+
         $userAgent = join(" ", array_filter(array(self::userAgent(), $appIdentifier)));
 
         $this->options = array(
@@ -101,10 +112,22 @@ class Client {
                 curl_close($request);
 
                 $headers = self::parseHeaders(substr($response, 0, $headerSize));
-                $body = substr($response, $headerSize);
+                $responseBody = substr($response, $headerSize);
 
                 if (isset($headers["compression-count"])) {
                     Tinify::setCompressionCount(intval($headers["compression-count"]));
+                }
+
+                if ( isset( $headers["compression-count-remaining"] ) ) {
+                    Tinify::setRemainingCredits( intval( $headers["compression-count-remaining"] ) );
+                }
+
+                if ( isset( $headers["paying-state"] ) ) {
+                    Tinify::setPayingState( $headers["paying-state"] );
+                }
+
+                if ( isset( $headers["email-address"] ) ) {
+                    Tinify::setEmailAddress( $headers["email-address"] );
                 }
 
                 $isJson = false;
@@ -121,8 +144,8 @@ class Client {
 
                 if ($isJson || $isError) {
                     /* Parse JSON bodies, always interpret errors as JSON. */
-                    $body = json_decode($body);
-                    if (!$body) {
+                    $responseBody = json_decode($responseBody);
+                    if (!$responseBody) {
                         $message = sprintf("Error while parsing response: %s (#%d)",
                             PHP_VERSION_ID >= 50500 ? json_last_error_msg() : "Error",
                             json_last_error());
@@ -133,10 +156,15 @@ class Client {
 
                 if ($isError) {
                     if ($retries > 0 && $status >= 500) continue;
-                    throw Exception::create($body->message, $body->error, $status);
+                    /* When the key doesn't exist a 404 response is given. */
+                    if ($status == 404) {
+                        throw Exception::create(null, null, $status);
+                    } else {
+                        throw Exception::create($responseBody->message, $responseBody->error, $status);
+                    }
                 }
 
-                return (object) array("body" => $body, "headers" => $headers);
+                return (object) array("body" => $responseBody, "headers" => $headers);
             } else {
                 $message = sprintf("%s (#%d)", curl_error($request), curl_errno($request));
                 curl_close($request);

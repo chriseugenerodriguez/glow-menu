@@ -28,7 +28,7 @@
 
 /* repeatable */
 .form-table.meta_box .meta_box_repeatable {
-	width:510px;
+	width:100%;
 }
 .form-table.meta_box .meta_box_repeatable th {
 	width:auto !important;
@@ -37,6 +37,7 @@
 	text-transform:uppercase;
 	font-size:10px;
 	text-shadow:none;
+	color:#ccc;
 }
 
 .form-table.meta_box .meta_box_repeatable tfoot th {
@@ -48,7 +49,7 @@
 	vertical-align:top;
 	padding:10px;
 	border-bottom:1px dashed #ccc;
-	background:#eee;
+	background:#fbfbfb;
 }
 
 .form-table.meta_box .meta_box_repeatable tr:nth-child(even) td {
@@ -115,6 +116,7 @@
 	/*background:url(../images/sprite.png);*/
 	margin-top:5px;
 	text-decoration:none;
+	cursor: pointer !important;
 }
 
 .meta_box_repeatable_add {
@@ -160,7 +162,11 @@
 
 /* Select */
 .form-table select {
-	width:25em;
+	width:auto;
+}
+
+.chosen-container-multi {
+	width: 95% !important;
 }
 
 .widget-content .meta_box_repeatable select {
@@ -215,7 +221,7 @@
 /**
  * Repeatable Row Styles
  */
-.form-table.meta_box .meta_box_repeatable_row {
+.meta_box_repeatable .meta_box_repeatable_row {
 	width:100%;
 }
 .form-table.meta_box .meta_box_repeatable_row td * {
@@ -228,18 +234,18 @@
 	display:block;
 	float: left;
 	padding: 5px;
-	min-height: 60px;
+	/*min-height: 60px;*/
 }
 .form-table.meta_box .meta_box_repeatable_row select/*,
 .form-table.meta_box .meta_box_repeatable_row textarea */ {
 	max-width: 120px;
 	width:120px;
-}
+}/*
 .form-table.meta_box .meta_box_repeatable_row .small-text{
 	max-width: 280px;
     width: 280px;
     height: 28px;
-}
+}*/
 .form-table.meta_box .meta_box_repeatable_row input[type=radio],
 .form-table.meta_box .meta_box_repeatable_row input[type=checkbox] {
 	float: left;
@@ -250,22 +256,28 @@
 	line-height:inherit;
 	float:none;
 }
-.form-table.meta_box .meta_box_repeatable_row .description {
+.meta_box_repeatable .description {
 	font-size:11px;
 	font-weight:300;
 }
-.form-table.meta_box .meta_box_repeatable_row  .meta_box_repeatable_remove,
-.form-table.meta_box .meta_box_repeatable_row .ui-sortable-handle {
-	color:#ccc;
+.meta_box_repeatable .meta_box_repeatable_remove,
+.meta_box_repeatable .ui-sortable-handle {
 	border: none;
 }
-.form-table.meta_box .meta_box_repeatable_row  .meta_box_repeatable_remove:hover {
+.meta_box_repeatable .meta_box_repeatable_remove:hover,
+.meta_box_repeatable .ui-sortable-handle:hover {
+	cursor:move;
+}
+.meta_box_repeatable .meta_box_repeatable_remove{
+	color:#ccc;
+}
+.meta_box_repeatable .meta_box_repeatable_remove:hover {
 	color:#cc0000;
 }
-.form-table.meta_box .meta_box_repeatable_row .ui-sortable-handle:hover {
+.meta_box_repeatable .ui-sortable-handle:hover {
 	color:#333;
 }
-.form-table.meta_box .meta_box_repeatable_row .dashicons {
+.meta_box_repeatable .dashicons {
 	font-size:14px;
 	width: 14px;
     height: 14px;
@@ -497,6 +509,12 @@
   margin-bottom: -16px;
 }
 
+/* Criteria fields */
+.criteria_fields {
+	float: left;
+	margin-right: 10px !important;
+}
+	
 /* Custom */
 #schema_article {
 	display: none;
@@ -508,9 +526,15 @@
 	margin-bottom: 20px;
 	display: block;
 }
-
+#_schema_review_pros-repeatable input,
+#_schema_review_cons-repeatable input {
+	float:left;
+}
+.form-table.meta_box .meta_box_repeatable td * {
+	margin:0;
+}
 /* Remove "+ Add New Category" */
-#category-adder {
+.post-type-schema .taxonomy-add-new {
 	display:none;
 }
 

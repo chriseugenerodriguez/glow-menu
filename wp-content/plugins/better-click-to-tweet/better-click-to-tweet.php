@@ -1,20 +1,30 @@
 <?php
-/*
-Plugin Name: Better Click To Tweet
-Description: Add Click to Tweet boxes simply and elegantly to your posts or pages. All the features of a premium plugin, for FREE!
-Version: 5.2.1
-Author: Ben Meredith
-Author URI: https://www.wpsteward.com
-Plugin URI: https://wordpress.org/plugins/better-click-to-tweet/
-License: GPL2
-Text Domain: better-click-to-tweet 
-*/
+/**
+ * Plugin Name: Better Click To Tweet
+ * Description: Add Click to Tweet boxes simply and elegantly to your posts or pages. All the features of a premium plugin, for FREE!
+ * Version: 5.12.0
+ * Author: Ben Meredith
+ * Author URI: https://www.betterclicktotweet.com
+ * Plugin URI: https://wordpress.org/plugins/better-click-to-tweet/
+ * License: GPL2
+ * Text Domain: better-click-to-tweet
+**/
+
+defined( 'ABSPATH' ) or die( "No soup for you. You leave now." );
+
+define ( 'BCTT_VERSION', '5.12.0' );
+
 include 'i18n-module.php';
+include 'bctt-admin.php';
 include 'bctt_options.php';
 include 'bctt-i18n.php';
 include 'admin-nags.php';
 
-defined( 'ABSPATH' ) or die( "No soup for you. You leave now." );
+// @since 5.7.0
+include 'includes/updater/bctt-updater.php';
+include 'includes/updater/license-page.php';
+include 'includes/misc-functions.php';
+include 'bctt-welcome-functions.php';
 
 /*
 *  	Strips the html, shortens the text (after checking for mb_internal_encoding compatibility) 
@@ -82,11 +92,12 @@ function bctt_shorten( $input, $length, $ellipsis = true, $strip_html = true ) {
 */
 
 function bctt_shortcode( $atts ) {
+	$twitter_handle = get_option( 'bctt-twitter-handle' );
 
 	$atts = shortcode_atts( apply_filters( 'bctt_atts', array(
-		'tweet'    => '',
+		'tweet'    => !empty( get_the_ID() ) ? get_the_title( get_the_ID() ) : '',
 		'via'      => 'yes',
-		'username' => 'not-a-real-user',
+		'username' => $twitter_handle ? $twitter_handle : 'not-a-real-user',
 		'url'      => 'yes',
 		'nofollow' => 'no',
 		'prompt'   => sprintf( _x( 'Click To Tweet', 'Text for the box on the reader-facing box', 'better-click-to-tweet' ) )
@@ -134,17 +145,17 @@ function bctt_shortcode( $atts ) {
 
 	if ( filter_var( $atts['url'], FILTER_VALIDATE_URL ) ) {
 
-		$bcttURL = $atts['url'];
+		$bcttURL = apply_filters( 'bctturl', $atts['url'], $atts );
 
 	} elseif ( $atts['url'] != 'no' ) {
 
 		if ( get_option( 'bctt-short-url' ) != false ) {
 
-			$bcttURL  = wp_get_shortlink();
+			$bcttURL  = apply_filters( 'bctturl', wp_get_shortlink(), $atts );
 
 		} else {
 
-			$bcttURL = get_permalink();
+			$bcttURL = apply_filters( 'bctturl', get_permalink(), $atts);
 
 		}
 
@@ -156,21 +167,21 @@ function bctt_shortcode( $atts ) {
 
 	if ( $atts['url'] != 'no' ) {
 
-		$short = bctt_shorten( $text, ( 117 - ( $handle_length ) ) );
+		$short = bctt_shorten( $text, ( 253 - ( $handle_length ) ) );
 
 	} else {
 
-		$short = bctt_shorten( $text, ( 140 - ( $handle_length ) ) );
+		$short = bctt_shorten( $text, ( 280 - ( $handle_length ) ) );
 
 	}
 
 	if ( $atts['nofollow'] != 'no' ) {
 
-		$rel = "rel='nofollow'";
+		$rel = 'rel="noopener noreferrer nofollow"';
 
 	} else {
 
-		$rel = '';
+		$rel = 'rel="noopener noreferrer"';
 
 	}
 
@@ -179,8 +190,8 @@ function bctt_shortcode( $atts ) {
 	$bctt_button_span_class = apply_filters( 'bctt_button_span_class', 'bctt-ctt-btn' );
 
 
-	$href  = add_query_arg( array(
-		'url'     => $bcttURL,
+	$href  = add_query_arg(  array(
+		'url'     => rawurlencode( $bcttURL ),
 		'text'    => rawurlencode( html_entity_decode( $short ) ),
 		'via'     => $via,
 		'related' => $related,
@@ -212,8 +223,7 @@ add_shortcode( 'bctt', 'bctt_shortcode' );
 
 function bctt_scripts() {
 
-	if ( get_option( 'bctt_disable_css' ) ) {
-		add_option( 'bctt_style_dequeued', true );
+	if ( bctt_is_default_styles_dequeued() ) {
 		foreach ( wp_load_alloptions() as $option => $value ) {
 			if ( strpos( $option, 'bcct_' ) === 0 ) {
 				delete_option( $option );
@@ -223,30 +233,88 @@ function bctt_scripts() {
 		return;
 	}
 
-	$dir = wp_upload_dir();
-
-	$custom = file_exists( $dir['basedir'] . '/bcttstyle.css' );
+	$custom = bctt_is_custom_stylesheet();
 
 	$tag      = $custom ? 'bcct_custom_style' : 'bcct_style';
-	$antitag  = $custom ? 'bcct_style' : 'bcct_custom_style';
-	$location = $custom ? $dir['baseurl'] . '/bcttstyle.css' : plugins_url( 'assets/css/styles.css', __FILE__ );
+	$location = bctt_get_stylesheet_url();
 
 	$version = $custom ? '1.0' : '3.0';
 
 	wp_register_style( $tag, $location, false, $version, 'all' );
 
 	wp_enqueue_style( $tag );
-
-	delete_option( 'bctt_style_dequeued' );
-	add_option( $tag . '_enqueued', true );
-	delete_option( $antitag . '_enqueued' );
-
-
 }
 
 
 add_action( 'wp_enqueue_scripts', 'bctt_scripts', 10 );
 
+/**
+ * Check if default stylesheet must not be enqueued
+ *
+ * @return bool
+ */
+function bctt_is_default_styles_dequeued() {
+	return (bool) get_option( 'bctt_disable_css' );
+}
+
+
+/**
+ * Check if there's a custom stylesheet that will be enqueued
+ */
+function bctt_is_custom_stylesheet() {
+	return file_exists( bctt_get_custom_styles_path() );
+}
+
+/**
+ * Return the BCTT stylesheet URL
+ *
+ * Return custom styles URL if the file exists or the default one otherwise
+ *
+ * @return string
+ */
+function bctt_get_stylesheet_url() {
+	return bctt_is_custom_stylesheet() ? bctt_get_custom_styles_url() : bctt_get_styles_url();
+}
+
+
+/**
+ * Return the custom stylesheet path
+ *
+ * @return string
+ */
+function bctt_get_custom_styles_path() {
+	$dir = wp_upload_dir();
+	return $dir['basedir'] . '/bcttstyle.css';
+}
+
+/**
+ * Return the custom stylesheet URL
+ *
+ * @return string
+ */
+function bctt_get_custom_styles_url() {
+	$dir = wp_upload_dir();
+	return $dir['baseurl'] . '/bcttstyle.css';
+}
+
+/**
+ * Return the default stylesheet path
+ *
+ * @return string
+ */
+function bctt_get_styles_url() {
+	return plugins_url( 'assets/css/styles.css', __FILE__ );
+}
+
+/**
+ * Plugin Activation
+ *
+ * @return void
+ */
+function bctt_on_activation() {
+	set_transient( '_bctt_activation_redirect', 1, 30 );
+}
+register_activation_hook( __FILE__, 'bctt_on_activation' );
 
 /*
  * Delete options and shortcode on uninstall
@@ -271,8 +339,6 @@ function bctt_on_uninstall() {
 
 }
 
-
-
 register_uninstall_hook( __FILE__, 'bctt_on_uninstall' );
 
 function bctt_options_link( $links ) {
@@ -289,3 +355,12 @@ function bctt_options_link( $links ) {
 
 $bcttlink = plugin_basename( __FILE__ );
 add_filter( "plugin_action_links_$bcttlink", 'bctt_options_link' );
+
+/**
+ * Register Block
+ */
+add_action( 'plugins_loaded', function () {
+	if ( function_exists( 'register_block_type' ) ) {
+		require_once( plugin_dir_path( __FILE__ ) . 'assets/block/init.php' );
+	}
+} );

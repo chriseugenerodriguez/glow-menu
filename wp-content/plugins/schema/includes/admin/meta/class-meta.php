@@ -22,7 +22,7 @@ define( 'SCHEMA_CUSTOM_METABOXES_DIR', plugin_dir_url( __FILE__ ) );
  *
  * @return	string									html for the field
  */
-function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
+function schema_wp_custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 	if ( ! ( $field || is_array( $field ) ) )
 		return;
 	
@@ -34,12 +34,19 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 	$placeholder = isset( $field['placeholder'] ) ? $field['placeholder'] : null;
 	$place = isset( $field['place'] ) ? $field['place'] : null;
 	$size = isset( $field['size'] ) ? $field['size'] : 'regular';
+	$class = isset( $field['class'] ) ? $field['class'] : '';
 	$post_type = isset( $field['post_type'] ) ? $field['post_type'] : null;
 	$options = isset( $field['options'] ) ? $field['options'] : null;
 	$settings = isset( $field['settings'] ) ? $field['settings'] : null;
 	$repeatable_fields = isset( $field['repeatable_fields'] ) ? $field['repeatable_fields'] : null;
 	$selectone = isset( $field['selectone'] ) ? $field['selectone'] : __('Select One', 'schema-wp');
 	$sanitizer = isset( $field['sanitizer'] ) ? $field['sanitizer'] : null;
+	$default = isset( $field['default'] ) ? $field['default'] : null;
+	$required = isset( $field['required'] ) ? $field['required'] : null;
+	$min = isset( $field['min'] ) ? $field['min'] : null;
+	$max = isset( $field['max'] ) ? $field['max'] : null;
+	$step = isset( $field['step'] ) ? $field['step'] : null;
+	$multiple = isset( $field['multiple'] ) ? $field['multiple'] : null;
 	
 	// the id and name for each field
 	$id = $name = isset( $field['id'] ) ? $field['id'] : null;
@@ -48,9 +55,13 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 		$id = $repeatable[0] . '_' . $repeatable[1] . '_' . $id;
 	}
 	switch( $type ) {
+		// separator 
+		case 'separator':
+			echo '<div style="height:2px; border-bottom: 1px dashed #ccc;"></div>';
+		break;
 		// opening div
 		case 'div_open':
-			echo '<span id="' . esc_attr( $id ) . '" class="toggle">'.__('Advanced', 'schema-wp').'</span>';
+			echo '<span id="' . esc_attr( $id ) . '" class="toggle">'.__('Advanced', 'schema-wp').' <span class="dashicons dashicons-arrow-down-alt2"></span></span>';
 			echo '</li></ul><span style="clear:both;display:block;"></span><div id="' . esc_attr( $id ) . '_wrap" class="toggle_div"><ul>';
 		break;
 		// closing div
@@ -66,20 +77,22 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 		case 'tel':
 		case 'email':
 		default:
-			echo '<input type="' . $type . '" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="' . esc_attr( $meta ) . '" class="'.$size.'-text" size="30" placeholder="' . $placeholder . '" />
+			//if ( is_array($meta) ) continue; // if $meta has an array, continue to the next case, @since 1.6.9.4 
+			if ( is_array($meta) ) break; // if $meta has an array, take a break, @since 1.7.3 
+			echo '<input type="' . $type . '" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="' . esc_attr( $meta ) . '" class="'.$size.'-text '.$class.'" size="30" placeholder="' . $placeholder . '" />
 					<br />' . $desc;
 		break;
 		case 'url':
-			echo '<input type="' . $type . '" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="' . esc_url( $meta ) . '" class="regular-text" size="30" />
+			echo '<input type="' . $type . '" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" placeholder="' . $placeholder . '" value="' . esc_url( $meta ) . '" class="regular-text '.$class.'" size="30" />
 					<br />' . $desc;
 		break;
 		case 'number':
-			echo '<input type="' . $type . '" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="' . intval( $meta ) . '" class="'.$size.'-text" size="30" />
+			echo '<input type="' . $type . '" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="' . intval( $meta ) . '" class="'.$size.'-text '.$class.'" size="30" />
 					<br />' . $desc;
 		break;
 		// textarea
 		case 'textarea':
-			echo '<textarea name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" placeholder="' . $placeholder . '" cols="60" rows="4">' . esc_textarea( $meta ) . '</textarea>
+			echo '<textarea name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" placeholder="' . $placeholder . '" cols="60" rows="4" class="'.$class.'">' . esc_textarea( $meta ) . '</textarea>
 					<br />' . $desc;
 		break;
 		// editor
@@ -94,7 +107,12 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 		// select, chosen
 		case 'select':
 		case 'chosen':
-			echo '<select name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '"' , $type == 'chosen' ? ' class="chosen"' : '' , isset( $multiple ) && $multiple == true ? ' multiple="multiple"' : '' , '>
+		
+		if ( '' === $meta || array() === $meta ) {
+				$meta = isset($field['default']) ? $field['default'] : '';
+			}
+			
+			echo '<select name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '"' , $type == 'chosen' ? ' class="'.$class.' chosen"' : ' class="'.$class.'"' , isset( $multiple ) && $multiple == true ? ' multiple="multiple"' : '' , '>
 					<option value="">' . $selectone . '</option>'; // Select One
 			foreach ( $options as $option )
 				echo '<option' . selected( $meta, $option['value'], false ) . ' value="' . $option['value'] . '">' . $option['label'] . '</option>';
@@ -115,6 +133,14 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 				echo '<li><input type="checkbox" value="' . $option['value'] . '" name="' . esc_attr( $name ) . '[]" id="' . esc_attr( $id ) . '-' . $option['value'] . '"' , is_array( $meta ) && in_array( $option['value'], $meta ) ? ' checked="checked"' : '' , ' /> 
 						<label for="' . esc_attr( $id ) . '-' . $option['value'] . '">' . $option['label'] . '</label></li>';
 			echo '</ul><p>' . $desc . '</p>';
+		break;
+		// checkbox_group
+		case 'checkbox_group_inline':
+			echo '<ul class="meta_box_items">';
+			foreach ( $options as $option )
+				echo '<input class="'.esc_attr( $option['value'] ).'" type="checkbox" value="' . $option['value'] . '" name="' . esc_attr( $name ) . '[]" id="' . esc_attr( $id ) . '-' . $option['value'] . '"' , is_array( $meta ) && in_array( $option['value'], $meta ) ? ' checked="checked"' : '' , ' /> 
+						<label for="' . esc_attr( $id ) . '-' . $option['value'] . '">' . $option['label'] . '</label><br>';
+			echo '<p>' . $desc . '</p>';
 		break;
 		// color
 		case 'color':
@@ -141,7 +167,8 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 			foreach ( $posts as $item )
 				echo '<option value="' . $item->ID . '"' . selected( is_array( $meta ) && in_array( $item->ID, $meta ), true, false ) . '>' . $item->post_title . '</option>';
 			$post_type_object = get_post_type_object( $post_type );
-			echo '</select> &nbsp;<span class="description"><a href="' . admin_url( 'edit.php?post_type=' . $post_type . '">Manage ' . $post_type_object->label ) . '</a></span><br />' . $desc;
+			if(isset($post_type_object->label))
+				echo '</select> &nbsp;<span class="description"><a href="' . admin_url( 'edit.php?post_type=' . $post_type . '">Manage ' . $post_type_object->label ) . '</a></span><br />' . $desc;
 		break;
 		// post_checkboxes
 		case 'post_checkboxes':
@@ -164,7 +191,7 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 						if ( is_array( $meta ) ) {
 							$items = explode( ',', $meta[$area['id']] );
 							foreach ( $items as $item ) {
-								$output = $display == 'thumbnail' ? get_the_post_thumbnail( $item, array( 204, 30 ) ) : get_the_title( $item ); 
+								$output = $display == 'thumbnail' ? get_the_post_thumbnail( $item, array( 204, 30 ) ) : wp_filter_nohtml_kses(get_the_title( $item )); 
 								echo '<li id="' . $item . '">' . $output . '</li>';
 							}
 						}
@@ -184,7 +211,7 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 			echo '<ul class="post_drop_sort_source sort_list">
 					<li class="post_drop_sort_area_name">Available ' . $label . '</li>';
 			foreach ( $posts as $item ) {
-				$output = $display == 'thumbnail' ? get_the_post_thumbnail( $item->ID, array( 204, 30 ) ) : get_the_title( $item->ID ); 
+				$output = $display == 'thumbnail' ? get_the_post_thumbnail( $item->ID, array( 204, 30 ) ) : wp_filter_nohtml_kses(get_the_title( $item->ID )); 
 				echo '<li id="' . $item->ID . '">' . $output . '</li>';
 			}
 			echo '</ul>';
@@ -206,24 +233,17 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 		break;
 		// CPT, custom post types
 		case 'cpt':
-		// builtin types needed
-			$builtin = array(
-				'post',
-				'page',
-			);
-			// all CPTs.
-			$cpts = get_post_types( array(
-				'public'   => true,
-				'_builtin' => false
-			) );
-			// merge Builtin types and 'important' CPTs to resulting array to use as argument.
-			$options = array_merge($builtin, $cpts);
+			$options = apply_filters('schema_wp_get_post_types_settings', schema_wp_get_post_types() );
 			echo $desc;
-			echo '<ul class="meta_box_items">';
-			foreach ( $options as $option )
-				echo '<li><input type="checkbox" value="' . $option . '" name="' . esc_attr( $name ) . '['.$option.']" id="' . esc_attr( $id ) . '-' . $option . '"' , is_array( $meta ) && in_array( $option, $meta, true ) ? ' checked="checked"' : '' , ' /> 
-						<label for="' . esc_attr( $id ) . '-' . $option. '">' . $option . '</label></li>';
-			echo '</ul>';
+			if (!empty($options)) {
+				echo '<ul class="meta_box_cpt_items">';
+				foreach ( $options as $option => $info )
+					echo '<li><input type="checkbox" value="' . $option . '" name="' . esc_attr( $name ) . '['.$option.']" id="' . esc_attr( $id ) . '-' . $option . '"' , is_array( $meta ) && in_array( $option, $meta, true ) ? ' checked="checked"' : '' , ' /> 
+						<label for="' . esc_attr( $id ) . '-' . $option. '">' . $info['label'] . '</label></li>';
+				echo '</ul>';
+			} else {
+				echo '';
+			}
 		break;
 		// tax_checkboxes
 		case 'tax_checkboxes':
@@ -244,10 +264,23 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 		break;
 		// slider
 		case 'slider':
-		$value = $meta != '' ? intval( $meta ) : '0';
+			$value = $meta != '' ? intval( $meta ) : '0';
 			echo '<div id="' . esc_attr( $id ) . '-slider"></div>
 				<br />
 				<input type="text" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="' . $value . '" size="5" /> ' . $desc;
+		break;
+		// rating slider
+		case 'sliderrating':
+			$post_id 		= isset($_GET['post']) ? $_GET['post'] : null;
+			$rating_type  	= schema_wp_review_get_rating_type( $post_id ); 
+			$rating_scale 	= schema_wp_review_get_rating_scale( $rating_type ); 
+			$value 			= $meta != '' ? intval( $meta ) : '0';
+			$value        	= schema_wp_review_adjust_rating( $value, $rating_scale );
+		
+			//$value = $meta != '' ? intval( $meta ) : '0';
+			echo '<div id="' . esc_attr( $id ) . '-sliderrating"></div>
+				<br />
+				<input type="text" readonly="readonly" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" class="' . esc_attr( $id ) . '" value="' . $value . '" size="5" />' . $desc;
 		break;
 		// image
 		case 'image':
@@ -299,7 +332,7 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 					if ( ! array_key_exists( $repeatable_field['id'], $meta[$i] ) )
 						$meta[$i][$repeatable_field['id']] = null;
 					echo '<label>' . $repeatable_field['label']  . '</label><p>';
-					echo custom_meta_box_field( $repeatable_field, $meta[$i][$repeatable_field['id']], array( $id, $i ) );
+					echo schema_wp_custom_meta_box_field( $repeatable_field, $meta[$i][$repeatable_field['id']], array( $id, $i ) );
 					echo '</p>';
 				} // end each field
 				echo '</td><td><a class="meta_box_repeatable_remove repeatable-remove" href="#"><span class="dashicons dashicons-dismiss"></span></a></td></tr>';
@@ -346,7 +379,7 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 					//echo '<li><label>' . $repeatable_field['label']  . '</label>';
 					echo '<li><label></label>';
 					//echo '<li>';
-					echo custom_meta_box_field( $repeatable_field, $meta[$i][$repeatable_field['id']], array( $id, $i ) );
+					echo schema_wp_custom_meta_box_field( $repeatable_field, $meta[$i][$repeatable_field['id']], array( $id, $i ) );
 					echo '</li>';
 				} // end each field
 				echo '</td><td><a class="meta_box_repeatable_remove" href="#"><span class="dashicons dashicons-dismiss"></span></a></td></tr>';
@@ -364,10 +397,10 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 			echo '</table>
 				  <p><br />' . $desc . '</p>';
 		break;
+		
 	} //end switch
 		
 }
-
 
 /**
  * Finds any item in any level of an array
@@ -376,16 +409,33 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
  * @param	array	$haystack	an array to search the type in
  *
  * @return	bool				whether or not the type is in the provided array
+ * @since 1.0
  */
-function meta_box_find_field_type( $needle, $haystack ) {
-	foreach ( $haystack as $h )
-		if ( isset( $h['type'] ) && $h['type'] == 'repeatable' )
-			return meta_box_find_field_type( $needle, $h['repeatable_fields'] );
-		elseif ( isset( $h['type'] ) && $h['type'] == 'repeatable_row' )
-			return meta_box_find_field_type( $needle, $h['repeatable_fields'] );
-		elseif ( ( isset( $h['type'] ) && $h['type'] == $needle ) || ( isset( $h['repeatable_type'] ) && $h['repeatable_type'] == $needle ) )
+function schema_wp_meta_box_find_field_type($keySearch, $array) {
+	
+	if ( ! is_array( $array) ) return;
+	
+    foreach ($array as $key => $item) {
+        
+		if ( isset( $key['type'] ) && $key['type'] == 'repeatable' )
+			return schema_wp_meta_box_find_field_type( $keySearch, $key['repeatable_fields'] );
+		elseif ( isset( $key['type'] ) && $key['type'] == 'repeatable_row' )
+			return schema_wp_meta_box_find_field_type( $keySearch, $h['repeatable_fields'] );
+		elseif ( ( isset( $key['type'] ) && $key['type'] == $keySearch ) || ( isset( $key['repeatable_type'] ) && $key['repeatable_type'] == $keySearch ) )
 			return true;
-	return false;
+		
+		// additional check
+		// @since 1.6.9.1
+		if ($key == $keySearch) {
+            return true;
+        } else {
+            if (is_array($item) && schema_wp_meta_box_find_field_type($item, $keySearch)) {
+               return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -402,7 +452,11 @@ function meta_box_find_field_type( $needle, $haystack ) {
  *
  * @return	bool				whether or not the type is in the provided array
  */
-function meta_box_find_repeatable( $needle = 'repeatable', $haystack ) {
+function schema_wp_meta_box_find_repeatable( $needle = 'repeatable', $haystack = array() ) {
+	
+	if ( empty($haystack) ) 
+		return false;
+
 	foreach ( $haystack as $h )
 		if ( isset( $h['type'] ) && $h['type'] == $needle )
 			return true;
@@ -423,7 +477,11 @@ function meta_box_find_repeatable( $needle = 'repeatable', $haystack ) {
  *
  * @return	bool				whether or not the type is in the provided array
  */
-function meta_box_find_repeatable_row( $needle = 'repeatable_row', $haystack ) {
+function schema_wp_meta_box_find_repeatable_row( $needle = 'repeatable_row', $haystack = array() ) {
+	
+	if ( empty($haystack) ) 
+		return false;
+
 	foreach ( $haystack as $h )
 		if ( isset( $h['type'] ) && $h['type'] == $needle )
 			return true;
@@ -433,7 +491,7 @@ function meta_box_find_repeatable_row( $needle = 'repeatable_row', $haystack ) {
 /**
  * sanitize boolean inputs
  */
-function meta_box_santitize_boolean( $string ) {
+function schema_wp_meta_box_santitize_boolean( $string ) {
 	if ( ! isset( $string ) || $string != 1 || $string != true )
 		return false;
 	else
@@ -448,7 +506,7 @@ function meta_box_santitize_boolean( $string ) {
  *
  * @return						a validated string
  */
-function meta_box_sanitize( $string, $function = 'sanitize_text_field' ) {
+function schema_wp_meta_box_sanitize( $string, $function = 'sanitize_text_field' ) {
 	switch ( $function ) {
 		case 'intval':
 			return intval( $string );
@@ -464,8 +522,12 @@ function meta_box_sanitize( $string, $function = 'sanitize_text_field' ) {
 			return is_email( $string );
 		case 'sanitize_title':
 			return sanitize_title( $string );
+		case 'santitize_title_with_dashes':
+			return sanitize_title_with_dashes( $string );
 		case 'santitize_boolean':
 			return santitize_boolean( $string );
+		case 'sanitize_html_class':
+			return sanitize_html_class( $string );
 		case 'no_santitize':
 			return $string;
 		case 'sanitize_text_field':
@@ -483,7 +545,7 @@ function meta_box_sanitize( $string, $function = 'sanitize_text_field' ) {
  *
  * @return	array				new array, fully mapped with the provided arrays
  */
-function meta_box_array_map_r( $func, $meta, $sanitizer ) {
+function schema_wp_meta_box_array_map_r( $func, $meta, $sanitizer ) {
 		
 	$newMeta = array();
 	$meta = array_values( $meta );
@@ -514,7 +576,7 @@ function meta_box_array_map_r( $func, $meta, $sanitizer ) {
 		 */
 		foreach( $array as $arrayKey => $arrayValue )
 			if ( is_array( $arrayValue ) )
-				$array[$arrayKey] = meta_box_array_map_r( $func, $arrayValue, $newSanitizer[$arrayKey] );
+				$array[$arrayKey] = schema_wp_meta_box_array_map_r( $func, $arrayValue, $newSanitizer[$arrayKey] );
 		
 		$array = array_map( $func, $array, $newSanitizer );
 		$newMeta[$key] = array_combine( $keys, array_values( $array ) );
@@ -562,43 +624,61 @@ class Schema_Custom_Add_Meta_Box {
 	function admin_enqueue_scripts() {
 		global $pagenow;
 		if ( in_array( $pagenow, array( 'post-new.php', 'post.php' ) ) && in_array( get_post_type(), $this->page ) ) {
+			
+			// debug
+			//echo'<pre>';print_r($this->fields);echo'</pre>';exit;
+			
 			// js
-			$deps = array( 'jquery' );
-			if ( meta_box_find_field_type( 'date', $this->fields ) )
+			$deps = array( 'jquery' ); 
+			if ( schema_wp_meta_box_find_field_type( 'date', $this->fields ) )
 				$deps[] = 'jquery-ui-datepicker';
-			if ( meta_box_find_field_type( 'slider', $this->fields ) )
+			if (  in_array( true, array(
+				schema_wp_meta_box_find_field_type( 'slider', $this->fields ),
+				schema_wp_meta_box_find_field_type( 'sliderrating', $this->fields )
+			) ) ) {
 				$deps[] = 'jquery-ui-slider';
-			if ( meta_box_find_field_type( 'color', $this->fields ) )
+			}
+			if ( schema_wp_meta_box_find_field_type( 'color', $this->fields ) )
 				$deps[] = 'farbtastic';
 			if ( in_array( true, array(
-				meta_box_find_field_type( 'chosen', $this->fields ),
-				meta_box_find_field_type( 'post_chosen', $this->fields )
+				schema_wp_meta_box_find_field_type( 'chosen', $this->fields ),
+				schema_wp_meta_box_find_field_type( 'post_chosen', $this->fields )
 			) ) ) {
-				wp_register_script( 'chosen', SCHEMA_CUSTOM_METABOXES_DIR . '/js/chosen.js', array( 'jquery' ) );
+				wp_register_script( 'chosen', SCHEMA_CUSTOM_METABOXES_DIR . 'js/chosen.js', array( 'jquery' ) );
 				$deps[] = 'chosen';
-				wp_enqueue_style( 'chosen', SCHEMA_CUSTOM_METABOXES_DIR . '/css/chosen.css' );
+				wp_enqueue_style( 'chosen', SCHEMA_CUSTOM_METABOXES_DIR . 'css/chosen.css' );
 			}
 			if ( in_array( true, array( 
-				meta_box_find_field_type( 'date', $this->fields ), 
-				meta_box_find_field_type( 'slider', $this->fields ),
-				meta_box_find_field_type( 'color', $this->fields ),
-				meta_box_find_field_type( 'chosen', $this->fields ),
-				meta_box_find_field_type( 'post_chosen', $this->fields ),
-				meta_box_find_repeatable( 'repeatable', $this->fields ),
-				meta_box_find_repeatable( 'repeatable_row', $this->fields ),
-				meta_box_find_field_type( 'image', $this->fields ),
-				meta_box_find_field_type( 'file', $this->fields )
+				schema_wp_meta_box_find_field_type( 'date', $this->fields ), 
+				schema_wp_meta_box_find_field_type( 'slider', $this->fields ),
+				schema_wp_meta_box_find_field_type( 'sliderrating', $this->fields ),
+				schema_wp_meta_box_find_field_type( 'color', $this->fields ),
+				schema_wp_meta_box_find_field_type( 'chosen', $this->fields ),
+				schema_wp_meta_box_find_field_type( 'post_chosen', $this->fields ),
+				schema_wp_meta_box_find_repeatable( 'repeatable', $this->fields ),
+				schema_wp_meta_box_find_repeatable( 'repeatable_row', $this->fields ),
+				schema_wp_meta_box_find_field_type( 'image', $this->fields ),
+				schema_wp_meta_box_find_field_type( 'file', $this->fields )
 			) ) )
-				wp_enqueue_script( 'meta_box', SCHEMA_CUSTOM_METABOXES_DIR . '/js/scripts.js', $deps );
-				
-			if ( in_array( true, array( 
-				meta_box_find_field_type( 'select', $this->fields )
-			) ) )
-				wp_enqueue_script( 'schema_meta_box', SCHEMA_CUSTOM_METABOXES_DIR . '/js/schema.js', $deps );
+				wp_enqueue_script( 'meta_box', SCHEMA_CUSTOM_METABOXES_DIR . 'js/scripts.js', $deps );
 			
+			// @since 1.7.9.5 
+			// Changed this check...
+			/*	
+			if ( in_array( true, array( 
+				schema_wp_meta_box_find_field_type( 'select', $this->fields )
+			) ) )
+				wp_enqueue_script( 'schema_meta_box', SCHEMA_CUSTOM_METABOXES_DIR . 'js/schema.js', $deps );
+			*/
+			// To this check:
+			//
+			if ( array_key_exists( 'schema_types',  $this->fields ) ) {
+				wp_enqueue_script( 'schema_meta_box', SCHEMA_CUSTOM_METABOXES_DIR . 'js/schema.js', $deps );
+			}
+
 			// Load media uploader required scripts
 			if ( in_array( true, array( 
-				meta_box_find_field_type( 'image', $this->fields )
+				schema_wp_meta_box_find_field_type( 'image', $this->fields )
 				) ) ) {
 				if(function_exists('wp_enqueue_media')) {
             		wp_enqueue_media();
@@ -608,15 +688,15 @@ class Schema_Custom_Add_Meta_Box {
             		wp_enqueue_style('thickbox');
         		}
 			}
-		
+			
 			// css
 			$deps = array();
-			wp_register_style( 'jqueryui', SCHEMA_CUSTOM_METABOXES_DIR . '/css/jqueryui.css' );
-			if ( meta_box_find_field_type( 'date', $this->fields ) || meta_box_find_field_type( 'slider', $this->fields ) )
+			wp_register_style( 'jqueryui', SCHEMA_CUSTOM_METABOXES_DIR . 'css/jqueryui.css' ); 
+			if ( schema_wp_meta_box_find_field_type( 'date', $this->fields ) || schema_wp_meta_box_find_field_type( 'slider', $this->fields ) || schema_wp_meta_box_find_field_type( 'sliderrating', $this->fields ) )
 				$deps[] = 'jqueryui';
-			if ( meta_box_find_field_type( 'color', $this->fields ) )
+			if ( schema_wp_meta_box_find_field_type( 'color', $this->fields ) )
 				$deps[] = 'farbtastic';
-			wp_enqueue_style( 'meta_box', SCHEMA_CUSTOM_METABOXES_DIR . '/css/meta_box.css', $deps );
+			wp_enqueue_style( 'meta_box', SCHEMA_CUSTOM_METABOXES_DIR . 'css/meta_box.css', $deps );
 		}
 	}
 	
@@ -624,10 +704,13 @@ class Schema_Custom_Add_Meta_Box {
 	 * adds scripts to the head for special fields with extra js requirements
 	 */
 	function admin_head() {
-		if ( in_array( get_post_type(), $this->page ) && ( meta_box_find_field_type( 'date', $this->fields ) || meta_box_find_field_type( 'slider', $this->fields ) ) ) {
+		
+		if ( in_array( get_post_type(), $this->page ) && ( schema_wp_meta_box_find_field_type( 'date', $this->fields ) 
+															|| schema_wp_meta_box_find_field_type( 'slider', $this->fields ) 
+															|| schema_wp_meta_box_find_field_type( 'sliderrating', $this->fields ) ) ) {
 		
 			echo '<script type="text/javascript">
-						jQuery(function( $) {';
+						jQuery(function($) {';
 			
 			foreach ( $this->fields as $field ) {
 				switch( $field['type'] ) {
@@ -639,11 +722,12 @@ class Schema_Custom_Add_Meta_Box {
 					break;
 					// slider
 					case 'slider' :
-					$value = get_post_meta( get_the_ID(), $field['id'], true );
-					if ( $value == '' )
-						$value = $field['min'];
-					echo '
+						$value = get_post_meta( get_the_ID(), $field['id'], true );
+						if ( $value == '' )
+							$value = $field['min'];
+						echo '
 							$( "#' . $field['id'] . '-slider" ).slider({
+								range : "min",
 								value: ' . $value . ',
 								min: ' . $field['min'] . ',
 								max: ' . $field['max'] . ',
@@ -653,12 +737,67 @@ class Schema_Custom_Add_Meta_Box {
 								}
 							});';
 					break;
+					// slider rating: Used by the Schema Review extension
+					case 'sliderrating' :
+						$post_id = get_the_ID();
+						$value = get_post_meta( $post_id, $field['id'], true );
+						if ( $value == '' )
+							$value = $field['min'];
+						
+						$_scale 		= schema_wp_get_option( 'schema_review_rating_scale', false );
+						$rating_type  	= schema_wp_review_get_rating_type( $post_id ); 
+						$rating_scale 	= schema_wp_review_get_rating_scale( $rating_type ); 
+						$value			= schema_wp_review_adjust_rating( $value, $rating_scale );
+							
+						echo '
+							$( "#' . $field['id'] . '-sliderrating" ).slider({
+								range : "min",
+								value: ' . $value . ',
+								min: ' . $rating_scale['min'] . ',
+								max: ' . $rating_scale['max'] . ',
+								step: ' . $rating_scale['step'] . ',
+								slide: function( event, ui ) {
+									$( "#' . $field['id'] . '" ).val( ui.value );
+								}
+							});
+							
+							var RatingType = "";
+							var RatingScale = ' . json_encode($_scale) . ';
+							var newBegin = 0;
+							var newEnd   = 0;
+							var newStep  = 0;
+	
+							$("#_schema_review_rating_type").on("change", function() {
+								
+        						var currentVal = parseInt($("#' . $field['id'] . '-sliderrating" ).slider("value")),
+        						RatingType = $("#_schema_review_rating_type").val();
+								
+								var newBegin = parseInt(RatingScale[RatingType]["min"]);
+								var newEnd 	 = parseInt(RatingScale[RatingType]["max"]);
+								var newStep  = parseFloat(RatingScale[RatingType]["step"]);
+    							
+								if ( currentVal > newEnd ) var currentVal = newEnd;
+								
+								
+								var $slide = $("#' . $field['id'] . '-sliderrating" ).slider({
+        							range : "min",
+									value: currentVal,
+        							min: newBegin,
+        							max: newEnd,
+									step: newStep,
+									slide: function( event, ui ) {
+										$( "#' . $field['id'] . '" ).val( ui.value );
+									}
+        						});
+								$slide.slider("value", $slide.slider("value"));
+      						});
+						';
+					break;
 				}
 			}
 			
 			echo '});
-				</script>';
-		
+			</script>';
 		}
 	}
 	
@@ -682,6 +821,9 @@ class Schema_Custom_Add_Meta_Box {
 		echo '<table class="form-table meta_box">';
 		foreach ( $this->fields as $field) {
 			
+			if ( !isset($field['label']) ) 
+				$field['label'] = null;
+			
 			// set tooltip
 			$tip = isset( $field['tip'] ) ? '<span data-tooltip="'.$field['tip'].'"><span class="dashicons dashicons-info"></span></span>' : null;
 			
@@ -693,12 +835,13 @@ class Schema_Custom_Add_Meta_Box {
 					</tr>';
 			}
 			else {
+				$label = isset($field['required']) ? $field['label'] . ' <span class="required">*</span>' : $field['label'];
 				echo '<tr>
-						<th style="width:20%"><label for="' . $field['id'] . '">' . $field['label'] . ' ' . $tip . '</label></th>
+						<th style="width:20%"><label for="' . $field['id'] . '">' . $label . ' ' . $tip . '</label></th>
 						<td>';
 						
 						$meta = get_post_meta( get_the_ID(), $field['id'], true);
-						echo custom_meta_box_field( $field, $meta );
+						echo schema_wp_custom_meta_box_field( $field, $meta );
 						
 				echo     '<td>
 					</tr>';
@@ -711,6 +854,7 @@ class Schema_Custom_Add_Meta_Box {
 	 * saves the captured data
 	 */
 	function save_box( $post_id ) {
+		
 		$post_type = get_post_type();
 		
 		// verify nonce
@@ -722,8 +866,12 @@ class Schema_Custom_Add_Meta_Box {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
 			return $post_id;
 		// check permissions
-		if ( ! current_user_can( 'edit_page', $post_id ) )
-			return $post_id;
+		//if ( ! current_user_can( 'edit_page', $post_id ) )
+			//return $post_id;
+		
+		// debug
+		//if ( isset( $_POST['_schema_review_rating_type'] ) ) echo $_POST['_schema_review_rating_type']; 
+		//echo '<pre>'; print_r($_POST);echo'</pre>'; 
 		
 		// loop through fields and save the data
 		foreach ( $this->fields as $field ) {
@@ -749,9 +897,9 @@ class Schema_Custom_Add_Meta_Box {
 				} elseif ( isset( $new ) && $new != $old ) {
 					$sanitizer = isset( $field['sanitizer'] ) ? $field['sanitizer'] : 'sanitize_text_field';
 					if ( is_array( $new ) )
-						$new = meta_box_array_map_r( 'meta_box_sanitize', $new, $sanitizer );
+						$new = schema_wp_meta_box_array_map_r( 'schema_wp_meta_box_sanitize', $new, $sanitizer );
 					else
-						$new = meta_box_sanitize( $new, $sanitizer );
+						$new = schema_wp_meta_box_sanitize( $new, $sanitizer );
 					update_post_meta( $post_id, $field['id'], $new );
 				}
 			}*/
@@ -769,12 +917,21 @@ class Schema_Custom_Add_Meta_Box {
 					delete_post_meta( $post_id, $field['id'], $old );
 				} elseif ( isset( $new ) && $new != $old ) {
 					$sanitizer = isset( $field['sanitizer'] ) ? $field['sanitizer'] : 'sanitize_text_field';
-					if ( is_array( $new ) )
-						$new = meta_box_array_map_r( 'meta_box_sanitize', $new, $sanitizer );
+					if ( is_array( $new ) ) 
+						$new = schema_wp_meta_box_array_map_r( 'schema_wp_meta_box_sanitize', $new, $sanitizer );
 					else
-						$new = meta_box_sanitize( $new, $sanitizer );
+						$new = schema_wp_meta_box_sanitize( $new, $sanitizer );
+					
 					if( $field['type'] == 'date') {
 						$new = strtotime($new);
+					}
+					if( $field['type'] == 'sliderrating') {
+						// adjust rating before saving values
+						if (function_exists('schema_wp_review_adjust_rating')) {
+							$rating_type	= schema_wp_review_get_rating_type( $post_id );
+							$scale 			= schema_wp_review_get_rating_scale( $rating_type );
+							$new        	= schema_wp_review_adjust_rating( $new, $scale, true );
+						}
 					}
 
 					update_post_meta( $post_id, $field['id'], $new );

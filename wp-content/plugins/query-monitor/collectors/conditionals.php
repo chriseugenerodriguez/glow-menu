@@ -1,29 +1,37 @@
-<?php
-/*
-Copyright 2009-2016 John Blackbourn
+<?php declare(strict_types = 1);
+/**
+ * Template conditionals collector.
+ *
+ * @package query-monitor
+ */
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
-
-class QM_Collector_Conditionals extends QM_Collector {
+/**
+ * @extends QM_DataCollector<QM_Data_Conditionals>
+ */
+class QM_Collector_Conditionals extends QM_DataCollector {
 
 	public $id = 'conditionals';
 
-	public function name() {
-		return __( 'Conditionals', 'query-monitor' );
+	public function get_storage(): QM_Data {
+		return new QM_Data_Conditionals();
 	}
 
+	/**
+	 * @return void
+	 */
 	public function process() {
 
+		/**
+		 * Allows users to filter the names of conditional functions that are exposed by QM.
+		 *
+		 * @since 2.7.0
+		 *
+		 * @param string[] $conditionals The list of conditional function names.
+		 */
 		$conds = apply_filters( 'qm/collect/conditionals', array(
 			'is_404',
 			'is_admin',
@@ -37,6 +45,7 @@ class QM_Collector_Conditionals extends QM_Collector {
 			'is_date',
 			'is_day',
 			'is_embed',
+			'is_favicon',
 			'is_feed',
 			'is_front_page',
 			'is_home',
@@ -49,6 +58,7 @@ class QM_Collector_Conditionals extends QM_Collector {
 			'is_paged',
 			'is_post_type_archive',
 			'is_preview',
+			'is_privacy_policy',
 			'is_robots',
 			'is_rtl',
 			'is_search',
@@ -63,18 +73,28 @@ class QM_Collector_Conditionals extends QM_Collector {
 			'is_user_admin',
 			'is_year',
 		) );
+
+		/**
+		 * This filter is deprecated. Please use `qm/collect/conditionals` instead.
+		 *
+		 * @since 2.7.0
+		 *
+		 * @param string[] $conditionals The list of conditional function names.
+		 */
 		$conds = apply_filters( 'query_monitor_conditionals', $conds );
 
-		$true = $false = $na = array();
+		$true = array();
+		$false = array();
+		$na = array();
 
 		foreach ( $conds as $cond ) {
 			if ( function_exists( $cond ) ) {
-
-				if ( ( 'is_sticky' === $cond ) and !get_post( $id = null ) ) {
+				$id = null;
+				if ( ( 'is_sticky' === $cond ) && ! get_post( $id ) ) {
 					# Special case for is_sticky to prevent PHP notices
 					$false[] = $cond;
-				} else if ( ! is_multisite() and in_array( $cond, array( 'is_main_network', 'is_main_site' ) ) ) {
-					# Special case for multisite conditionals to prevent them from being annoying on single site installs
+				} elseif ( ! is_multisite() && in_array( $cond, array( 'is_main_network', 'is_main_site' ), true ) ) {
+					# Special case for multisite conditionals to prevent them from being annoying on single site installations
 					$na[] = $cond;
 				} else {
 					if ( call_user_func( $cond ) ) {
@@ -83,19 +103,23 @@ class QM_Collector_Conditionals extends QM_Collector {
 						$false[] = $cond;
 					}
 				}
-
 			} else {
 				$na[] = $cond;
 			}
 		}
-		$this->data['conds'] = compact( 'true', 'false', 'na' );
+		$this->data->conds = compact( 'true', 'false', 'na' );
 
 	}
 
 }
 
+/**
+ * @param array<string, QM_Collector> $collectors
+ * @param QueryMonitor $qm
+ * @return array<string, QM_Collector>
+ */
 function register_qm_collector_conditionals( array $collectors, QueryMonitor $qm ) {
-	$collectors['conditionals'] = new QM_Collector_Conditionals;
+	$collectors['conditionals'] = new QM_Collector_Conditionals();
 	return $collectors;
 }
 

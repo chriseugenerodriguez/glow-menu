@@ -1,8 +1,11 @@
 <?php
 
-include_once('ListTable.php');
+//*****  Check WP_List_Table exists
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
+}
 
-class WPAM_List_Commission_Table extends WPAM_List_Table {
+class WPAM_List_Commission_Table extends WP_List_Table {
 
     function __construct() {
         global $status, $page;
@@ -17,20 +20,24 @@ class WPAM_List_Commission_Table extends WPAM_List_Table {
 
     function column_default($item, $column_name) {
         //Just print the data for that column
-        return $item[$column_name];
+        return esc_attr($item[$column_name]);
     }
 
     function column_transactionId($item) {
         
         //Build row actions
         $actions = array(
-            'delete' => sprintf('<a href="admin.php?page=wpam-commission&delete_rowid=%s" onclick="return confirm(\'Are you sure you want to delete this entry?\')">Delete</a>', $item['transactionId']),
+            'edit' => sprintf('<a href="admin.php?page=wpam-commission&action=edit-commission&edit_rowid=%s">Edit</a>', esc_attr($item['transactionId'])),
+            'delete' => sprintf('<a href="%s" onclick="return confirm(\'Are you sure you want to delete this entry?\')">Delete</a>', esc_url(admin_url(wp_nonce_url('admin.php?page=wpam-commission&delete_rowid='.$item['transactionId'], 'wpam-delete-commission')))),
         );
 
         //Return the id column contents
-        return $item['transactionId'] . $this->row_actions($actions);
+        return esc_attr($item['transactionId']) . $this->row_actions($actions);
     }
 
+    function column_affiliateId($item) {
+        return sprintf('<a href="admin.php?page=wpam-affiliates&viewDetail=%1$s">%2$s</a>', esc_attr($item['affiliateId']), esc_html($item['affiliateId']));
+    }
 
     /* Custom column output - only use if you have some columns that needs custom output */
 //    function column_<name_of_column>($item) {//Outputs the thubmnail image the way we want it
@@ -43,7 +50,7 @@ class WPAM_List_Commission_Table extends WPAM_List_Table {
     /* overridden function to show a custom message when no records are present */
 
     function no_items() {
-        echo '<br />No Commission Data Found!';
+        echo '<br />'.__('No Commission Data Found!', 'affiliates-manager');
     }
 
     function column_cb($item) {
@@ -77,7 +84,7 @@ class WPAM_List_Commission_Table extends WPAM_List_Table {
 
     function get_bulk_actions() {
         $actions = array(
-            'delete' => 'Delete'
+            'delete' => __('Delete', 'affiliates-manager')
         );
         return $actions;
     }
@@ -85,10 +92,20 @@ class WPAM_List_Commission_Table extends WPAM_List_Table {
     function process_bulk_action() {
         //Detect when a bulk action is being triggered... //print_r($_GET);  
         if ('delete' === $this->current_action()) {
+            $nonce = '';
+            if(isset($_REQUEST['_wpnonce'])){
+                $nonce = sanitize_text_field($_REQUEST['_wpnonce']);
+            }
+            else{
+                wp_die(__('Error! Nonce is not present! Go to the Commissions page to delete the commission.', 'affiliates-manager'));
+            }
+            if(!wp_verify_nonce($nonce, 'bulk-'.$this->_args['plural'])){
+                wp_die(__('Error! Nonce Security Check Failed! Go to the Commissions page to delete the commission.', 'affiliates-manager'));
+            }
             $nvp_key = $this->_args['singular'];
-            $records_to_delete = $_GET[$nvp_key];
+            $records_to_delete = isset($_GET[$nvp_key]) ? $_GET[$nvp_key] : '';
             if (empty($records_to_delete)) {
-                echo '<div id="message" class="updated fade"><p>' . __('Error! You need to select multiple records to perform a bulk action!', 'affiliates-manager') . '</p></div>';
+                echo '<div id="message" class="updated fade"><p>' . __('Error! You need to select records to perform a bulk action!', 'affiliates-manager') . '</p></div>';
                 return;
             }
             global $wpdb;
@@ -105,6 +122,10 @@ class WPAM_List_Commission_Table extends WPAM_List_Table {
 
         if (isset($_REQUEST['page']) && 'wpam-commission' == $_REQUEST['page']) {
             if (isset($_REQUEST['delete_rowid'])) { //delete a transaction record
+                $nonce = isset($_REQUEST['_wpnonce']) ? sanitize_text_field($_REQUEST['_wpnonce']) : '';
+                if(!wp_verify_nonce($nonce, 'wpam-delete-commission')){
+                    wp_die(__('Error! Nonce Security Check Failed! Go to the Commissions page to delete the commission.', 'affiliates-manager'));
+                }
                 $row_id = esc_sql($_REQUEST['delete_rowid']);
                 if(!is_numeric($row_id)){
                     return;
@@ -131,12 +152,25 @@ class WPAM_List_Commission_Table extends WPAM_List_Table {
         $this->process_bulk_action();
 
         // This checks for sorting input and sorts the data.
-        $orderby_column = isset($_GET['orderby']) ? $_GET['orderby'] : '';
-        $sort_order = isset($_GET['order']) ? $_GET['order'] : '';
+        $orderby_column = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : '';
+        if("dateCreated" == $orderby_column){
+            $orderby_column = "dateCreated";
+        }
+        else{
+            $orderby_column = "transactionId";
+        }
+        $sort_order = isset($_GET['order']) ? sanitize_text_field($_GET['order']) : '';
+        if("asc" == $sort_order){
+            $sort_order = "ASC";
+        }
+        else{
+            $sort_order = "DESC";
+        }
+        /*
         if (empty($orderby_column)) {
             $orderby_column = "transactionId";
             $sort_order = "DESC";
-        }
+        }*/
         global $wpdb;
         $records_table_name = WPAM_TRANSACTIONS_TBL; //The table to query
         

@@ -62,6 +62,7 @@ class Search_Live_Thumbnail {
 
 	/**
 	 * Returns the current size name for search result thumbnails.
+	 *
 	 * @return string
 	 */
 	public static function thumbnail_size_name() {
@@ -74,10 +75,11 @@ class Search_Live_Thumbnail {
 	/**
 	 * Obtains or generates the thumbnail image if the search-live-thumbnail
 	 * size is requested.
-	 * 
+	 *
 	 * @param boolean $foo false
 	 * @param int $id
 	 * @param string $size
+	 *
 	 * @return array|boolean image result as array or false if it couldn't be obtained/generated
 	 */
 	public static function image_downsize( $foo, $id, $size ) {
@@ -93,7 +95,7 @@ class Search_Live_Thumbnail {
 
 			if ( !empty( $size ) && wp_attachment_is_image( $id ) ) {
 				$regenerate = false;
-				// Do we have the appropriate size? 
+				// Do we have the appropriate size?
 				if ( $intermediate = image_get_intermediate_size( $id, $size ) ) {
 					$img_url = $intermediate['url'];
 					if ( empty( $img_url ) && !empty( $intermediate['file'] ) ) {
@@ -143,7 +145,7 @@ class Search_Live_Thumbnail {
 
 				// Generate the thumbnail image if
 				// a) there was no result which means no thumbnail has been generated yet
-				// b) the dimensions are off and we're getting an image that is similar in size but not matching what we need 
+				// b) the dimensions are off and we're getting an image that is similar in size but not matching what we need
 				if ( !$result || $regenerate ) {
 					$meta = wp_get_attachment_metadata( $id );
 					$upload_dir = wp_upload_dir();
@@ -177,7 +179,7 @@ class Search_Live_Thumbnail {
 	/**
 	 * Retrieve the placeholder thumbnail image and its dimensions, or null
 	 * if none should be used.
-	 * 
+	 *
 	 * @return array holding the placeholder URL, width and height in that order or null
 	 */
 	public static function get_placeholder_thumbnail() {

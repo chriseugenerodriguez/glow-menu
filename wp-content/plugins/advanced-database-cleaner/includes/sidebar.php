@@ -1,42 +1,38 @@
-<div>
-	<h2>Advanced Database Cleaner <?php echo ADBC_PLUGIN_VERSION; ?></h2>
-	<p class="aDBc-donation-text"><?php _e('By making a donation, you help me supporting this plugin!', 'advanced-db-cleaner'); ?></p>
-	<br/><a href="http://www.sigmaplugin.com/donation" target="_blank">
-		<p class="aDBc-donation-gif"></p>
-	</a>
-</div>
+<!-- style et code ok -->
+<div class="aDBc-sidebar">
 
-<br/>
+	<div class="aDBc-upgrade">
 
-<div class="aDBc-grey-row">
-	<div class="aDBc-float-left">
-		<span class="aDBc-row-text"><?php _e('Please rate us', 'advanced-db-cleaner'); ?></span>
-	</div>
-	<div class="aDBc-float-right">
-		<a href="https://wordpress.org/support/view/plugin-reviews/advanced-database-cleaner#postform" target="_blank">
-			<p class="aDBc-support-us"></p>
+		<a target="_blank" href="https://sigmaplugin.com/downloads/wordpress-advanced-database-cleaner">
+
+			<img src="<?php echo ADBC_PLUGIN_DIR_PATH; ?>/images/premium.svg" />
+
+			<h3><?php _e( 'Upgrade to Pro', 'advanced-database-cleaner' ); ?></h3>
+
+			<ul>
+
+				<li><span class="dashicons dashicons-yes"></span> <?php _e( 'Filter & search specific items', 'advanced-database-cleaner' ); ?></li>
+
+				<li><span class="dashicons dashicons-yes"></span> <?php _e( 'Detect orphaned options', 'advanced-database-cleaner' ); ?></li>
+
+				<li><span class="dashicons dashicons-yes"></span> <?php _e( 'Detect orphaned tables', 'advanced-database-cleaner' ); ?></li>
+
+				<li><span class="dashicons dashicons-yes"></span> <?php _e( 'Detect orphaned cron tasks', 'advanced-database-cleaner' ); ?></li>
+
+				<li><span class="dashicons dashicons-yes"></span> <?php _e( 'Premium & technical support', 'advanced-database-cleaner' ); ?></li>
+
+			</ul>
+
+			<div>
+
+				<?php echo __( 'The price will increase soon! Buy now at lower price!', 'advanced-database-cleaner' ); ?>
+
+			</div>
+
 		</a>
+
 	</div>
+
 </div>
 
-<div class="aDBc-white-row">
-	<div class="aDBc-float-left">
-		<span class="aDBc-row-text"><?php _e('Having issues?', 'advanced-db-cleaner'); ?></span>
-	</div>
-	<div class="aDBc-float-right">
-		<a class="aDBc-sidebar-link" href="https://wordpress.org/support/plugin/advanced-database-cleaner" target="_blank">
-			<?php echo __('Create a ticket', 'advanced-db-cleaner'); ?>
-		</a>
-	</div>
-</div>
 
-<div class="aDBc-grey-row">
-	<div class="aDBc-float-left">
-		<span class="aDBc-row-text"><?php _e('Developed by:', 'advanced-db-cleaner'); ?></span>
-	</div>
-	<div class="aDBc-float-right">
-		<a class="aDBc-sidebar-link" href="http://www.sigmaplugin.com" target="_blank">
-			- SigmaPlugin -
-		</a>
-	</div>
-</div>

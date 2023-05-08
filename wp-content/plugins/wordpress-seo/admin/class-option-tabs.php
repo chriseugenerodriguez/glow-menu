@@ -1,24 +1,40 @@
 <?php
 /**
+ * WPSEO plugin file.
+ *
  * @package WPSEO\Admin\Options\Tabs
  */
 
 /**
- * Class WPSEO_Option_Tabs
+ * Class WPSEO_Option_Tabs.
  */
 class WPSEO_Option_Tabs {
 
-	/** @var string Tabs base */
+	/**
+	 * Tabs base.
+	 *
+	 * @var string
+	 */
 	private $base;
 
-	/** @var array The tabs in this group */
-	private $tabs = array();
+	/**
+	 * The tabs in this group.
+	 *
+	 * @var array
+	 */
+	private $tabs = [];
 
-	/** @var string Name of the active tab */
+	/**
+	 * Name of the active tab.
+	 *
+	 * @var string
+	 */
 	private $active_tab = '';
 
 	/**
 	 * WPSEO_Option_Tabs constructor.
+	 *
+	 * @codeCoverageIgnore
 	 *
 	 * @param string $base       Base of the tabs.
 	 * @param string $active_tab Currently active tab.
@@ -26,12 +42,13 @@ class WPSEO_Option_Tabs {
 	public function __construct( $base, $active_tab = '' ) {
 		$this->base = sanitize_title( $base );
 
-		$tab              = filter_input( INPUT_GET, 'tab' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reason: We are not processing form information.
+		$tab              = isset( $_GET['tab'] ) && is_string( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : '';
 		$this->active_tab = empty( $tab ) ? $active_tab : $tab;
 	}
 
 	/**
-	 * Get the base
+	 * Get the base.
 	 *
 	 * @return string
 	 */
@@ -40,7 +57,7 @@ class WPSEO_Option_Tabs {
 	}
 
 	/**
-	 * Add a tab
+	 * Add a tab.
 	 *
 	 * @param WPSEO_Option_Tab $tab Tab to add.
 	 *
@@ -53,16 +70,16 @@ class WPSEO_Option_Tabs {
 	}
 
 	/**
-	 * Get active tab
+	 * Get active tab.
 	 *
-	 * @return null|WPSEO_Option_Tab Get the active tab.
+	 * @return WPSEO_Option_Tab|null Get the active tab.
 	 */
 	public function get_active_tab() {
 		if ( empty( $this->active_tab ) ) {
 			return null;
 		}
 
-		$active_tabs = array_filter( $this->tabs, array( $this, 'is_active_tab' ) );
+		$active_tabs = array_filter( $this->tabs, [ $this, 'is_active_tab' ] );
 		if ( ! empty( $active_tabs ) ) {
 			$active_tabs = array_values( $active_tabs );
 			if ( count( $active_tabs ) === 1 ) {
@@ -74,7 +91,7 @@ class WPSEO_Option_Tabs {
 	}
 
 	/**
-	 * Is the tab the active tab
+	 * Is the tab the active tab.
 	 *
 	 * @param WPSEO_Option_Tab $tab Tab to check for active tab.
 	 *
@@ -85,7 +102,7 @@ class WPSEO_Option_Tabs {
 	}
 
 	/**
-	 * Get all tabs
+	 * Get all tabs.
 	 *
 	 * @return WPSEO_Option_Tab[]
 	 */
@@ -94,13 +111,12 @@ class WPSEO_Option_Tabs {
 	}
 
 	/**
-	 * Display the tabs
+	 * Display the tabs.
 	 *
-	 * @param Yoast_Form $yform   Yoast Form needed in the views.
-	 * @param array      $options Options needed in the views.
+	 * @param Yoast_Form $yform Yoast Form needed in the views.
 	 */
-	public function display( Yoast_Form $yform, $options = array() ) {
+	public function display( Yoast_Form $yform ) {
 		$formatter = new WPSEO_Option_Tabs_Formatter();
-		$formatter->run( $this, $yform, $options );
+		$formatter->run( $this, $yform );
 	}
 }

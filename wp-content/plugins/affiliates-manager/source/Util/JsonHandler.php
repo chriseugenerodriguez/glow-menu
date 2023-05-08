@@ -30,7 +30,7 @@ class WPAM_Util_JsonHandler
 		if ( $affiliate->isPending() ) {
 			$userHandler = new WPAM_Util_UserHandler();
 			$userHandler->approveAffiliate( $affiliate, $bountyType, $bountyAmount );
-
+                        do_action('wpam_affiliate_application_approved', $affiliateId);
 			return new JsonResponse( JsonResponse::STATUS_OK );
 		} else {
 			throw new Exception( __( 'Invalid state transition.', 'affiliates-manager' ) );
@@ -61,6 +61,7 @@ class WPAM_Util_JsonHandler
 			}
 			$affiliate->decline();
 			$db->getAffiliateRepository()->update($affiliate);
+                        do_action('wpam_affiliate_application_declined', $affiliateId);
 			return new JsonResponse(JsonResponse::STATUS_OK);
 		}
 		else
@@ -86,6 +87,7 @@ class WPAM_Util_JsonHandler
 		{
 			$affiliate->block();
 			$db->getAffiliateRepository()->update($affiliate);
+                        do_action('wpam_affiliate_application_blocked', $affiliateId);
 			return new JsonResponse(JsonResponse::STATUS_OK);
 		}
 		else
@@ -116,7 +118,7 @@ class WPAM_Util_JsonHandler
 
 		$user = new WP_User($affiliate->userId);
 		$user->add_cap(WPAM_PluginConfig::$AffiliateActiveCap);		
-
+                do_action('wpam_affiliate_application_activated', $affiliateId);
 		return new JsonResponse(JsonResponse::STATUS_OK);
 	}
 	
@@ -140,7 +142,7 @@ class WPAM_Util_JsonHandler
 
 		$user = new WP_User( $affiliate->userId );
 		$user->remove_cap( WPAM_PluginConfig::$AffiliateActiveCap );
-
+                do_action('wpam_affiliate_application_deactivated', $affiliateId);
 		return new JsonResponse(JsonResponse::STATUS_OK);
 	}
 
@@ -174,22 +176,6 @@ class WPAM_Util_JsonHandler
 		return new JsonResponse(JsonResponse::STATUS_OK);
 	}
 
-	public function getPostImageElement($postId)
-	{
-		$imgElement = wp_get_attachment_image_src((int)$postId);
-
-		if (is_array($imgElement))
-		{
-			$response = new JsonResponse(JsonResponse::STATUS_OK);
-			$response->data = $imgElement[0];
-			return $response;
-		}
-		else
-		{
-			return new JsonResponse(JsonResponse::STATUS_ERROR, "No image found.");
-		}
-	}
-
 	public function addTransaction($affiliateId, $type, $amount, $description = NULL)
 	{
 		if (!wp_get_current_user()->has_cap(WPAM_PluginConfig::$AdminCap))
@@ -218,8 +204,13 @@ class WPAM_Util_JsonHandler
 		return new JsonResponse(JsonResponse::STATUS_OK);
 	}
 
-	public function deleteCreative($creativeId)
+	public function deleteCreative($request)
 	{
+                $nonce = isset($request['nonce']) ? sanitize_text_field($request['nonce']) : '';
+                if(!wp_verify_nonce($nonce, 'wpam-delete-creative')){
+                    wp_die(__('Error! Nonce Security Check Failed! Go to the My Creatives page to delete the creative.', 'affiliates-manager'));
+                }
+                $creativeId = sanitize_text_field($request['creativeId']);
 		if (!wp_get_current_user()->has_cap(WPAM_PluginConfig::$AdminCap))
 			throw new Exception( __('Access denied.', 'affiliates-manager' ) );
 		$db = new WPAM_Data_DataAccess();

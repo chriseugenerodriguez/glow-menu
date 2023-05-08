@@ -1,16 +1,17 @@
 <?php
-
 /**
  * Module Name: Shortcode Embeds
- * Module Description: Embed media from popular sites without any coding.
+ * Module Description: Shortcodes are WordPress-specific markup that let you add media from popular sites. This feature is no longer necessary as the editor now handles media embeds rather gracefully.
  * Sort Order: 3
  * First Introduced: 1.1
  * Major Changes In: 1.2
  * Requires Connection: No
- * Auto Activate: Yes
+ * Auto Activate: No
  * Module Tags: Photos and Videos, Social, Writing, Appearance
  * Feature: Writing
- * Additional Search Queries: shortcodes, shortcode, embeds, media, bandcamp, dailymotion, facebook, flickr, google calendars, google maps, google+, polldaddy, recipe, recipes, scribd, slideshare, slideshow, slideshows, soundcloud, ted, twitter, vimeo, vine, youtube
+ * Additional Search Queries: shortcodes, shortcode, embeds, media, bandcamp, dailymotion, facebook, flickr, google calendars, google maps, polldaddy, recipe, recipes, scribd, slideshare, slideshow, slideshows, soundcloud, ted, twitter, vimeo, vine, youtube
+ *
+ * @package automattic/jetpack
  */
 
 /**
@@ -47,7 +48,7 @@ function shortcode_new_to_old_params( $params, $old_format_support = false ) {
 function jetpack_load_shortcodes() {
 	$shortcode_includes = array();
 
-	foreach ( Jetpack::glob_php( dirname( __FILE__ ) . '/shortcodes' ) as $file ) {
+	foreach ( Jetpack::glob_php( __DIR__ . '/shortcodes' ) as $file ) {
 		$filename = substr( basename( $file ), 0, -4 );
 
 		$shortcode_includes[ $filename ] = $file;
@@ -55,6 +56,8 @@ function jetpack_load_shortcodes() {
 
 	/**
 	 * This filter allows other plugins to override which shortcodes Jetpack loads.
+	 *
+	 * Fires as part of the `plugins_loaded` WP hook, so modifying code needs to be in a plugin, not in a theme's functions.php.
 	 *
 	 * @module shortcodes
 	 *
@@ -66,7 +69,7 @@ function jetpack_load_shortcodes() {
 	$shortcode_includes = apply_filters( 'jetpack_shortcodes_to_include', $shortcode_includes );
 
 	foreach ( $shortcode_includes as $include ) {
-		include $include;
+		include_once $include;
 	}
 }
 
@@ -82,10 +85,6 @@ function jetpack_load_shortcodes() {
  * @return string $content    Replaced post content.
  */
 function jetpack_preg_replace_outside_tags( $pattern, $replacement, $content, $search = null ) {
-	if ( ! function_exists( 'wp_html_split' ) ) {
-		return $content;
-	}
-
 	if ( $search && false === strpos( $content, $search ) ) {
 		return $content;
 	}
@@ -93,7 +92,7 @@ function jetpack_preg_replace_outside_tags( $pattern, $replacement, $content, $s
 	$textarr = wp_html_split( $content );
 	unset( $content );
 	foreach ( $textarr as &$element ) {
-		if ( '' === $element || '<' === $element{0} ) {
+		if ( '' === $element || '<' === $element[0] ) {
 			continue;
 		}
 		$element = preg_replace( $pattern, $replacement, $element );
@@ -114,10 +113,6 @@ function jetpack_preg_replace_outside_tags( $pattern, $replacement, $content, $s
  * @return string $content Replaced post content.
  */
 function jetpack_preg_replace_callback_outside_tags( $pattern, $callback, $content, $search = null ) {
-	if ( ! function_exists( 'wp_html_split' ) ) {
-		return $content;
-	}
-
 	if ( $search && false === strpos( $content, $search ) ) {
 		return $content;
 	}
@@ -125,7 +120,7 @@ function jetpack_preg_replace_callback_outside_tags( $pattern, $callback, $conte
 	$textarr = wp_html_split( $content );
 	unset( $content );
 	foreach ( $textarr as &$element ) {
-		if ( '' === $element || '<' === $element{0} ) {
+		if ( '' === $element || '<' === $element[0] ) {
 			continue;
 		}
 		$element = preg_replace_callback( $pattern, $callback, $element );
@@ -139,7 +134,8 @@ if ( ! function_exists( 'jetpack_shortcode_get_wpvideo_id' ) ) {
 	 * Get VideoPress ID from wpvideo shortcode attributes.
 	 *
 	 * @param array $atts Shortcode attributes.
-	 * @return int  $id   VideoPress ID.
+	 *
+	 * @return string|int $id VideoPress ID.
 	 */
 	function jetpack_shortcode_get_wpvideo_id( $atts ) {
 		if ( isset( $atts[0] ) ) {
@@ -184,11 +180,24 @@ function wpcom_shortcodereverse_parseattr( $attrs ) {
 
 	$attrs = shortcode_atts( $defaults, $attrs );
 
-	$attrs['src']    = strip_tags( $attrs['src'] ); // For sanity
-	$attrs['width']  = ( is_numeric( $attrs['width'] ) ) ? abs( intval( $attrs['width'] ) ) : $defaults['width'];
-	$attrs['height'] = ( is_numeric( $attrs['height'] ) ) ? abs( intval( $attrs['height'] ) ) : $defaults['height'];
+	$attrs['src']    = wp_strip_all_tags( $attrs['src'] ); // For sanity.
+	$attrs['width']  = ( is_numeric( $attrs['width'] ) ) ? abs( (int) $attrs['width'] ) : $defaults['width'];
+	$attrs['height'] = ( is_numeric( $attrs['height'] ) ) ? abs( (int) $attrs['height'] ) : $defaults['height'];
 
 	return $attrs;
+}
+
+/**
+ * When an embed service goes away, we can use this handler
+ * to output a link for history's sake.
+ *
+ * @param array  $matches Regex partial matches against the URL passed.
+ * @param array  $attr    Attributes received in embed response.
+ * @param string $url     Requested URL to be embedded.
+ * @return string Link to output.
+ */
+function jetpack_deprecated_embed_handler( $matches, $attr, $url ) {
+	return sprintf( '<a href="%s">%s</a>', esc_url( $url ), esc_html( esc_url( $url ) ) );
 }
 
 jetpack_load_shortcodes();

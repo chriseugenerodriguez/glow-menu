@@ -18,25 +18,32 @@
 	margin: 0;
 }
 
+div.jp-relatedposts .jp-relatedposts-headline em:after {
+	content: ":";
+}
+
 #page .entry-content div.sharedaddy h3,
 #page .entry-summary div.sharedaddy h3,
 #page .entry-content h3.sd-title,
 #page .entry-summary h3.sd-title,
 #primary div.sharedaddy .jp-relatedposts-headline em,
-.pd-rating {
+.pd-rating,
+.cs-rating {
 	color: #767676;
 	font-size: 11px;
 	text-transform: uppercase;
 }
 
-.pd-rating {
+.pd-rating,
+.cs-rating {
 	min-height: 23px;
 	margin-bottom: 5px;
 }
 
 .wp-multiplayer,
 .PDS_Poll,
-.entry-content .slideshow-window {
+.CSS_Poll,
+.entry-content .jetpack-slideshow-window {
 	margin-bottom: 24px;
 }
 
@@ -44,7 +51,7 @@
 	margin-bottom: 0;
 }
 
-.entry-content .slideshow-window {
+.entry-content .jetpack-slideshow-window {
 	border-radius: 0;
 }
 
@@ -144,6 +151,10 @@ img[id*="botd"] {
 
 .widget_authors li:last-child {
 	margin-bottom: 0;
+}
+
+.widget_authors img {
+	margin-right: 5px;
 }
 
 /* Contact Info Widget */

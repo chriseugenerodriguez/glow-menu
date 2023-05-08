@@ -1,8 +1,11 @@
 <?php
 
-include_once('ListTable.php');
+//*****  Check WP_List_Table exists
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
+}
 
-class WPAM_List_Affiliates_Table extends WPAM_List_Table {
+class WPAM_List_Affiliates_Table extends WP_List_Table {
 
     function __construct() {
         global $status, $page;
@@ -17,27 +20,28 @@ class WPAM_List_Affiliates_Table extends WPAM_List_Table {
 
     function column_default($item, $column_name) {
         //Just print the data for that column
-        return $item[$column_name];
+        return esc_attr($item[$column_name]);
     }
 
     function column_affiliateId($item) {
         //Build row actions
         $actions = array(
-            'edit' => sprintf('<a href="admin.php?page=wpam-affiliates&viewDetail=%s">View</a>', $item['affiliateId']),
-            'delete' => sprintf('<a href="admin.php?page=wpam-affiliates&delete_aid=%s" onclick="return confirm(\'Are you sure you want to delete this entry?\')">Delete</a>', $item['affiliateId']),
+            'edit' => sprintf('<a href="admin.php?page=wpam-affiliates&viewDetail=%s">View</a>', esc_attr($item['affiliateId'])),
+            //'delete' => sprintf('<a href="admin.php?page=wpam-affiliates&delete_aid=%s" onclick="return confirm(\'Are you sure you want to delete this entry?\')">Delete</a>', esc_attr($item['affiliateId'])),
+            'delete' => sprintf('<a href="%s" onclick="return confirm(\'Are you sure you want to delete this entry?\')">Delete</a>', esc_url(admin_url(wp_nonce_url('admin.php?page=wpam-affiliates&delete_aid='.$item['affiliateId'], 'wpam-delete-affiliate')))),
         );
 
         //Return the id column contents
-        return $item['affiliateId'] . $this->row_actions($actions);
+        return esc_attr($item['affiliateId']) . $this->row_actions($actions);
     }
 
     function column_dateCreated($item) {
         $item['dateCreated'] = date("m/d/Y", strtotime($item['dateCreated']));
-        return $item['dateCreated'];
+        return esc_attr($item['dateCreated']);
     }
 
     function column_viewDetail($item) {
-        $item['viewDetail'] = '<a class="button-secondary" href="admin.php?page=wpam-affiliates&viewDetail=' . $item['affiliateId'] . '">' . __('View', 'affiliates-manager') . '</a>';
+        $item['viewDetail'] = '<a class="button-secondary" href="admin.php?page=wpam-affiliates&viewDetail=' . esc_attr($item['affiliateId']) . '">' . __('View', 'affiliates-manager') . '</a>';
         return $item['viewDetail'];
     }
 
@@ -83,7 +87,7 @@ class WPAM_List_Affiliates_Table extends WPAM_List_Table {
 
     function get_bulk_actions() {
         $actions = array(
-            'delete' => 'Delete'
+            'delete' => __('Delete', 'affiliates-manager')
         );
         return $actions;
     }
@@ -120,18 +124,24 @@ class WPAM_List_Affiliates_Table extends WPAM_List_Table {
 
         if (isset($_REQUEST['page']) && 'wpam-affiliates' == $_REQUEST['page']) {
             if (isset($_REQUEST['delete_aid'])) { //delete an affiliate record
+                $nonce = isset($_REQUEST['_wpnonce']) ? sanitize_text_field($_REQUEST['_wpnonce']) : '';
+                if(!wp_verify_nonce($nonce, 'wpam-delete-affiliate')){
+                    wp_die(__('Error! Nonce Security Check Failed! Go to the My Affiliates page to delete the affiliate account.', 'affiliates-manager'));
+                }
                 $aid = esc_sql($_REQUEST['delete_aid']);
                 if (!is_numeric($aid)) {
                     return;
                 }
                 global $wpdb;
                 $record_table_name = WPAM_AFFILIATES_TBL; //The table name for the records
-                $selectdb = $wpdb->get_row("SELECT * FROM $record_table_name WHERE affiliateId='$aid'");
-                $aff_email = $selectdb->email;
-                $user = get_user_by('email', $aff_email);
-                if ($user) {
-                    if (!in_array('administrator', $user->roles)) {
-                        wp_delete_user($user->ID);
+                if(get_option(WPAM_PluginConfig::$AutoDeleteWPUserAccount) == 1){
+                    $selectdb = $wpdb->get_row("SELECT * FROM $record_table_name WHERE affiliateId='$aid'");
+                    $aff_email = $selectdb->email;
+                    $user = get_user_by('email', $aff_email);
+                    if ($user) {
+                        if (!in_array('administrator', $user->roles)) {
+                            wp_delete_user($user->ID);
+                        }
                     }
                 }
                 $updatedb = "DELETE FROM $record_table_name WHERE affiliateId='$aid'";
@@ -155,12 +165,25 @@ class WPAM_List_Affiliates_Table extends WPAM_List_Table {
         $this->process_bulk_action();
 
         // This checks for sorting input and sorts the data.
-        $orderby_column = isset($_GET['orderby']) ? $_GET['orderby'] : '';
-        $sort_order = isset($_GET['order']) ? $_GET['order'] : '';
+        $orderby_column = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : '';
+        if("dateCreated" == $orderby_column){
+            $orderby_column = "dateCreated";
+        }
+        else{
+            $orderby_column = "affiliateId";
+        }
+        $sort_order = isset($_GET['order']) ? sanitize_text_field($_GET['order']) : '';
+        if("asc" == $sort_order){
+            $sort_order = "ASC";
+        }
+        else{
+            $sort_order = "DESC";
+        }
+        /*
         if (empty($orderby_column)) {
             $orderby_column = "affiliateId";
             $sort_order = "DESC";
-        }
+        }*/
         global $wpdb;
         $aff_table_name = WPAM_AFFILIATES_TBL;
         $trn_table_name = WPAM_TRANSACTIONS_TBL;
@@ -179,7 +202,11 @@ class WPAM_List_Affiliates_Table extends WPAM_List_Table {
                 $where = " where status = '$status'";
             }
         }
-
+        //affiliate search
+        if (isset($_REQUEST['wpam_affiliate_search']) && !empty($_REQUEST['wpam_affiliate_search'])) {
+            $search_term = esc_sql($_REQUEST['wpam_affiliate_search']);
+            $where = " where affiliateId like '%" . $search_term . "%' OR firstName like '%" . $search_term . "%' OR lastName like '%" . $search_term . "%' OR email like '%" . $search_term . "%' OR paypalEmail like '%" . $search_term . "%'";
+        }
         //count the total number of items
         $query = "select count(*) from $aff_table_name" . $where;
 

@@ -65,7 +65,7 @@
 }
 
 /* Gallery Widget */
-.widget-gallery .slideshow-window {
+.widget-gallery .jetpack-slideshow-window {
 	border-radius: 0;
 }
 
@@ -159,6 +159,72 @@
 .widget.widget_wpcom_social_media_icons_widget li a:hover:before,
 .widget.widget_wpcom_social_media_icons_widget li a:focus:before {
 	opacity: 0.8;
+}
+
+/* Social Icons Widget */
+.widget.jetpack_widget_social_icons ul {
+	margin: 0 0 -0.4375em;
+}
+
+.widget.jetpack_widget_social_icons ul:before,
+.widget.jetpack_widget_social_icons ul:after {
+	content: "";
+	display: table;
+}
+
+.widget.jetpack_widget_social_icons ul:after {
+	clear: both;
+}
+
+.widget.jetpack_widget_social_icons li {
+	float: left;
+	margin: 0 0.4375em 0.4375em 0;
+}
+
+.widget.jetpack_widget_social_icons li a {
+	border: 1px solid currentColor;
+	border-radius: 50%;
+	color: inherit;
+	display: block;
+	position: relative;
+}
+
+.widget.jetpack_widget_social_icons li a:hover,
+.widget.jetpack_widget_social_icons li a:focus {
+	opacity: 0.8;
+}
+
+.widget.jetpack_widget_social_icons ul.size-small a {
+	height: 38px;
+	padding: 6px;
+	width: 38px;
+}
+
+.widget.jetpack_widget_social_icons ul.size-small svg {
+	height: 24px;
+	width: 24px;
+}
+
+.widget.jetpack_widget_social_icons ul.size-medium a {
+	height: 50px;
+	padding: 8px;
+	width: 50px;
+}
+
+.widget.jetpack_widget_social_icons ul.size-medium svg {
+	height: 32px;
+	width: 32px;
+}
+
+.widget.jetpack_widget_social_icons ul.size-large a {
+	height: 70px;
+	padding: 10px;
+	width: 70px;
+}
+
+.widget.jetpack_widget_social_icons ul.size-large svg {
+	height: 48px;
+	width: 48px;
 }
 
 /* Top Posts & Pages Widget */
@@ -275,13 +341,15 @@ iframe[src^="http://api.mixcloud.com/"] {
 	max-width: calc(100% + 8px);
 }
 
-/* Polldaddy */
-.PDS_Poll {
+/* Crowdsignal */
+.PDS_Poll,
+.CSS_Poll {
 	display: block !important;
 	margin-bottom: 1.75em;
 }
 
-.PDS_Poll .pds-box {
+.PDS_Poll .pds-box,
+.CSS_Poll .css-box {
 	max-width: 100%;
 	width: auto;
 }
@@ -378,7 +446,7 @@ iframe[src^="http://api.mixcloud.com/"] {
 }
 
 /* Slideshow */
-.entry-content .slideshow-window {
+.entry-content .jetpack-slideshow-window {
 	border-radius: 0;
 	margin-bottom: 1.75em;
 }
@@ -641,19 +709,6 @@ iframe[src^="http://api.mixcloud.com/"] {
 
 .sd-social-official .sd-content ul {
 	margin-bottom: -0.625em !important;
-}
-
-.hentry #sharing_email .sharing_send,
-.hentry .sd-content ul li .option a.share-ustom,
-.hentry .sd-content ul li a.sd-button,
-.hentry .sd-content ul li.advanced a.share-more,
-.hentry .sd-content ul li.preview-item div.option.option-smart-off a,
-.hentry .sd-social-icon .sd-content ul li a.sd-button,
-.hentry .sd-social-icon-text .sd-content ul li a.sd-button,
-.hentry .sd-social-official .sd-content > ul > li .digg_button > a,
-.hentry .sd-social-official .sd-content > ul > li > a.sd-button,
-.hentry .sd-social-text .sd-content ul li a.sd-button {
-	box-shadow: none;
 }
 
 

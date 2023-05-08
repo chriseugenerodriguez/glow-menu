@@ -1,31 +1,18 @@
 <?php
-/*
+/**
  * Plugin Name: WooCommerce Stripe Gateway
  * Plugin URI: https://wordpress.org/plugins/woocommerce-gateway-stripe/
  * Description: Take credit card payments on your store using Stripe.
  * Author: WooCommerce
  * Author URI: https://woocommerce.com/
- * Version: 3.2.2
- * Requires at least: 4.4
- * Tested up to: 4.8
+ * Version: 7.3.0
+ * Requires at least: 5.9
+ * Tested up to: 6.1.1
+ * WC requires at least: 7.1
+ * WC tested up to: 7.5
  * Text Domain: woocommerce-gateway-stripe
  * Domain Path: /languages
- *
- * Copyright (c) 2017 WooCommerce
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -34,600 +21,763 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'WC_STRIPE_VERSION', '3.2.2' );
-define( 'WC_STRIPE_MIN_PHP_VER', '5.6.0' );
-define( 'WC_STRIPE_MIN_WC_VER', '2.5.0' );
+define( 'WC_STRIPE_VERSION', '7.3.0' ); // WRCS: DEFINED_VERSION.
+define( 'WC_STRIPE_MIN_PHP_VER', '7.3.0' );
+define( 'WC_STRIPE_MIN_WC_VER', '7.1' );
+define( 'WC_STRIPE_FUTURE_MIN_WC_VER', '7.2' );
 define( 'WC_STRIPE_MAIN_FILE', __FILE__ );
+define( 'WC_STRIPE_ABSPATH', __DIR__ . '/' );
 define( 'WC_STRIPE_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 define( 'WC_STRIPE_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 
-if ( ! class_exists( 'WC_Stripe' ) ) :
+// phpcs:disable WordPress.Files.FileName
 
-	class WC_Stripe {
+/**
+ * WooCommerce fallback notice.
+ *
+ * @since 4.1.2
+ */
+function woocommerce_stripe_missing_wc_notice() {
+	/* translators: 1. URL link. */
+	echo '<div class="error"><p><strong>' . sprintf( esc_html__( 'Stripe requires WooCommerce to be installed and active. You can download %s here.', 'woocommerce-gateway-stripe' ), '<a href="https://woocommerce.com/" target="_blank">WooCommerce</a>' ) . '</strong></p></div>';
+}
 
-		/**
-		 * @var Singleton The reference the *Singleton* instance of this class
-		 */
-		private static $instance;
+/**
+ * WooCommerce not supported fallback notice.
+ *
+ * @since 4.4.0
+ */
+function woocommerce_stripe_wc_not_supported() {
+	/* translators: $1. Minimum WooCommerce version. $2. Current WooCommerce version. */
+	echo '<div class="error"><p><strong>' . sprintf( esc_html__( 'Stripe requires WooCommerce %1$s or greater to be installed and active. WooCommerce %2$s is no longer supported.', 'woocommerce-gateway-stripe' ), WC_STRIPE_MIN_WC_VER, WC_VERSION ) . '</strong></p></div>';
+}
 
-		/**
-		 * @var Reference to logging class.
-		 */
-		private static $log;
+function woocommerce_gateway_stripe() {
 
-		/**
-		 * Returns the *Singleton* instance of this class.
-		 *
-		 * @return Singleton The *Singleton* instance.
-		 */
-		public static function get_instance() {
-			if ( null === self::$instance ) {
-				self::$instance = new self();
-			}
-			return self::$instance;
-		}
+	static $plugin;
 
-		/**
-		 * Private clone method to prevent cloning of the instance of the
-		 * *Singleton* instance.
-		 *
-		 * @return void
-		 */
-		private function __clone() {}
+	if ( ! isset( $plugin ) ) {
 
-		/**
-		 * Private unserialize method to prevent unserializing of the *Singleton*
-		 * instance.
-		 *
-		 * @return void
-		 */
-		private function __wakeup() {}
+		class WC_Stripe {
 
-		/**
-		 * Flag to indicate whether or not we need to load code for / support subscriptions.
-		 *
-		 * @var bool
-		 */
-		private $subscription_support_enabled = false;
+			/**
+			 * The *Singleton* instance of this class
+			 *
+			 * @var WC_Stripe
+			 */
+			private static $instance;
 
-		/**
-		 * Flag to indicate whether or not we need to load support for pre-orders.
-		 *
-		 * @since 3.0.3
-		 *
-		 * @var bool
-		 */
-		private $pre_order_enabled = false;
-
-		/**
-		 * Notices (array)
-		 * @var array
-		 */
-		public $notices = array();
-
-		/**
-		 * Protected constructor to prevent creating a new instance of the
-		 * *Singleton* via the `new` operator from outside of this class.
-		 */
-		protected function __construct() {
-			add_action( 'admin_init', array( $this, 'check_environment' ) );
-			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
-			add_action( 'plugins_loaded', array( $this, 'init' ) );
-		}
-
-		/**
-		 * Init the plugin after plugins_loaded so environment variables are set.
-		 */
-		public function init() {
-			// Don't hook anything else in the plugin if we're in an incompatible environment
-			if ( self::get_environment_warning() ) {
-				return;
+			/**
+			 * Returns the *Singleton* instance of this class.
+			 *
+			 * @return WC_Stripe The *Singleton* instance.
+			 */
+			public static function get_instance() {
+				if ( null === self::$instance ) {
+					self::$instance = new self();
+				}
+				return self::$instance;
 			}
 
-			include_once( dirname( __FILE__ ) . '/includes/class-wc-stripe-api.php' );
-			include_once( dirname( __FILE__ ) . '/includes/class-wc-stripe-customer.php' );
+			/**
+			 * Stripe Connect API
+			 *
+			 * @var WC_Stripe_Connect_API
+			 */
+			private $api;
 
-			// Init the gateway itself
-			$this->init_gateways();
+			/**
+			 * Stripe Connect
+			 *
+			 * @var WC_Stripe_Connect
+			 */
+			public $connect;
 
-			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
-			add_action( 'woocommerce_order_status_on-hold_to_processing', array( $this, 'capture_payment' ) );
-			add_action( 'woocommerce_order_status_on-hold_to_completed', array( $this, 'capture_payment' ) );
-			add_action( 'woocommerce_order_status_on-hold_to_cancelled', array( $this, 'cancel_payment' ) );
-			add_action( 'woocommerce_order_status_on-hold_to_refunded', array( $this, 'cancel_payment' ) );
-			add_filter( 'woocommerce_get_customer_payment_tokens', array( $this, 'woocommerce_get_customer_payment_tokens' ), 10, 3 );
-			add_action( 'woocommerce_payment_token_deleted', array( $this, 'woocommerce_payment_token_deleted' ), 10, 2 );
-			add_action( 'woocommerce_payment_token_set_default', array( $this, 'woocommerce_payment_token_set_default' ) );
-			add_action( 'wp_ajax_stripe_dismiss_request_api_notice', array( $this, 'dismiss_request_api_notice' ) );
-			add_action( 'wp_ajax_stripe_dismiss_apple_pay_notice', array( $this, 'dismiss_apple_pay_notice' ) );
+			/**
+			 * Stripe Payment Request configurations.
+			 *
+			 * @var WC_Stripe_Payment_Request
+			 */
+			public $payment_request_configuration;
 
-			include_once( dirname( __FILE__ ) . '/includes/class-wc-stripe-payment-request.php' );
-		}
+			/**
+			 * Stripe Account.
+			 *
+			 * @var WC_Stripe_Account
+			 */
+			public $account;
 
-		/**
-		 * Allow this class and other classes to add slug keyed notices (to avoid duplication)
-		 */
-		public function add_admin_notice( $slug, $class, $message ) {
-			$this->notices[ $slug ] = array(
-				'class'   => $class,
-				'message' => $message,
-			);
-		}
+			/**
+			 * The main Stripe gateway instance. Use get_main_stripe_gateway() to access it.
+			 *
+			 * @var null|WC_Stripe_Payment_Gateway
+			 */
+			protected $stripe_gateway = null;
 
-		/**
-		 * The backup sanity check, in case the plugin is activated in a weird way,
-		 * or the environment changes after activation. Also handles upgrade routines.
-		 */
-		public function check_environment() {
-			if ( ! defined( 'IFRAME_REQUEST' ) && ( WC_STRIPE_VERSION !== get_option( 'wc_stripe_version' ) ) ) {
-				$this->install();
+			/**
+			 * Private clone method to prevent cloning of the instance of the
+			 * *Singleton* instance.
+			 *
+			 * @return void
+			 */
+			public function __clone() {}
 
-				do_action( 'woocommerce_stripe_updated' );
+			/**
+			 * Private unserialize method to prevent unserializing of the *Singleton*
+			 * instance.
+			 *
+			 * @return void
+			 */
+			public function __wakeup() {}
+
+			/**
+			 * Protected constructor to prevent creating a new instance of the
+			 * *Singleton* via the `new` operator from outside of this class.
+			 */
+			public function __construct() {
+				add_action( 'admin_init', [ $this, 'install' ] );
+
+				$this->init();
+
+				add_action( 'rest_api_init', [ $this, 'register_routes' ] );
 			}
 
-			$environment_warning = self::get_environment_warning();
-
-			if ( $environment_warning && is_plugin_active( plugin_basename( __FILE__ ) ) ) {
-				$this->add_admin_notice( 'bad_environment', 'error', $environment_warning );
-			}
-
-			// Check if secret key present. Otherwise prompt, via notice, to go to
-			// setting.
-			if ( ! class_exists( 'WC_Stripe_API' ) ) {
-				include_once( dirname( __FILE__ ) . '/includes/class-wc-stripe-api.php' );
-			}
-
-			$secret = WC_Stripe_API::get_secret_key();
-
-			if ( empty( $secret ) && ! ( isset( $_GET['page'], $_GET['section'] ) && 'wc-settings' === $_GET['page'] && 'stripe' === $_GET['section'] ) ) {
-				$setting_link = $this->get_setting_link();
-				$this->add_admin_notice( 'prompt_connect', 'notice notice-warning', sprintf( __( 'Stripe is almost ready. To get started, <a href="%s">set your Stripe account keys</a>.', 'woocommerce-gateway-stripe' ), $setting_link ) );
-			}
-		}
-
-		/**
-		 * Updates the plugin version in db
-		 *
-		 * @since 3.1.0
-		 * @version 3.1.0
-		 * @return bool
-		 */
-		private static function _update_plugin_version() {
-			delete_option( 'wc_stripe_version' );
-			update_option( 'wc_stripe_version', WC_STRIPE_VERSION );
-
-			return true;
-		}
-
-		/**
-		 * Dismiss the Google Payment Request API Feature notice.
-		 *
-		 * @since 3.1.0
-		 * @version 3.1.0
-		 */
-		public function dismiss_request_api_notice() {
-			update_option( 'wc_stripe_show_request_api_notice', 'no' );
-		}
-
-		/**
-		 * Dismiss the Apple Pay Feature notice.
-		 *
-		 * @since 3.1.0
-		 * @version 3.1.0
-		 */
-		public function dismiss_apple_pay_notice() {
-			update_option( 'wc_stripe_show_apple_pay_notice', 'no' );
-		}
-
-		/**
-		 * Handles upgrade routines.
-		 *
-		 * @since 3.1.0
-		 * @version 3.1.0
-		 */
-		public function install() {
-			if ( ! defined( 'WC_STRIPE_INSTALLING' ) ) {
-				define( 'WC_STRIPE_INSTALLING', true );
-			}
-
-			$this->_update_plugin_version();
-		}
-
-		/**
-		 * Checks the environment for compatibility problems.  Returns a string with the first incompatibility
-		 * found or false if the environment has no problems.
-		 */
-		static function get_environment_warning() {
-			if ( version_compare( phpversion(), WC_STRIPE_MIN_PHP_VER, '<' ) ) {
-				$message = __( 'WooCommerce Stripe - The minimum PHP version required for this plugin is %1$s. You are running %2$s.', 'woocommerce-gateway-stripe' );
-
-				return sprintf( $message, WC_STRIPE_MIN_PHP_VER, phpversion() );
-			}
-
-			if ( ! defined( 'WC_VERSION' ) ) {
-				return __( 'WooCommerce Stripe requires WooCommerce to be activated to work.', 'woocommerce-gateway-stripe' );
-			}
-
-			if ( version_compare( WC_VERSION, WC_STRIPE_MIN_WC_VER, '<' ) ) {
-				$message = __( 'WooCommerce Stripe - The minimum WooCommerce version required for this plugin is %1$s. You are running %2$s.', 'woocommerce-gateway-stripe' );
-
-				return sprintf( $message, WC_STRIPE_MIN_WC_VER, WC_VERSION );
-			}
-
-			if ( ! function_exists( 'curl_init' ) ) {
-				return __( 'WooCommerce Stripe - cURL is not installed.', 'woocommerce-gateway-stripe' );
-			}
-
-			return false;
-		}
-
-		/**
-		 * Adds plugin action links
-		 *
-		 * @since 1.0.0
-		 */
-		public function plugin_action_links( $links ) {
-			$setting_link = $this->get_setting_link();
-
-			$plugin_links = array(
-				'<a href="' . $setting_link . '">' . __( 'Settings', 'woocommerce-gateway-stripe' ) . '</a>',
-				'<a href="https://docs.woocommerce.com/document/stripe/">' . __( 'Docs', 'woocommerce-gateway-stripe' ) . '</a>',
-				'<a href="https://woocommerce.com/contact-us/">' . __( 'Support', 'woocommerce-gateway-stripe' ) . '</a>',
-			);
-			return array_merge( $plugin_links, $links );
-		}
-
-		/**
-		 * Get setting link.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @return string Setting link
-		 */
-		public function get_setting_link() {
-			$use_id_as_section = function_exists( 'WC' ) ? version_compare( WC()->version, '2.6', '>=' ) : false;
-
-			$section_slug = $use_id_as_section ? 'stripe' : strtolower( 'WC_Gateway_Stripe' );
-
-			return admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . $section_slug );
-		}
-
-		/**
-		 * Display any notices we've collected thus far (e.g. for connection, disconnection)
-		 */
-		public function admin_notices() {
-			$show_request_api_notice = get_option( 'wc_stripe_show_request_api_notice' );
-			$show_apple_pay_notice   = get_option( 'wc_stripe_show_apple_pay_notice' );
-
-			if ( empty( $show_apple_pay_notice ) ) {
-				// @TODO remove this notice in the future.
-				?>
-				<div class="notice notice-warning wc-stripe-apple-pay-notice is-dismissible"><p><?php echo sprintf( esc_html__( 'New Feature! Stripe now supports %s. Your customers can now purchase your products even faster. Apple Pay has been enabled by default.', 'woocommerce-gateway-stripe' ), '<a href="https://woocommerce.com/apple-pay/">Apple Pay</a>'); ?></p></div>
-
-				<script type="application/javascript">
-					jQuery( '.wc-stripe-apple-pay-notice' ).on( 'click', '.notice-dismiss', function() {
-						var data = {
-							action: 'stripe_dismiss_apple_pay_notice'
-						};
-
-						jQuery.post( '<?php echo admin_url( 'admin-ajax.php' ); ?>', data );
-					});
-				</script>
-
-				<?php
-			}
-
-			if ( empty( $show_request_api_notice ) ) {
-				// @TODO remove this notice in the future.
-				?>
-				<div class="notice notice-warning wc-stripe-request-api-notice is-dismissible"><p><?php esc_html_e( 'New Feature! Stripe now supports Google Payment Request. Your customers can now use mobile phones with supported browsers such as Chrome to make purchases easier and faster.', 'woocommerce-gateway-stripe' ); ?></p></div>
-
-				<script type="application/javascript">
-					jQuery( '.wc-stripe-request-api-notice' ).on( 'click', '.notice-dismiss', function() {
-						var data = {
-							action: 'stripe_dismiss_request_api_notice'
-						};
-
-						jQuery.post( '<?php echo admin_url( 'admin-ajax.php' ); ?>', data );
-					});
-				</script>
-
-				<?php
-			}
-
-			foreach ( (array) $this->notices as $notice_key => $notice ) {
-				echo "<div class='" . esc_attr( $notice['class'] ) . "'><p>";
-				echo wp_kses( $notice['message'], array( 'a' => array( 'href' => array() ) ) );
-				echo '</p></div>';
-			}
-		}
-
-		/**
-		 * Initialize the gateway. Called very early - in the context of the plugins_loaded action
-		 *
-		 * @since 1.0.0
-		 */
-		public function init_gateways() {
-			if ( class_exists( 'WC_Subscriptions_Order' ) && function_exists( 'wcs_create_renewal_order' ) ) {
-				$this->subscription_support_enabled = true;
-			}
-
-			if ( class_exists( 'WC_Pre_Orders_Order' ) ) {
-				$this->pre_order_enabled = true;
-			}
-
-			if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
-				return;
-			}
-
-			if ( class_exists( 'WC_Payment_Gateway_CC' ) ) {
-				include_once( dirname( __FILE__ ) . '/includes/class-wc-gateway-stripe.php' );
-				include_once( dirname( __FILE__ ) . '/includes/class-wc-stripe-apple-pay.php' );
-			} else {
-				include_once( dirname( __FILE__ ) . '/includes/legacy/class-wc-gateway-stripe.php' );
-				include_once( dirname( __FILE__ ) . '/includes/legacy/class-wc-gateway-stripe-saved-cards.php' );
-			}
-
-			load_plugin_textdomain( 'woocommerce-gateway-stripe', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
-			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
-
-			$load_addons = (
-				$this->subscription_support_enabled
-				||
-				$this->pre_order_enabled
-			);
-
-			if ( $load_addons ) {
-				require_once( dirname( __FILE__ ) . '/includes/class-wc-gateway-stripe-addons.php' );
-			}
-		}
-
-		/**
-		 * Add the gateways to WooCommerce
-		 *
-		 * @since 1.0.0
-		 */
-		public function add_gateways( $methods ) {
-			if ( $this->subscription_support_enabled || $this->pre_order_enabled ) {
-				$methods[] = 'WC_Gateway_Stripe_Addons';
-			} else {
-				$methods[] = 'WC_Gateway_Stripe';
-			}
-			return $methods;
-		}
-
-		/**
-		 * List of currencies supported by Stripe that has no decimals.
-		 *
-		 * @return array $currencies
-		 */
-		public static function no_decimal_currencies() {
-			return array(
-				'bif', // Burundian Franc
-				'djf', // Djiboutian Franc
-				'jpy', // Japanese Yen
-				'krw', // South Korean Won
-				'pyg', // Paraguayan Guaraní
-				'vnd', // Vietnamese Đồng
-				'xaf', // Central African Cfa Franc
-				'xpf', // Cfp Franc
-				'clp', // Chilean Peso
-				'gnf', // Guinean Franc
-				'kmf', // Comorian Franc
-				'mga', // Malagasy Ariary
-				'rwf', // Rwandan Franc
-				'vuv', // Vanuatu Vatu
-				'xof', // West African Cfa Franc
-			);
-		}
-
-		/**
-		 * Stripe uses smallest denomination in currencies such as cents.
-		 * We need to format the returned currency from Stripe into human readable form.
-		 *
-		 * @param object $balance_transaction
-		 * @param string $type Type of number to format
-		 */
-		public static function format_number( $balance_transaction, $type = 'fee' ) {
-			if ( ! is_object( $balance_transaction ) ) {
-				return;
-			}
-
-			if ( in_array( strtolower( $balance_transaction->currency ), self::no_decimal_currencies() ) ) {
-				if ( 'fee' === $type ) {
-					return $balance_transaction->fee;
+			/**
+			 * Init the plugin after plugins_loaded so environment variables are set.
+			 *
+			 * @since 1.0.0
+			 * @version 5.0.0
+			 */
+			public function init() {
+				if ( is_admin() ) {
+					require_once dirname( __FILE__ ) . '/includes/admin/class-wc-stripe-privacy.php';
 				}
 
-				return $balance_transaction->net;
-			}
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-feature-flags.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-upe-compatibility.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-exception.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-logger.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-helper.php';
+				include_once dirname( __FILE__ ) . '/includes/class-wc-stripe-api.php';
+				require_once dirname( __FILE__ ) . '/includes/compat/trait-wc-stripe-subscriptions-utilities.php';
+				require_once dirname( __FILE__ ) . '/includes/compat/trait-wc-stripe-subscriptions.php';
+				require_once dirname( __FILE__ ) . '/includes/compat/trait-wc-stripe-pre-orders.php';
+				require_once dirname( __FILE__ ) . '/includes/abstracts/abstract-wc-stripe-payment-gateway.php';
+				require_once dirname( __FILE__ ) . '/includes/abstracts/abstract-wc-stripe-payment-gateway-voucher.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-webhook-state.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-webhook-handler.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-sepa-payment-token.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-link-payment-token.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-apple-pay-registration.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-gateway-stripe.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-gateway.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-cc.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-giropay.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-ideal.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-bancontact.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-boleto.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-oxxo.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-eps.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-sepa.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-p24.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-sofort.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-upe-payment-method-link.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-bancontact.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-sofort.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-giropay.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-eps.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-ideal.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-p24.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-alipay.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-sepa.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-multibanco.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-boleto.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-gateway-stripe-oxxo.php';
+				require_once dirname( __FILE__ ) . '/includes/payment-methods/class-wc-stripe-payment-request.php';
+				require_once dirname( __FILE__ ) . '/includes/compat/class-wc-stripe-woo-compat-utils.php';
+				require_once dirname( __FILE__ ) . '/includes/connect/class-wc-stripe-connect.php';
+				require_once dirname( __FILE__ ) . '/includes/connect/class-wc-stripe-connect-api.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-order-handler.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-payment-tokens.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-customer.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-intent-controller.php';
+				require_once dirname( __FILE__ ) . '/includes/admin/class-wc-stripe-inbox-notes.php';
+				require_once dirname( __FILE__ ) . '/includes/admin/class-wc-stripe-upe-compatibility-controller.php';
+				require_once dirname( __FILE__ ) . '/includes/migrations/class-allowed-payment-request-button-types-update.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-account.php';
+				new Allowed_Payment_Request_Button_Types_Update();
 
-			if ( 'fee' === $type ) {
-				return number_format( $balance_transaction->fee / 100, 2, '.', '' );
-			}
+				$this->api                           = new WC_Stripe_Connect_API();
+				$this->connect                       = new WC_Stripe_Connect( $this->api );
+				$this->payment_request_configuration = new WC_Stripe_Payment_Request();
+				$this->account                       = new WC_Stripe_Account( $this->connect, 'WC_Stripe_API' );
 
-			return number_format( $balance_transaction->net / 100, 2, '.', '' );
-		}
+				if ( is_admin() ) {
+					require_once dirname( __FILE__ ) . '/includes/admin/class-wc-stripe-admin-notices.php';
+					require_once dirname( __FILE__ ) . '/includes/admin/class-wc-stripe-settings-controller.php';
 
-		/**
-		 * Capture payment when the order is changed from on-hold to complete or processing
-		 *
-		 * @param  int $order_id
-		 */
-		public function capture_payment( $order_id ) {
-			$order = wc_get_order( $order_id );
+					if ( WC_Stripe_Feature_Flags::is_upe_preview_enabled() ) {
+						require_once dirname( __FILE__ ) . '/includes/admin/class-wc-stripe-old-settings-upe-toggle-controller.php';
+						new WC_Stripe_Old_Settings_UPE_Toggle_Controller();
+					}
 
-			if ( 'stripe' === ( version_compare( WC_VERSION, '3.0.0', '<' ) ? $order->payment_method : $order->get_payment_method() ) ) {
-				$charge   = get_post_meta( $order_id, '_stripe_charge_id', true );
-				$captured = get_post_meta( $order_id, '_stripe_charge_captured', true );
-
-				if ( $charge && 'no' === $captured ) {
-					$result = WC_Stripe_API::request( array(
-						'amount'   => $order->get_total() * 100,
-						'expand[]' => 'balance_transaction',
-					), 'charges/' . $charge . '/capture' );
-
-					if ( is_wp_error( $result ) ) {
-						$order->add_order_note( __( 'Unable to capture charge!', 'woocommerce-gateway-stripe' ) . ' ' . $result->get_error_message() );
+					if ( isset( $_GET['area'] ) && 'payment_requests' === $_GET['area'] ) {
+						require_once dirname( __FILE__ ) . '/includes/admin/class-wc-stripe-payment-requests-controller.php';
+						new WC_Stripe_Payment_Requests_Controller();
 					} else {
-						$order->add_order_note( sprintf( __( 'Stripe charge complete (Charge ID: %s)', 'woocommerce-gateway-stripe' ), $result->id ) );
-						update_post_meta( $order_id, '_stripe_charge_captured', 'yes' );
+						new WC_Stripe_Settings_Controller( $this->account );
+					}
 
-						// Store other data such as fees
-						update_post_meta( $order_id, 'Stripe Payment ID', $result->id );
-						update_post_meta( $order_id, '_transaction_id', $result->id );
+					if ( WC_Stripe_Feature_Flags::is_upe_checkout_enabled() ) {
+						require_once dirname( __FILE__ ) . '/includes/admin/class-wc-stripe-payment-gateways-controller.php';
+						new WC_Stripe_Payment_Gateways_Controller();
+					}
+				}
 
-						if ( isset( $result->balance_transaction ) && isset( $result->balance_transaction->fee ) ) {
-							// Fees and Net needs to both come from Stripe to be accurate as the returned
-							// values are in the local currency of the Stripe account, not from WC.
-							$fee = ! empty( $result->balance_transaction->fee ) ? self::format_number( $result->balance_transaction, 'fee' ) : 0;
-							$net = ! empty( $result->balance_transaction->net ) ? self::format_number( $result->balance_transaction, 'net' ) : 0;
-							update_post_meta( $order_id, 'Stripe Fee', $fee );
-							update_post_meta( $order_id, 'Net Revenue From Stripe', $net );
+				// REMOVE IN THE FUTURE.
+				require_once dirname( __FILE__ ) . '/includes/deprecated/class-wc-stripe-apple-pay.php';
+
+				add_filter( 'woocommerce_payment_gateways', [ $this, 'add_gateways' ] );
+				add_filter( 'pre_update_option_woocommerce_stripe_settings', [ $this, 'gateway_settings_update' ], 10, 2 );
+				add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), [ $this, 'plugin_action_links' ] );
+				add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
+
+				// Update the email field position.
+				if ( ! is_admin() ) {
+					add_filter( 'woocommerce_billing_fields', [ $this, 'checkout_update_email_field_priority' ], 50 );
+				}
+
+				// Modify emails emails.
+				add_filter( 'woocommerce_email_classes', [ $this, 'add_emails' ], 20 );
+
+				if ( version_compare( WC_VERSION, '3.4', '<' ) ) {
+					add_filter( 'woocommerce_get_sections_checkout', [ $this, 'filter_gateway_order_admin' ] );
+				}
+
+				new WC_Stripe_UPE_Compatibility_Controller();
+			}
+
+			/**
+			 * Updates the plugin version in db
+			 *
+			 * @since 3.1.0
+			 * @version 4.0.0
+			 */
+			public function update_plugin_version() {
+				delete_option( 'wc_stripe_version' );
+				update_option( 'wc_stripe_version', WC_STRIPE_VERSION );
+			}
+
+			/**
+			 * Handles upgrade routines.
+			 *
+			 * @since 3.1.0
+			 * @version 3.1.0
+			 */
+			public function install() {
+				if ( ! is_plugin_active( plugin_basename( __FILE__ ) ) ) {
+					return;
+				}
+
+				if ( ! defined( 'IFRAME_REQUEST' ) && ( WC_STRIPE_VERSION !== get_option( 'wc_stripe_version' ) ) ) {
+					do_action( 'woocommerce_stripe_updated' );
+
+					if ( ! defined( 'WC_STRIPE_INSTALLING' ) ) {
+						define( 'WC_STRIPE_INSTALLING', true );
+					}
+
+					add_woocommerce_inbox_variant();
+					$this->update_plugin_version();
+
+					// TODO: Remove this when we're reasonably sure most merchants have had their
+					// settings updated like this. ~80% of merchants is a good threshold.
+					// - @reykjalin
+					$this->update_prb_location_settings();
+				}
+			}
+
+			/**
+			 * Updates the PRB location settings based on deprecated filters.
+			 *
+			 * The filters were removed in favor of plugin settings. This function can, and should,
+			 * be removed when we're reasonably sure most merchants have had their settings updated
+			 * through this function. Maybe ~80% of merchants is a good threshold?
+			 *
+			 * @since 5.5.0
+			 * @version 5.5.0
+			 */
+			public function update_prb_location_settings() {
+				$stripe_settings = get_option( 'woocommerce_stripe_settings', [] );
+				$prb_locations   = isset( $stripe_settings['payment_request_button_locations'] )
+					? $stripe_settings['payment_request_button_locations']
+					: [];
+				if ( ! empty( $stripe_settings ) && empty( $prb_locations ) ) {
+					global $post;
+
+					$should_show_on_product_page  = ! apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, $post );
+					$should_show_on_cart_page     = apply_filters( 'wc_stripe_show_payment_request_on_cart', true );
+					$should_show_on_checkout_page = apply_filters( 'wc_stripe_show_payment_request_on_checkout', false, $post );
+
+					$new_prb_locations = [];
+
+					if ( $should_show_on_product_page ) {
+						$new_prb_locations[] = 'product';
+					}
+
+					if ( $should_show_on_cart_page ) {
+						$new_prb_locations[] = 'cart';
+					}
+
+					if ( $should_show_on_checkout_page ) {
+						$new_prb_locations[] = 'checkout';
+					}
+
+					$stripe_settings['payment_request_button_locations'] = $new_prb_locations;
+					update_option( 'woocommerce_stripe_settings', $stripe_settings );
+				}
+			}
+
+			/**
+			 * Add plugin action links.
+			 *
+			 * @since 1.0.0
+			 * @version 4.0.0
+			 */
+			public function plugin_action_links( $links ) {
+				$plugin_links = [
+					'<a href="admin.php?page=wc-settings&tab=checkout&section=stripe">' . esc_html__( 'Settings', 'woocommerce-gateway-stripe' ) . '</a>',
+				];
+				return array_merge( $plugin_links, $links );
+			}
+
+			/**
+			 * Add plugin action links.
+			 *
+			 * @since 4.3.4
+			 * @param  array  $links Original list of plugin links.
+			 * @param  string $file  Name of current file.
+			 * @return array  $links Update list of plugin links.
+			 */
+			public function plugin_row_meta( $links, $file ) {
+				if ( plugin_basename( __FILE__ ) === $file ) {
+					$row_meta = [
+						'docs'    => '<a href="' . esc_url( apply_filters( 'woocommerce_gateway_stripe_docs_url', 'https://woocommerce.com/document/stripe/' ) ) . '" title="' . esc_attr( __( 'View Documentation', 'woocommerce-gateway-stripe' ) ) . '">' . __( 'Docs', 'woocommerce-gateway-stripe' ) . '</a>',
+						'support' => '<a href="' . esc_url( apply_filters( 'woocommerce_gateway_stripe_support_url', 'https://woocommerce.com/my-account/create-a-ticket?select=18627' ) ) . '" title="' . esc_attr( __( 'Open a support request at WooCommerce.com', 'woocommerce-gateway-stripe' ) ) . '">' . __( 'Support', 'woocommerce-gateway-stripe' ) . '</a>',
+					];
+					return array_merge( $links, $row_meta );
+				}
+				return (array) $links;
+			}
+
+			/**
+			 * Add the gateways to WooCommerce.
+			 *
+			 * @since 1.0.0
+			 * @version 5.6.0
+			 */
+			public function add_gateways( $methods ) {
+				$methods[] = $this->get_main_stripe_gateway();
+
+				if ( ! WC_Stripe_Feature_Flags::is_upe_preview_enabled() || ! WC_Stripe_Feature_Flags::is_upe_checkout_enabled() ) {
+					// These payment gateways will be hidden when UPE is enabled:
+					$methods[] = WC_Gateway_Stripe_Sepa::class;
+					$methods[] = WC_Gateway_Stripe_Giropay::class;
+					$methods[] = WC_Gateway_Stripe_Ideal::class;
+					$methods[] = WC_Gateway_Stripe_Bancontact::class;
+					$methods[] = WC_Gateway_Stripe_Eps::class;
+					$methods[] = WC_Gateway_Stripe_Sofort::class;
+					$methods[] = WC_Gateway_Stripe_P24::class;
+					$methods[] = WC_Gateway_Stripe_Boleto::class;
+					$methods[] = WC_Gateway_Stripe_Oxxo::class;
+				}
+
+				// These payment gateways will always be visible, regardless if UPE is enabled or disabled:
+				$methods[] = WC_Gateway_Stripe_Alipay::class;
+				$methods[] = WC_Gateway_Stripe_Multibanco::class;
+
+				return $methods;
+			}
+
+			/**
+			 * Modifies the order of the gateways displayed in admin.
+			 *
+			 * @since 4.0.0
+			 * @version 4.0.0
+			 */
+			public function filter_gateway_order_admin( $sections ) {
+				unset( $sections['stripe'] );
+				if ( WC_Stripe_Feature_Flags::is_upe_preview_enabled() ) {
+					unset( $sections['stripe_upe'] );
+				}
+				unset( $sections['stripe_bancontact'] );
+				unset( $sections['stripe_sofort'] );
+				unset( $sections['stripe_giropay'] );
+				unset( $sections['stripe_eps'] );
+				unset( $sections['stripe_ideal'] );
+				unset( $sections['stripe_p24'] );
+				unset( $sections['stripe_alipay'] );
+				unset( $sections['stripe_sepa'] );
+				unset( $sections['stripe_multibanco'] );
+
+				$sections['stripe'] = 'Stripe';
+				if ( WC_Stripe_Feature_Flags::is_upe_preview_enabled() ) {
+					$sections['stripe_upe'] = 'Stripe checkout experience';
+				}
+				$sections['stripe_bancontact'] = __( 'Stripe Bancontact', 'woocommerce-gateway-stripe' );
+				$sections['stripe_sofort']     = __( 'Stripe Sofort', 'woocommerce-gateway-stripe' );
+				$sections['stripe_giropay']    = __( 'Stripe giropay', 'woocommerce-gateway-stripe' );
+				$sections['stripe_eps']        = __( 'Stripe EPS', 'woocommerce-gateway-stripe' );
+				$sections['stripe_ideal']      = __( 'Stripe iDEAL', 'woocommerce-gateway-stripe' );
+				$sections['stripe_p24']        = __( 'Stripe P24', 'woocommerce-gateway-stripe' );
+				$sections['stripe_alipay']     = __( 'Stripe Alipay', 'woocommerce-gateway-stripe' );
+				$sections['stripe_sepa']       = __( 'Stripe SEPA Direct Debit', 'woocommerce-gateway-stripe' );
+				$sections['stripe_multibanco'] = __( 'Stripe Multibanco', 'woocommerce-gateway-stripe' );
+
+				return $sections;
+			}
+
+			/**
+			 * Provide default values for missing settings on initial gateway settings save.
+			 *
+			 * @since 4.5.4
+			 * @version 4.5.4
+			 *
+			 * @param array      $settings New settings to save.
+			 * @param array|bool $old_settings Existing settings, if any.
+			 * @return array New value but with defaults initially filled in for missing settings.
+			 */
+			public function gateway_settings_update( $settings, $old_settings ) {
+				if ( false === $old_settings ) {
+					$gateway      = new WC_Gateway_Stripe();
+					$fields       = $gateway->get_form_fields();
+					$old_settings = array_merge( array_fill_keys( array_keys( $fields ), '' ), wp_list_pluck( $fields, 'default' ) );
+					$settings     = array_merge( $old_settings, $settings );
+				}
+
+				if ( ! WC_Stripe_Feature_Flags::is_upe_preview_enabled() ) {
+					return $settings;
+				}
+
+				return $this->toggle_upe( $settings, $old_settings );
+			}
+
+			/**
+			 * Enable or disable UPE.
+			 *
+			 * When enabling UPE: For each currently enabled Stripe LPM, the corresponding UPE method is enabled.
+			 *
+			 * When disabling UPE: For each currently enabled UPE method, the corresponding LPM is enabled.
+			 *
+			 * @param array      $settings New settings to save.
+			 * @param array|bool $old_settings Existing settings, if any.
+			 * @return array New value but with defaults initially filled in for missing settings.
+			 */
+			protected function toggle_upe( $settings, $old_settings ) {
+				if ( false === $old_settings || ! isset( $old_settings[ WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] ) ) {
+					$old_settings = [ WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME => 'no' ];
+				}
+				if ( ! isset( $settings[ WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] ) || $settings[ WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] === $old_settings[ WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] ) {
+					return $settings;
+				}
+
+				if ( 'yes' === $settings[ WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] ) {
+					return $this->enable_upe( $settings );
+				}
+
+				return $this->disable_upe( $settings );
+			}
+
+			protected function enable_upe( $settings ) {
+				$settings['upe_checkout_experience_accepted_payments'] = [];
+				$payment_gateways                                      = WC()->payment_gateways->payment_gateways();
+				foreach ( WC_Stripe_UPE_Payment_Gateway::UPE_AVAILABLE_METHODS as $method_class ) {
+					if ( ! defined( "$method_class::LPM_GATEWAY_CLASS" ) ) {
+						continue;
+					}
+
+					$lpm_gateway_id = constant( $method_class::LPM_GATEWAY_CLASS . '::ID' );
+					if ( isset( $payment_gateways[ $lpm_gateway_id ] ) && 'yes' === $payment_gateways[ $lpm_gateway_id ]->enabled ) {
+						// DISABLE LPM
+						if ( 'stripe' !== $lpm_gateway_id ) {
+							/**
+							 * TODO: This can be replaced with:
+							 *
+							 *   $payment_gateways[ $lpm_gateway_id ]->update_option( 'enabled', 'no' );
+							 *   $payment_gateways[ $lpm_gateway_id ]->enabled = 'no';
+							 *
+							 * ...once the minimum WC version is 3.4.0.
+							 */
+							$payment_gateways[ $lpm_gateway_id ]->settings['enabled'] = 'no';
+							update_option(
+								$payment_gateways[ $lpm_gateway_id ]->get_option_key(),
+								apply_filters( 'woocommerce_settings_api_sanitized_fields_' . $payment_gateways[ $lpm_gateway_id ]::ID, $payment_gateways[ $lpm_gateway_id ]->settings ),
+								'yes'
+							);
 						}
+						// ENABLE UPE METHOD
+						$settings['upe_checkout_experience_accepted_payments'][] = $method_class::STRIPE_ID;
 					}
 				}
+				if ( empty( $settings['upe_checkout_experience_accepted_payments'] ) ) {
+					$settings['upe_checkout_experience_accepted_payments'] = [ 'card' ];
+				} else {
+					// The 'stripe' gateway must be enabled for UPE if any LPMs were enabled.
+					$settings['enabled'] = 'yes';
+				}
+
+				return $settings;
 			}
-		}
 
-		/**
-		 * Cancel pre-auth on refund/cancellation
-		 *
-		 * @param  int $order_id
-		 */
-		public function cancel_payment( $order_id ) {
-			$order = wc_get_order( $order_id );
-
-			if ( 'stripe' === ( version_compare( WC_VERSION, '3.0.0', '<' ) ? $order->payment_method : $order->get_payment_method() ) ) {
-				$charge   = get_post_meta( $order_id, '_stripe_charge_id', true );
-
-				if ( $charge ) {
-					$result = WC_Stripe_API::request( array(
-						'amount' => $order->get_total() * 100,
-					), 'charges/' . $charge . '/refund' );
-
-					if ( is_wp_error( $result ) ) {
-						$order->add_order_note( __( 'Unable to refund charge!', 'woocommerce-gateway-stripe' ) . ' ' . $result->get_error_message() );
-					} else {
-						$order->add_order_note( sprintf( __( 'Stripe charge refunded (Charge ID: %s)', 'woocommerce-gateway-stripe' ), $result->id ) );
-						delete_post_meta( $order_id, '_stripe_charge_captured' );
-						delete_post_meta( $order_id, '_stripe_charge_id' );
+			protected function disable_upe( $settings ) {
+				$upe_gateway            = new WC_Stripe_UPE_Payment_Gateway();
+				$upe_enabled_method_ids = $upe_gateway->get_upe_enabled_payment_method_ids();
+				foreach ( WC_Stripe_UPE_Payment_Gateway::UPE_AVAILABLE_METHODS as $method_class ) {
+					if ( ! defined( "$method_class::LPM_GATEWAY_CLASS" ) || ! in_array( $method_class::STRIPE_ID, $upe_enabled_method_ids, true ) ) {
+						continue;
 					}
+					// ENABLE LPM
+					$gateway_class = $method_class::LPM_GATEWAY_CLASS;
+					$gateway       = new $gateway_class();
+					/**
+					 * TODO: This can be replaced with:
+					 *
+					 *   $gateway->update_option( 'enabled', 'yes' );
+					 *
+					 * ...once the minimum WC version is 3.4.0.
+					 */
+					$gateway->settings['enabled'] = 'yes';
+					update_option( $gateway->get_option_key(), apply_filters( 'woocommerce_settings_api_sanitized_fields_' . $gateway::ID, $gateway->settings ), 'yes' );
+				}
+				// Disable main Stripe/card LPM if 'card' UPE method wasn't enabled.
+				if ( ! in_array( 'card', $upe_enabled_method_ids, true ) ) {
+					$settings['enabled'] = 'no';
+				}
+				// DISABLE ALL UPE METHODS
+				if ( ! isset( $settings['upe_checkout_experience_accepted_payments'] ) ) {
+					$settings['upe_checkout_experience_accepted_payments'] = [];
+				}
+				return $settings;
+			}
+
+			/**
+			 * Adds the failed SCA auth email to WooCommerce.
+			 *
+			 * @param WC_Email[] $email_classes All existing emails.
+			 * @return WC_Email[]
+			 */
+			public function add_emails( $email_classes ) {
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/compat/class-wc-stripe-email-failed-authentication.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/compat/class-wc-stripe-email-failed-renewal-authentication.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/compat/class-wc-stripe-email-failed-preorder-authentication.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/compat/class-wc-stripe-email-failed-authentication-retry.php';
+
+				// Add all emails, generated by the gateway.
+				$email_classes['WC_Stripe_Email_Failed_Renewal_Authentication']  = new WC_Stripe_Email_Failed_Renewal_Authentication( $email_classes );
+				$email_classes['WC_Stripe_Email_Failed_Preorder_Authentication'] = new WC_Stripe_Email_Failed_Preorder_Authentication( $email_classes );
+				$email_classes['WC_Stripe_Email_Failed_Authentication_Retry']    = new WC_Stripe_Email_Failed_Authentication_Retry( $email_classes );
+
+				return $email_classes;
+			}
+
+			/**
+			 * Register REST API routes.
+			 *
+			 * New endpoints/controllers can be added here.
+			 */
+			public function register_routes() {
+				/** API includes */
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-stripe-rest-base-controller.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/abstracts/abstract-wc-stripe-connect-rest-controller.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-rest-stripe-account-controller.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-rest-stripe-connection-tokens-controller.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-rest-stripe-locations-controller.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-rest-stripe-orders-controller.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-rest-stripe-tokens-controller.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/connect/class-wc-stripe-connect-rest-oauth-init-controller.php';
+				require_once WC_STRIPE_PLUGIN_PATH . '/includes/connect/class-wc-stripe-connect-rest-oauth-connect-controller.php';
+
+				$connection_tokens_controller = new WC_REST_Stripe_Connection_Tokens_Controller( $this->get_main_stripe_gateway() );
+				$locations_controller         = new WC_REST_Stripe_Locations_Controller();
+				$orders_controller            = new WC_REST_Stripe_Orders_Controller( $this->get_main_stripe_gateway() );
+				$stripe_tokens_controller     = new WC_REST_Stripe_Tokens_Controller();
+				$oauth_init                   = new WC_Stripe_Connect_REST_Oauth_Init_Controller( $this->connect, $this->api );
+				$oauth_connect                = new WC_Stripe_Connect_REST_Oauth_Connect_Controller( $this->connect, $this->api );
+				$stripe_account_controller    = new WC_REST_Stripe_Account_Controller( $this->get_main_stripe_gateway(), $this->account );
+
+				$connection_tokens_controller->register_routes();
+				$locations_controller->register_routes();
+				$orders_controller->register_routes();
+				$stripe_tokens_controller->register_routes();
+				$oauth_init->register_routes();
+				$oauth_connect->register_routes();
+				$stripe_account_controller->register_routes();
+
+				if ( WC_Stripe_Feature_Flags::is_upe_preview_enabled() ) {
+					require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-rest-stripe-settings-controller.php';
+					require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-stripe-rest-upe-flag-toggle-controller.php';
+					require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-rest-stripe-account-keys-controller.php';
+					require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-rest-stripe-payment-gateway-controller.php';
+
+					$upe_flag_toggle_controller = new WC_Stripe_REST_UPE_Flag_Toggle_Controller();
+					$upe_flag_toggle_controller->register_routes();
+
+					$settings_controller = new WC_REST_Stripe_Settings_Controller( $this->get_main_stripe_gateway() );
+					$settings_controller->register_routes();
+
+					$stripe_account_keys_controller = new WC_REST_Stripe_Account_Keys_Controller( $this->account );
+					$stripe_account_keys_controller->register_routes();
+
+					$settings_controller = new WC_REST_Stripe_Payment_Gateway_Controller();
+					$settings_controller->register_routes();
 				}
 			}
-		}
 
-		/**
-		 * Gets saved tokens from API if they don't already exist in WooCommerce.
-		 * @param array $tokens
-		 * @return array
-		 */
-		public function woocommerce_get_customer_payment_tokens( $tokens, $customer_id, $gateway_id ) {
-			if ( is_user_logged_in() && 'stripe' === $gateway_id && class_exists( 'WC_Payment_Token_CC' ) ) {
-				$stripe_customer = new WC_Stripe_Customer( $customer_id );
-				$stripe_cards    = $stripe_customer->get_cards();
-				$stored_tokens   = array();
-
-				foreach ( $tokens as $token ) {
-					$stored_tokens[] = $token->get_token();
+			/**
+			 * Returns the main Stripe payment gateway class instance.
+			 *
+			 * @return WC_Stripe_Payment_Gateway
+			 */
+			public function get_main_stripe_gateway() {
+				if ( ! is_null( $this->stripe_gateway ) ) {
+					return $this->stripe_gateway;
 				}
 
-				foreach ( $stripe_cards as $card ) {
-					if ( ! in_array( $card->id, $stored_tokens ) ) {
-						$token = new WC_Payment_Token_CC();
-						$token->set_token( $card->id );
-						$token->set_gateway_id( 'stripe' );
-						$token->set_card_type( strtolower( $card->brand ) );
-						$token->set_last4( $card->last4 );
-						$token->set_expiry_month( $card->exp_month );
-						$token->set_expiry_year( $card->exp_year );
-						$token->set_user_id( $customer_id );
-						$token->save();
-						$tokens[ $token->get_id() ] = $token;
-					}
+				if ( WC_Stripe_Feature_Flags::is_upe_preview_enabled() && WC_Stripe_Feature_Flags::is_upe_checkout_enabled() ) {
+					$this->stripe_gateway = new WC_Stripe_UPE_Payment_Gateway();
+
+					return $this->stripe_gateway;
 				}
-			}
-			return $tokens;
-		}
 
-		/**
-		 * Delete token from Stripe
-		 */
-		public function woocommerce_payment_token_deleted( $token_id, $token ) {
-			if ( 'stripe' === $token->get_gateway_id() ) {
-				$stripe_customer = new WC_Stripe_Customer( get_current_user_id() );
-				$stripe_customer->delete_card( $token->get_token() );
-			}
-		}
+				$this->stripe_gateway = new WC_Gateway_Stripe();
 
-		/**
-		 * Set as default in Stripe
-		 */
-		public function woocommerce_payment_token_set_default( $token_id ) {
-			$token = WC_Payment_Tokens::get( $token_id );
-			if ( 'stripe' === $token->get_gateway_id() ) {
-				$stripe_customer = new WC_Stripe_Customer( get_current_user_id() );
-				$stripe_customer->set_default_card( $token->get_token() );
-			}
-		}
-
-		/**
-		 * Checks Stripe minimum order value authorized per currency
-		 */
-		public static function get_minimum_amount() {
-			// Check order amount
-			switch ( get_woocommerce_currency() ) {
-				case 'USD':
-				case 'CAD':
-				case 'EUR':
-				case 'CHF':
-				case 'AUD':
-				case 'SGD':
-					$minimum_amount = 50;
-					break;
-				case 'GBP':
-					$minimum_amount = 30;
-					break;
-				case 'DKK':
-					$minimum_amount = 250;
-					break;
-				case 'NOK':
-				case 'SEK':
-					$minimum_amount = 300;
-					break;
-				case 'JPY':
-					$minimum_amount = 5000;
-					break;
-				case 'MXN':
-					$minimum_amount = 1000;
-					break;
-				case 'HKD':
-					$minimum_amount = 400;
-					break;
-				default:
-					$minimum_amount = 50;
-					break;
+				return $this->stripe_gateway;
 			}
 
-			return $minimum_amount;
-		}
+			/**
+			 * Move the email field to the top of the Checkout page.
+			 *
+			 * @param array $fields WooCommerce checkout fields.
+			 *
+			 * @return array WooCommerce checkout fields.
+			 */
+			public function checkout_update_email_field_priority( $fields ) {
+				if ( isset( $fields['billing_email'] ) && WC_Stripe_UPE_Payment_Method_Link::is_link_enabled() ) {
+					// Update the field priority.
+					$fields['billing_email']['priority'] = 1;
 
-		/**
-		 * What rolls down stairs
-		 * alone or in pairs,
-		 * and over your neighbor's dog?
-		 * What's great for a snack,
-		 * And fits on your back?
-		 * It's log, log, log
-		 */
-		public static function log( $message ) {
-			if ( empty( self::$log ) ) {
-				self::$log = new WC_Logger();
+					// Add extra `wcpay-checkout-email-field` class.
+					$fields['billing_email']['class'][] = 'stripe-gateway-checkout-email-field';
+
+					// Append StripeLink modal trigger button for logged in users.
+					$fields['billing_email']['label'] = $fields['billing_email']['label']
+						. ' <button class="stripe-gateway-stripelink-modal-trigger"></button>';
+				}
+
+				return $fields;
 			}
-
-			self::$log->add( 'woocommerce-gateway-stripe', $message );
 		}
+
+		$plugin = WC_Stripe::get_instance();
+
 	}
 
-	$GLOBALS['wc_stripe'] = WC_Stripe::get_instance();
+	return $plugin;
+}
 
-endif;
+add_action( 'plugins_loaded', 'woocommerce_gateway_stripe_init' );
+
+function woocommerce_gateway_stripe_init() {
+	load_plugin_textdomain( 'woocommerce-gateway-stripe', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
+
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		add_action( 'admin_notices', 'woocommerce_stripe_missing_wc_notice' );
+		return;
+	}
+
+	if ( version_compare( WC_VERSION, WC_STRIPE_MIN_WC_VER, '<' ) ) {
+		add_action( 'admin_notices', 'woocommerce_stripe_wc_not_supported' );
+		return;
+	}
+
+	woocommerce_gateway_stripe();
+}
+
+/**
+ * Add woocommerce_inbox_variant for the Remote Inbox Notification.
+ *
+ * P2 post can be found at https://wp.me/paJDYF-1uJ.
+ */
+if ( ! function_exists( 'add_woocommerce_inbox_variant' ) ) {
+	function add_woocommerce_inbox_variant() {
+		$config_name = 'woocommerce_inbox_variant_assignment';
+		if ( false === get_option( $config_name, false ) ) {
+			update_option( $config_name, wp_rand( 1, 12 ) );
+		}
+	}
+}
+register_activation_hook( __FILE__, 'add_woocommerce_inbox_variant' );
+
+function wcstripe_deactivated() {
+	// admin notes are not supported on older versions of WooCommerce.
+	require_once WC_STRIPE_PLUGIN_PATH . '/includes/class-wc-stripe-upe-compatibility.php';
+	if ( WC_Stripe_Inbox_Notes::are_inbox_notes_supported() ) {
+		// requirements for the note
+		require_once WC_STRIPE_PLUGIN_PATH . '/includes/class-wc-stripe-feature-flags.php';
+		require_once WC_STRIPE_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-availability-note.php';
+		WC_Stripe_UPE_Availability_Note::possibly_delete_note();
+
+		require_once WC_STRIPE_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-stripelink-note.php';
+		WC_Stripe_UPE_StripeLink_Note::possibly_delete_note();
+	}
+}
+register_deactivation_hook( __FILE__, 'wcstripe_deactivated' );
+
+// Hook in Blocks integration. This action is called in a callback on plugins loaded, so current Stripe plugin class
+// implementation is too late.
+add_action( 'woocommerce_blocks_loaded', 'woocommerce_gateway_stripe_woocommerce_block_support' );
+
+function woocommerce_gateway_stripe_woocommerce_block_support() {
+	if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+		require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-blocks-support.php';
+		// priority is important here because this ensures this integration is
+		// registered before the WooCommerce Blocks built-in Stripe registration.
+		// Blocks code has a check in place to only register if 'stripe' is not
+		// already registered.
+		add_action(
+			'woocommerce_blocks_payment_method_type_registration',
+			function( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+				// I noticed some incompatibility with WP 5.x and WC 5.3 when `_wcstripe_feature_upe_settings` is enabled.
+				if ( ! class_exists( 'WC_Stripe_Payment_Request' ) ) {
+					return;
+				}
+
+				$container = Automattic\WooCommerce\Blocks\Package::container();
+				// registers as shared instance.
+				$container->register(
+					WC_Stripe_Blocks_Support::class,
+					function() {
+						if ( class_exists( 'WC_Stripe' ) ) {
+							return new WC_Stripe_Blocks_Support( WC_Stripe::get_instance()->payment_request_configuration );
+						} else {
+							return new WC_Stripe_Blocks_Support();
+						}
+					}
+				);
+				$payment_method_registry->register(
+					$container->get( WC_Stripe_Blocks_Support::class )
+				);
+			},
+			5
+		);
+	}
+}
+
+add_action(
+	'before_woocommerce_init',
+	function() {
+		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
+);

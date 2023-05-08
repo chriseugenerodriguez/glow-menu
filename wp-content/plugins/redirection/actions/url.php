@@ -1,23 +1,55 @@
 <?php
 
+/**
+ * URL action - redirect to a URL
+ */
 class Url_Action extends Red_Action {
-	function can_change_code() {
+	/**
+	 * Redirect to a URL
+	 *
+	 * @param string $target Target URL.
+	 * @return void
+	 */
+	protected function redirect_to( $target ) {
+		// This is a known redirect, possibly extenal
+		// phpcs:ignore
+		$redirect = wp_redirect( $target, $this->get_code(), 'redirection' );
+
+		if ( $redirect ) {
+			/** @psalm-suppress InvalidGlobal */
+			global $wp_version;
+
+			if ( version_compare( $wp_version, '5.1', '<' ) ) {
+				header( 'X-Redirect-Agent: redirection' );
+			}
+
+			die();
+		}
+	}
+
+	/**
+	 * Run this action. May not return from this function.
+	 *
+	 * @return void
+	 */
+	public function run() {
+		$target = $this->get_target();
+
+		if ( $target !== null ) {
+			$this->redirect_to( $target );
+		}
+	}
+
+	/**
+	 * Does this action need a target?
+	 *
+	 * @return boolean
+	 */
+	public function needs_target() {
 		return true;
 	}
 
-	function action_codes() {
-		return array(
-			301 => get_status_header_desc( 301 ),
-			302 => get_status_header_desc( 302 ),
-			307 => get_status_header_desc( 307 ),
-            308 => get_status_header_desc( 308 ),
-		);
-	}
-
-	function process_before( $code, $target ) {
-		$redirect = wp_redirect( $target, $code );
-		if ( $redirect ) {
-			die();
-		}
+	public function name() {
+		return __( 'Redirect to URL', 'redirection' );
 	}
 }

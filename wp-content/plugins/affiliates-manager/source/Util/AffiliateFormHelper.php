@@ -6,15 +6,17 @@ class WPAM_Util_AffiliateFormHelper {
 
 		foreach ($affiliateFields as $affiliateField)
 		{
-			$request_value = $request['_'.$affiliateField->databaseField];
-			
-			if ( $affiliateField->fieldType == 'phoneNumber' )
+			$request_value = isset($request['_'.$affiliateField->databaseField]) ? $request['_'.$affiliateField->databaseField] : '';
+                        
+			if ( $affiliateField->fieldType == 'phoneNumber' ){
 				$value = $request_value;
-			else if ( $affiliateField->fieldType == 'ssn' && is_array( $request_value ) )
+                        }
+			else if ( $affiliateField->fieldType == 'ssn' && is_array( $request_value ) ){
 				$value = implode($request_value);
-			else
+                        }
+			else{
 				$value = $request_value;
-
+                        }
 			if ($affiliateField->type == 'base')
 			{
 				if ( $affiliateField->fieldType == 'email' && empty( $value ) )
@@ -37,6 +39,10 @@ class WPAM_Util_AffiliateFormHelper {
 
 		if( isset( $request['txtPaypalEmail'] ) ) {
 			$model->paypalEmail = $request['txtPaypalEmail'];
+		}
+                
+                if( isset( $request['txtBankDetails'] ) ) {
+			$model->bankDetails = $request['txtBankDetails'];
 		}
 
 		if( isset( $request['ddBountyType'] ) ) {
@@ -100,6 +106,9 @@ class WPAM_Util_AffiliateFormHelper {
 					case 'string':
 						$validator->addValidator($fieldName, new WPAM_Validation_StringValidator(1, $affiliateField->length));
 						break;
+                                        case 'textarea':
+						$validator->addValidator($fieldName, new WPAM_Validation_StringValidator(1));
+						break;    
 					case 'email':
 						$validator->addValidator($fieldName, new WPAM_Validation_EmailValidator());
 						break;
@@ -155,6 +164,8 @@ class WPAM_Util_AffiliateFormHelper {
 
                 if (get_option(WPAM_PluginConfig::$PayoutMethodManualIsEnabledOption) == 1)
 			$payments['manual'] = __( 'Manual Transfer', 'affiliates-manager' );
+                if (get_option(WPAM_PluginConfig::$PayoutMethodBankIsEnabledOption) == 1)
+			$payments['bank'] = __( 'Bank Transfer', 'affiliates-manager' );
 
 		return $payments;
 	}

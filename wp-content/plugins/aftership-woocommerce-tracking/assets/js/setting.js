@@ -1,72 +1,65 @@
 jQuery(function () {
+    // Couriers selection
+	var aftership_couriers_select = jQuery('#aftership_couriers_select');
+	var aftership_couriers = jQuery('#aftership_couriers');
     function set_aftership_tracking_provider(selected_couriers) {
-        var couriers = sort_couriers(get_couriers());
-
-//		console.log(couriers);
-
+        var couriers = sort_couriers(get_aftership_couriers());
         jQuery.each(couriers, function (key, courier) {
-//			console.log(courier.name);
             var str = '<option ';
             str += 'value="' + courier['slug'] + '" ';
             if (selected_couriers.hasOwnProperty(courier['slug'])) {
                 str += 'selected="selected"';
             }
             str += '>' + courier['name'] + '</option>';
-            jQuery('#couriers_select').append(str);
+			aftership_couriers_select.append(str);
         });
 
-        jQuery('#couriers_select').val(selected_couriers);
-        jQuery('#couriers_select').chosen();
-	    jQuery('#couriers_select').trigger('chosen:updated');
+		aftership_couriers_select.val(selected_couriers);
+		aftership_couriers_select.chosen();
+		aftership_couriers_select.trigger('chosen:updated');
     }
 
-    function set_track_message_demo(){
-        jQuery('#track_message_demo_1').html(
-            jQuery('#track_message_1').val() + 'UPS' +
-                '<br/>'+
-            jQuery('#track_message_2').val() + '1Z0X118A0324011613'
-        );
-    }
-
-    jQuery('#couriers_select').change(function () {
-        var couriers_select = jQuery('#couriers_select').val();
+	aftership_couriers_select.change(function () {
+        var couriers_select = aftership_couriers_select.val();
         var value = (couriers_select) ? couriers_select.join(',') : '';
-        jQuery('#couriers').val(value);
+		aftership_couriers.val(value);
     });
 
-    jQuery('#plugin').change(function () {
-        if (jQuery(this).val() == 'aftership') {
-            jQuery('#couriers').parent().parent().show();
-            jQuery('#track_message_demo_1').parent().parent().show();
-        } else {
-            jQuery('#couriers').parent().parent().hide();
-            jQuery('#track_message_demo_1').parent().parent().hide();
-        }
-    });
-
-    if (jQuery('#couriers')) {
-        var couriers_select = jQuery('#couriers').val();
+    if (aftership_couriers) {
+        var couriers_select = aftership_couriers.val();
         var couriers_select_array = (couriers_select) ? couriers_select.split(',') : [];
         set_aftership_tracking_provider(couriers_select_array);
-
-        if (jQuery('#plugin').val() != 'aftership') {
-            jQuery('#couriers').parent().parent().hide();
-        }
     }
 
-    if (jQuery('#track_message_demo_1')) {
-        set_track_message_demo();
+    // Add Tracking Order action selection
+    var aftership_show_order_actions_select = jQuery('#aftership_show_order_actions_select');
+    var aftership_show_order_actions = jQuery('#aftership_show_order_actions');
+    function set_aftership_show_order_actions(selected_status) {
+        var show_order_status = get_aftership_show_order_status();
+        jQuery.each(show_order_status, function (key, status) {
+            var str = '<option ';
+            str += 'value="' + status['status'] + '" ';
+            if (selected_status.hasOwnProperty(status['status'])) {
+                str += 'selected="selected"';
+            }
+            str += '>' + status['name'] + '</option>';
+            aftership_show_order_actions_select.append(str);
+        });
 
-        if (jQuery('#plugin').val() != 'aftership') {
-            jQuery('#track_message_demo_1').parent().parent().hide();
-        }
+        aftership_show_order_actions_select.val(selected_status);
+        aftership_show_order_actions_select.chosen();
+        aftership_show_order_actions_select.trigger('chosen:updated');
     }
 
-    jQuery('#track_message_1').keyup(function () {
-        set_track_message_demo();
+    aftership_show_order_actions_select.change(function () {
+        var order_actions_select = aftership_show_order_actions_select.val();
+        var value = (order_actions_select) ? order_actions_select.join(',') : '';
+        aftership_show_order_actions.val(value);
     });
 
-    jQuery('#track_message_2').keyup(function () {
-        set_track_message_demo();
-    });
+    if (aftership_show_order_actions) {
+        var order_actions_select = aftership_show_order_actions.val();
+        var order_actions_select_array = (order_actions_select) ? order_actions_select.split(',') : [];
+        set_aftership_show_order_actions(order_actions_select_array);
+    }
 });

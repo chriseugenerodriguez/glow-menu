@@ -27,8 +27,9 @@ if ( !function_exists( 'search_live' ) ) {
 	/**
 	 * Renders a search form which is returned as HTML and loads
 	 * required resources.
-	 * 
+	 *
 	 * @param array $atts desired search facility options
+	 *
 	 * @return string form HTML
 	 */
 	function search_live( $atts = array() ) {
@@ -63,11 +64,12 @@ class Search_Live_Shortcodes {
 
 	/**
 	 * Shortcode handler, renders a search form.
-	 * 
+	 *
 	 * Enqueues required scripts and styles.
-	 * 
+	 *
 	 * @param array $atts
 	 * @param array $content not used
+	 *
 	 * @return string form HTML
 	 */
 	public static function search_live( $atts = array(), $content = '' ) {
@@ -96,7 +98,6 @@ class Search_Live_Shortcodes {
 				'submit_button'       => 'no',
 				'submit_button_label' => _x( 'Search', 'submit button', 'search-live' ),
 				'navigable'           => 'yes',
-				'auto_adjust'         => 'yes',
 				'wpml'                => 'no'
 			),
 			$atts
@@ -141,7 +142,6 @@ class Search_Live_Shortcodes {
 					case 'inhibit_enter' :
 					case 'submit_button' :
 					case 'navigable' :
-					case 'auto_adjust' :
 					case 'wpml' :
 					case 'thumbnails' :
 					case 'show_description' :
@@ -189,6 +189,7 @@ class Search_Live_Shortcodes {
 		$form_id    = 'search-live-form-' . $n;
 		$field_id   = 'search-live-field-' . $n;
 		$results_id = 'search-live-results-' .$n;
+		$results_content_id = 'search-live-results-content-' . $n;
 
 		$output .= self::inline_styles();
 
@@ -199,9 +200,11 @@ class Search_Live_Shortcodes {
 		);
 
 		$output .= '<div class="search-live-form">';
-		$output .= sprintf( '<form role="search" id="%s" class="search-live-form" action="%s" method="get">', esc_attr( $form_id ), esc_url( home_url( '/' ) ) );
-		$output .= '<div>';
-		$output .= '<span class="screen-reader-text">' . _x( 'Search for:', 'label', 'search-live' ) . '</span>';
+		$output .= sprintf(
+			'<form role="search" id="%s" class="search-live-form" action="%s" method="get">',
+			esc_attr( $form_id ),
+			esc_url( home_url( '/' ) )
+		);
 		$output .= sprintf(
 			'<input id="%s" name="s" type="text" class="search-live-field" placeholder="%s" autocomplete="off" title="%s" value="%s" />',
 			esc_attr( $field_id ),
@@ -210,7 +213,7 @@ class Search_Live_Shortcodes {
 			get_search_query() // this comes in escaped through esc_attr()
 		);
 
-		if ( isset( $url_params['limit'] ) ) { 
+		if ( isset( $url_params['limit'] ) ) {
 			$output .= sprintf( '<input type="hidden" name="limit" value="%d"/>', intval( $url_params['limit'] ) );
 		}
 		if ( $params['wpml'] && defined( 'ICL_LANGUAGE_CODE' ) ) {
@@ -226,11 +229,16 @@ class Search_Live_Shortcodes {
 			$output .= '</noscript>';
 		}
 
-		$output .= '</div>';
 		$output .= '</form>';
 		$output .= '</div>'; // .search-live-form
 
 		$output .= sprintf( '<div id="%s" class="search-live-results">', $results_id );
+		$results_content_style = '';
+		if ( !empty( $params['height'] ) ) { // @todo
+			$results_content_style = sprintf( 'max-height:%s;', $params['height'] );
+		}
+		$output .= sprintf( '<div id="%s" class="search-live-results-content" style="%s">', $results_content_id, esc_attr( $results_content_style ) );
+		$output .= '</div>'; // .search-live-results-content
 		$output .= '</div>'; // .search-live-results
 
 		$output .= '</div>'; // .search-live
@@ -253,9 +261,10 @@ class Search_Live_Shortcodes {
 		}
 		$js_args = '{' . implode( ',', $js_args ) . '}';
 
-		$post_target_url = add_query_arg( $url_params , admin_url( 'admin-ajax.php' ) ); 
+		$post_target_url = add_query_arg( $url_params , admin_url( 'admin-ajax.php' ) );
 
 		$output .= '<script type="text/javascript">';
+		$output .= 'document.addEventListener( "DOMContentLoaded", function() {';
 		$output .= 'if ( typeof jQuery !== "undefined" ) {';
 		$output .= 'jQuery(document).ready(function(){';
 		$output .= sprintf(
@@ -268,7 +277,7 @@ class Search_Live_Shortcodes {
 			esc_attr( $field_id ), // jQuery selector for the input field
 			esc_attr( $field_id ), // jQuery selector for the input field passed to searchLive()
 			esc_attr( $search_id ), // container selector
-			esc_attr( $search_id . ' div.search-live-results' ), // results container selector
+			esc_attr( $search_id . ' div.search-live-results-content' ), // results content container selector
 			$post_target_url,
 			$js_args,
 			$params['delay'],
@@ -281,13 +290,11 @@ class Search_Live_Shortcodes {
 			$output .= sprintf( 'ixsl.navigate("%s","%s");', $field_id, $results_id );
 		}
 		if ( $params['dynamic_focus'] ) {
-			$output .= sprintf( 'ixsl.dynamicFocus("%s","%s");', $search_id, $results_id );
-		}
-		if ( $params['auto_adjust'] ) {
-			$output .= sprintf( 'ixsl.autoAdjust("%s","%s");', $field_id, $results_id );
+			$output .= sprintf( 'ixsl.dynamicFocus("%s","%s");', $search_id, $results_content_id );
 		}
 		$output .= '});'; // ready
 		$output .= '}'; // if
+		$output .= '});'; // document...
 		$output .= '</script>';
 
 		return $output;
@@ -295,7 +302,7 @@ class Search_Live_Shortcodes {
 
 	/**
 	 * Renders search inline styles if defined (once only).
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function inline_styles() {

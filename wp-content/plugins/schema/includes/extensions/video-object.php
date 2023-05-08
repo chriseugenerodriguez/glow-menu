@@ -1,5 +1,4 @@
 <?php
-
 /**
  *  VideoObject extention
  *
@@ -25,7 +24,7 @@ function schema_wp_video_object_admin_init() {
 		return;
 	
 	$video_objec_enable = schema_wp_get_option( 'video_object_enable' );
-	
+
 	if ( $video_objec_enable != true )
 		return;
 	
@@ -243,16 +242,17 @@ function schema_wp_video_object_output( $schema ) {
 	
 	if ( $video_object_enable != true )
 		return $schema;
-		
+			
 	global $wp_query, $post, $wp_embed;
 	
 	// Maybe this is not needed!
 	if ( ! $wp_query->is_main_query() ) return $schema;
 	
-	if ( $wp_embed->last_url == '' || ! isset($wp_embed->last_url) ) return $schema;
+	// This didn't work, that's why it's commented
+	//if ( $wp_embed->last_url == '' || ! isset($wp_embed->last_url) ) return $schema;
 	
 	// Get post meta
-	$schema_ref = get_post_meta( $post->ID, '_schema_ref'			, true );
+	$schema_ref = get_post_meta( $post->ID, '_schema_ref', true );
 	
 	// Check for ref, if is not presented, then get out!
 	if ( ! isset($schema_ref) || $schema_ref  == '' ) return $schema;
@@ -261,12 +261,12 @@ function schema_wp_video_object_output( $schema ) {
 	$type	 = get_post_meta( $schema_ref, '_schema_video_object_type', true );
 	
 	//if ( ! isset($enabled) ) $enabled = false; // default
-	//if ( ! isset($video_object_type_enabled)  || $video_object_type_enabled == '' )	$video_object_type_enabled	= false;		// default
+	//if ( ! isset($video_object_type_enabled)  || $video_object_type_enabled == '' ) $video_object_type_enabled	= false;		// default
 	if ( ! isset($type) ) $type = 'none'; // default
 	
 	if ( $type != 'none' ) {
 		
-		require_once( ABSPATH . WPINC . '/class-oembed.php' );
+		require_once( ABSPATH . WPINC . '/class-wp-oembed.php' );
 	
 		// Get content
 		$post_object = get_post( $post->ID );
@@ -294,7 +294,7 @@ function schema_wp_video_object_output( $schema ) {
 			if (filter_var($provider, FILTER_VALIDATE_URL) != FALSE) {
 				$data = $autoembed->fetch( $provider, $url );
 				if (!empty($data) ) {
-					$schema['video'] = schema_wp_get_video_object_array( $data );
+					$schema['video'] = schema_wp_get_video_object_array( $data, $url );
 				}
 			}
 		
@@ -305,7 +305,7 @@ function schema_wp_video_object_output( $schema ) {
 				if (filter_var($provider, FILTER_VALIDATE_URL) != FALSE) {
 					$data = $autoembed->fetch( $provider, $url );
 					if (!empty($data) ) {
-						$schema['video'] = schema_wp_get_video_object_array( $data );
+						$schema['video'] = schema_wp_get_video_object_array( $data, $url );
 					}
 				}
 			}*/
@@ -328,7 +328,7 @@ function schema_wp_video_object_output( $schema ) {
 				if (filter_var($provider, FILTER_VALIDATE_URL) != FALSE) {
 					$data = $autoembed->fetch( $provider, $url );
 					if (!empty($data) ) {
-						$schema['video'][] = schema_wp_get_video_object_array( $data );
+						$schema['video'][] = schema_wp_get_video_object_array( $data, $url );
 					}
 				}
 			}
@@ -337,11 +337,12 @@ function schema_wp_video_object_output( $schema ) {
 	}
 	
 	// Debug
-	//if (current_user_can( 'manage_options' )) {
-			//echo'<pre>'; print_r( $schema ); echo'</pre>';
-			//exit;
-			//echo 'Execution time in seconds: ' . (microtime(true) - $time_start) . '<br>';
-	//}
+	/*if (current_user_can( 'manage_options' )) {
+			echo'<pre>'; print_r( $schema ); echo'</pre>';
+			exit;
+			echo 'Execution time in seconds: ' . (microtime(true) - $time_start) . '<br>';
+	}
+	*/
 	
 	// finally!
 	return $schema;
@@ -356,14 +357,9 @@ function schema_wp_video_object_output( $schema ) {
  * @since 1.5
  * @return array 
  */
-function schema_wp_get_video_object_array( $data ) {
+function schema_wp_get_video_object_array( $data, $url ) {
 	
 	global $post;
-	
-	// Check for WPRichSnippets
-	//if (function_exists('wprs_is_enabled')) {
-	//	if ( wprs_is_enabled($post->ID) ) return;
-	//}
 	
 	//print_r($data); exit;
 	
@@ -395,13 +391,16 @@ function schema_wp_get_video_object_array( $data ) {
 	$duration		= isset($data->duration) ? schema_wp_get_time_second_to_iso8601_duration( $data->duration ) : $meta_duration;
 	
 	$schema = array( 
-						'@type'			=> 'VideoObject',
-						"name"			=> $name,
-						"description"	=> $description,
-						"thumbnailUrl"	=> $thumbnail_url,
-						'uploadDate'	=> $upload_date,
-						"duration"		=> $duration
-					);
-					
+		'@type'			=> 'VideoObject',
+		"name"			=> $name,
+		"description"	=> $description,
+		"thumbnailUrl"	=> $thumbnail_url,
+		'uploadDate'	=> $upload_date,
+		"duration"		=> $duration,
+		"embedUrl"		=> $url
+	);
+	
+	//echo'<pre>'; print_r( $data ); echo'</pre>';
+
 	return $schema;
 }

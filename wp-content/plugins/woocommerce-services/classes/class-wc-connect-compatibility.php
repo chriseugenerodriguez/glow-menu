@@ -4,18 +4,34 @@
  * This is the base class. Its static members auto-select the correct version to use.
  */
 
-// No direct access please
+// No direct access please.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 if ( ! class_exists( 'WC_Connect_Compatibility' ) ) {
-
+	/**
+	 * WC_Connect_Compatibility class.
+	 */
 	abstract class WC_Connect_Compatibility {
+
+		/**
+		 * WC_Connect_Compatibility.
+		 *
+		 * @var WC_Connect_Compatibility
+		 */
 		private static $singleton;
+
+		/**
+		 * Woocommerce version.
+		 *
+		 * @var string
+		 */
 		private static $version = WC_VERSION;
 
 		/**
+		 * WC_Connect_Compatibility singleton instance.
+		 *
 		 * @return WC_Connect_Compatibility
 		 */
 		public static function instance() {
@@ -27,89 +43,58 @@ if ( ! class_exists( 'WC_Connect_Compatibility' ) ) {
 		}
 
 		/**
+		 * Return subclass for active version of WooCommerce.
+		 *
 		 * @return WC_Connect_Compatibility subclass for active version of WooCommerce
 		 */
 		private static function select_compatibility() {
-			if ( version_compare( self::$version, '3.0.0', '<' ) ) {
-				require_once 'class-wc-connect-compatibility-wc26.php';
-				return new WC_Connect_Compatibility_WC26();
-			} else {
+			if ( version_compare( self::$version, '6.9.0', '<' ) ) {
 				require_once 'class-wc-connect-compatibility-wc30.php';
+
 				return new WC_Connect_Compatibility_WC30();
+			} else {
+				require_once 'class-wc-connect-compatibility-wc69.php';
+
+				return new WC_Connect_Compatibility_WC69();
 			}
 		}
 
+		/**
+		 * Overwrite default WooCommerce Version.
+		 *
+		 * @param string $value WooCommerce Version.
+		 * @return void
+		 */
 		public static function set_version( $value ) {
 			self::$singleton = null;
-			self::$version = $value;
+			self::$version   = $value;
 		}
 
+		/**
+		 * Revert to current WooCommerce Version.
+		 *
+		 * @return void
+		 */
 		public static function reset_version() {
 			self::$singleton = null;
-			self::$version = WC_VERSION;
+			self::$version   = WC_VERSION;
 		}
 
 		/**
-		 * Get the ID for a given Order.
+		 * Return the order admin screen
 		 *
-		 * @param WC_Order $order
-		 *
-		 * @return int
+		 * @return string The order admin screen
 		 */
-		abstract public function get_order_id( WC_Order $order );
+		abstract public function get_order_admin_screen();
 
 		/**
-		 * Retrieve the corresponding Product for the given Order Item.
+		 * Helper function to initialize the global $theorder object, mostly used during order meta boxes rendering.
 		 *
-		 * @param WC_Order $order
-		 * @param WC_Order_Item|WC_Order_Item_Product|array $item
+		 * @param WC_Order|WP_Post $post_or_order_object Post or order object.
 		 *
-		 * @return WC_Product
+		 * @return bool|WC_Order|WC_Order_Refund.
 		 */
-		abstract public function get_item_product( WC_Order $order, $item );
+		abstract public function init_theorder_object( $post_or_order_object );
 
-		/**
-		 * Get formatted list of Product Variations, if applicable.
-		 *
-		 * @param WC_Product_Variation $product
-		 * @param bool $flat
-		 *
-		 * @return string
-		 */
-		abstract public function get_formatted_variation( WC_Product_Variation $product, $flat = false );
-
-		/**
-		 * Get the most specific ID for a given Product.
-		 *
-		 * Note: Returns the Variation ID for Variable Products.
-		 *
-		 * @param WC_Product $product
-		 *
-		 * @return int
-		 */
-		abstract public function get_product_id( WC_Product $product );
-
-		/**
-		 * Get the top-level ID for a given Product.
-		 *
-		 * Note: Returns the Parent ID for Variable Products.
-		 *
-		 * @param WC_Product $product
-		 *
-		 * @return int
-		 */
-		abstract public function get_parent_product_id( WC_Product $product );
-
-		/**
-		 * For a given product ID, it tries to find its name inside an order's line items.
-		 * This is useful when an order has a product which was later deleted from the
-		 * store.
-		 *
-		 * @param int $product_id Product ID or variation ID
-		 * @param WC_Order $order
-		 * @return string The product (or variation) name, ready to print
-		 */
-		abstract public function get_product_name_from_order( $product_id, $order );
 	}
-
 }

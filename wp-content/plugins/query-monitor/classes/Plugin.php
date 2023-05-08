@@ -1,29 +1,28 @@
-<?php
-/*
-Copyright 2009-2016 John Blackbourn
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-*/
+<?php declare(strict_types = 1);
+/**
+ * Abstract plugin wrapper.
+ *
+ * @package query-monitor
+ */
 
 if ( ! class_exists( 'QM_Plugin' ) ) {
 abstract class QM_Plugin {
 
+	/**
+	 * @var array<string, string>
+	 */
 	private $plugin = array();
+
+	/**
+	 * @var string
+	 */
+	public $file = '';
 
 	/**
 	 * Class constructor
 	 *
-	 * @author John Blackbourn
-	 **/
+	 * @param string $file
+	 */
 	protected function __construct( $file ) {
 		$this->file = $file;
 	}
@@ -31,10 +30,9 @@ abstract class QM_Plugin {
 	/**
 	 * Returns the URL for for a file/dir within this plugin.
 	 *
-	 * @param $file string The path within this plugin, e.g. '/js/clever-fx.js'
+	 * @param string $file The path within this plugin, e.g. '/js/clever-fx.js'
 	 * @return string URL
-	 * @author John Blackbourn
-	 **/
+	 */
 	final public function plugin_url( $file = '' ) {
 		return $this->_plugin( 'url', $file );
 	}
@@ -42,10 +40,9 @@ abstract class QM_Plugin {
 	/**
 	 * Returns the filesystem path for a file/dir within this plugin.
 	 *
-	 * @param $file string The path within this plugin, e.g. '/js/clever-fx.js'
+	 * @param string $file The path within this plugin, e.g. '/js/clever-fx.js'
 	 * @return string Filesystem path
-	 * @author John Blackbourn
-	 **/
+	 */
 	final public function plugin_path( $file = '' ) {
 		return $this->_plugin( 'path', $file );
 	}
@@ -53,20 +50,18 @@ abstract class QM_Plugin {
 	/**
 	 * Returns a version number for the given plugin file.
 	 *
-	 * @param $file string The path within this plugin, e.g. '/js/clever-fx.js'
+	 * @param string $file The path within this plugin, e.g. '/js/clever-fx.js'
 	 * @return string Version
-	 * @author John Blackbourn
-	 **/
+	 */
 	final public function plugin_ver( $file ) {
-		return filemtime( $this->plugin_path( $file ) );
+		return QM_VERSION;
 	}
 
 	/**
 	 * Returns the current plugin's basename, eg. 'my_plugin/my_plugin.php'.
 	 *
 	 * @return string Basename
-	 * @author John Blackbourn
-	 **/
+	 */
 	final public function plugin_base() {
 		return $this->_plugin( 'base' );
 	}
@@ -74,9 +69,11 @@ abstract class QM_Plugin {
 	/**
 	 * Populates and returns the current plugin info.
 	 *
-	 * @author John Blackbourn
-	 **/
-	final private function _plugin( $item, $file = '' ) {
+	 * @param string $item
+	 * @param string $file
+	 * @return string
+	 */
+	private function _plugin( $item, $file = '' ) {
 		if ( ! array_key_exists( $item, $this->plugin ) ) {
 			switch ( $item ) {
 				case 'url':
@@ -91,6 +88,21 @@ abstract class QM_Plugin {
 			}
 		}
 		return $this->plugin[ $item ] . ltrim( $file, '/' );
+	}
+
+	/**
+	 * @param string $name Icon name.
+	 * @return string Icon HTML.
+	 */
+	public static function icon( $name ) {
+		if ( 'blank' === $name ) {
+			return '<span class="qm-icon qm-icon-blank"></span>';
+		}
+
+		return sprintf(
+			'<svg class="qm-icon qm-icon-%1$s" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20"><use href="#qm-icon-%1$s" /></svg>',
+			esc_attr( $name )
+		);
 	}
 
 }

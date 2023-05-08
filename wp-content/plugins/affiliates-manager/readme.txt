@@ -3,8 +3,8 @@ Contributors: wp.insider, affmngr, ElementGreen
 Donate link: https://wpaffiliatemanager.com/
 Tags: affiliate, affiliates manager, affiliate marketing, affiliate plugin, affiliates, referral, affiliate program, ads, advertising, affiliate tool, digital downloads, e-commerce, tracking, track affiliates, leads, affiliate software, woocommerce, affiliate campaign, paypal  
 Requires at least: 3.5
-Tested up to: 4.8
-Stable tag: 2.4.6
+Tested up to: 6.2
+Stable tag: 2.9.23
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,13 +16,14 @@ Running your WordPress site with an e-Commerce plugin or solution? WP Affiliate 
 
 Affiliate Marketing is the fastest growing advertising method and it is very cost effective.
 
-This plugin facilitates the affiliates recruitment, registration, login, management process. 
+This wp affiliate plugin facilitates the affiliates recruitment, registration, login, management process. 
 
 It will also track the referrals your affiliates send to your site and give commissions appropriately.
 
 Affiliates Manager integrates with some popular e-commerce solutions. It integrates with:
 
 * WooCommerce
+* WooCommerce Subscriptions
 * Simple Shopping Cart
 * WP eCommerce
 * JigoShop
@@ -32,61 +33,121 @@ Affiliates Manager integrates with some popular e-commerce solutions. It integra
 * Sell Digital Downloads
 * Paid Membership Pro
 * S2Member
+* Simple Membership
+* Stripe Payments
+* Gravity Forms PayPal
+* Gravity Forms Stripe
+* WP Express Checkout
+* OptimizeMember
+* MemberMouse
+* AppThemes
+* LifterLMS
+* WP Courseware
+* MemberPress
+* GiveWP
 
-= Real-Time Reporting =
+=== Real-Time Reporting ===
 
 Your affiliate's traffic and sales are recorded and ready for display as soon as they happen.
 
-= Unlimited Affiliates =
+=== Unlimited Affiliates ===
 
 No matter if you have 1 or 1,000 affiliates, you can track them all.
 
-= Flat Rate or Percentage Based Payouts =
+=== Automatic Affiliate Approval ===
+
+Automatically approve newly registered affiliates so they can start promoting your products.
+
+=== Manual Affiliate Approval ===
+
+Do you want to work with selected affiliates? With the manual approval option you can approve/decline each affiliate application.
+
+=== Flat Rate or Percentage Based Payouts ===
 
 You decide how you want to reward your affiliates. You can choose to pay your affiliates a flat rate per order, or choose to pay them a percentage of every order they initiate.
 
-= Set Payout Rates Per Affiliate =
+=== Set Payout Rates Per Affiliate ===
 
 Each of your affiliates can be set to their own payout amount.
 
-= Manual Adjustments and Payouts =
+=== Manual Adjustments and Payouts ===
 
 There may be a time when you need to credit an affiliate for something other than a sale. For example, a bonus for reaching a sales goal. Manual adjustments are treated as a line item for easy tracking.
 
-= Pay Your Affiliates Using PayPal =
+=== Pay Your Affiliates Using PayPal ===
 
 Ability to easily pay your affiliates their commission using PayPal.
 
-= Unlimited Creatives and Ads for your Affiliates = 
+=== Manual Payout ===
+
+Pay affiliates with your preferred method and mark them as paid in the plugin.
+
+=== Unlimited Creatives and Ads for your Affiliates === 
 
 You can add as many banners or text link ads as you wish. Plus, you can easily activate or deactivate creatives as needed.
 
-= Customizable Affiliate Registration =
+=== Customizable Affiliate Registration ===
 
 You can decide how much or how little data to collect from your affiliates when they sign up. You can mark each field as optional or required.
 
-= Autoresponder Integration =
+=== Disable Own Referrals ===
+
+Prevent affiliates from earning commissions on their own purchases.
+
+=== Affiliate Registration Form Customization ===
+
+Customize the affiliate registration form with custom affiliate fields.
+
+=== Affiliate Coupon Tracking ===
+
+Link affiliate accounts to WooCommerce coupon codes and track them to reward commissions.
+
+=== Manual Referral Tracking ===
+
+Manually track a purchase and create a commission/referral record for it.
+
+=== Referral Link Generator ===
+
+Affiliates can generate their own referral links from the affiliate dashboard.
+
+=== Social Sharing Links ===
+
+Affiliates can generate links for your products that can be shared on social media.
+
+=== Set Cookie Duration ===
+
+Specify how long the referral cookie should be valid for (30 days by default).
+
+=== Autoresponder Integration ===
 
 * Sign up affiliates to your Mailchimp list.
 * Sign up affiliates to MailPoet newsletter list.
+* Sign up affiliates to your AWeber list.
+* Sign up affiliates to your Mad Mimi list.
+* Sign up affiliates to your Infusionsoft account.
+* Sign up affiliates to your GetResponse list.
+* Sign up affiliates to your ActiveCampaign list.
 
-= Affiliate Ad Impression Tracking = 
+=== Affiliate Ad Impression Tracking === 
 
 Track how many times a particular affiliate ad is getting viewed.
 
-= Customize Messages for Affiliates = 
+=== Customize Email for Affiliates === 
 
-You can customize the email messages that gets sent to your affiliate when they register for an account. The following messages are customizable:
+You can customize the email that is sent to an affiliate after they register for an account. The following messages are customizable:
 
 * HTML message displayed to user at logon if affiliate STATUS = APPROVED 
 * HTML message displayed to user at logon if affiliate STATUS = DECLINED
 * HTML message displayed to user at logon if affiliate STATUS = PENDING
 * HTML message displayed to user after successfully submitting the affiliate registration form
 * Body of the e-mail sent to the affiliate immediately after submitting their application.
-* Body of the e-mail sent to a newly registered affiliate immediately following their application being approved.
 * Body of e-mail sent to the affiliate immediately following their application being declined.
+* Body of e-mail sent to a newly registered affiliate immediately following their application being approved.
+* Body of e-mail sent to the affiliate immediately after earning a commission.
+* Body of e-mail sent to the admin when an affiliate earns a commission.
+* Body of e-mail sent to a newly approved affiliate if they have an existing user account.
 
-= Translation Ready = 
+=== Translation Ready === 
 
 This plugin can be translated to your language. The following language translations are already available in the plugin:
 
@@ -105,7 +166,7 @@ This plugin can be translated to your language. The following language translati
 
 You can translate the plugin using [this documentation](https://wpaffiliatemanager.com/affiliate-manager-plugin-translation/).
 
-= Support =
+=== Support ===
 
 View the [Plugin Documentation](https://wpaffiliatemanager.com/documentation/) to get started.
 
@@ -113,7 +174,7 @@ If you have a question, you can ask it on our support forum.
 
 Visit the [affiliate manager plugin](https://wpaffiliatemanager.com) site for more details.
 
-= Developers =
+=== Developers ===
 * If you are a developer and you need some extra hooks or filters for this plugin then let us know.
 * Github repository - https://github.com/wp-insider/affiliates-manager-plugin
 
@@ -132,6 +193,253 @@ View screenshots in the following page:
 https://wpaffiliatemanager.com/screen-shots/
 
 == Changelog ==
+
+= 2.9.23 =
+- Linked affiliate IDs in the Commissions table to their respective profiles.
+
+= 2.9.22 =
+- Fixed some PHP 8.2 notices.
+
+= 2.9.21 =
+- Made some security related improvements suggested by Patchstack.
+
+= 2.9.20 =
+- Fixed an issue where bank transfer instructions were not shown to manually approved affiliates.
+
+= 2.9.19 =
+- Added bank transfer as a payout method.
+
+= 2.9.18 =
+- Added an option to enable/disable nonce check on the registration page.
+
+= 2.9.17 =
+- Added more strict checking for own referrals.
+
+= 2.9.16 =
+- Added an option to automatically create affiliate accounts for Simple Membership members.
+
+= 2.9.15 =
+- Added an option to make a payout based on a date range.
+
+= 2.9.14 =
+- Made some security related improvements suggested by WPScan.
+
+= 2.9.13 =
+- Updated the integration for Easy Digital Downloads version 3.0.
+
+= 2.9.12 =
+- Fixed an issue where the blogname tag was not available in the affiliate email if Send Notification to Admin is disabled.
+- Fixed a PHP 8 warning in the MessageHelper.php file.
+
+= 2.9.11 =
+- Added a filter for the Export to CSV option.
+
+= 2.9.10 =
+- Referrals can now be edited.
+- Added an option to enable/disable referral tracking with IP addresses.
+- Updated the Russian language translation.
+
+= 2.9.9 =
+- Added search functionality to the My Affiliates page.
+
+= 2.9.8 =
+- Fixed a bug that was affecting the PayPal MassPay date range selection.
+
+= 2.9.7 =
+- Fixed a layout issue that was affecting the terms and payment details pages for a manually approved affiliate.
+
+= 2.9.6 =
+- Added an option to show/hide terms and conditions on the affiliate registration page.
+
+= 2.9.5 =
+- Creative list now shows a preview of the image banner instead of the name.
+- Moved the Log out button to the right.
+- Added an option to disable affiliate registration on the front end.
+- Affiliate pages are not automatically created when the init action hook is triggered.
+
+= 2.9.4 =
+- Fixed an issue in the affiliate sales interface where dates were not correctly filtered for the German language.
+- Added the affiliate registration form anchor option. When enabled, the affiliate will be taken to the registration form anchor within the page after the form is submitted.
+
+= 2.9.3 =
+- A shareable link is now displayed for each creative.
+- Added action hooks for affiliate specific events.
+
+= 2.9.2 =
+- Added more email tags for the affiliate_application_submitted_email template.
+
+= 2.9.1 =
+- Fixed an issue where new affiliates could not be approved when Auto WooCommerce Affiliate Account Creation addon was active.
+- Added support for the Checkout Referrals addon which allows visitors to set the referrer or affiliate id.
+  https://wpaffiliatemanager.com/allow-visitors-to-set-the-referrer-or-affiliate-id/    
+- Integrated Affiliates Manager with the GiveWP plugin.
+  https://wpaffiliatemanager.com/affiliates-manager-givewp-integration/
+
+= 2.9.0 =
+- Added Portuguese(Portugal) language translation to the plugin. The translation was submitted by Rúben Fernandes.
+- Fixed a security issue in click tracking. The issue was reported by wpscan.com.
+- Updated the My Affiliates, Click Tracking and Commissions menus.
+
+= 2.8.9 =
+- Added an email template in the Messaging tab.
+
+= 2.8.8 =
+- Fixed an issue where manual commissions could not be added when the WooCommerce product specific commission addon was active.
+
+= 2.8.7 =
+- Fixed a SQL vulnerability reported by wpscan.com.
+- Fixed an issue where the Export Data tab was not showing active.
+
+= 2.8.6 =
+- Fixed a bug in the alternative tracking method for WooCommerce.
+
+= 2.8.5 =
+- Added an alternative tracking method for WooCommerce.
+
+= 2.8.4 =
+- Added an option which allows using HTML in the email.
+
+= 2.8.3 =
+- Added an option to enable/disable automatic deletion of WordPress user accounts.
+
+= 2.8.2 =
+- Added Japanese language translation to the plugin. The translation was submitted by Makoto Koga.
+
+= 2.8.1 =
+- Textarea is available as a custom field type.
+- Custom field display name supports up to 255 characters.
+
+= 2.8.0 =
+- Fixed a country code issue on the registration form.
+- Updated the language files.
+
+= 2.7.9 =
+- French translation improvements (contributed by Th0masL).
+- Made Cancel button translatable in the confirm dialogue.
+
+= 2.7.8 =
+- Security related improvements to the form data.
+
+= 2.7.7 =
+- Made some changes to impression tracking to fix "Cannot modify header information" warning on some sites. The fix was provided by Nathan Hadsall.
+
+= 2.7.6 =
+- Made some improvements to prevent duplicate clicks.
+
+= 2.7.5 =
+- Fixed some PHP 7.4 deprecated warnings.
+- Fixed an issue where notification emails were not sent for manually added commissions.
+
+= 2.7.4 =
+- An error will now be shown when rewarding a commission if the affiliate account is not active.
+
+= 2.7.3 =
+- Fixed an issue where the active navigation link was not shown correctly.
+
+= 2.7.2 =
+- The plugin now updates the affiliate email when the WordPress user email is updated.
+
+= 2.7.1 =
+- Added Lithuanian language translation to the plugin. The translation was submitted by Robertas Peteraitis.
+- Updated the simple cart integration so it works with smart checkout.
+- Added an option to notify the admin whenever an affiliate earns a commission.
+
+= 2.7.0 =
+- Updated the integration code to make it compatible with the latest version of WooCommerce Subscriptions.
+
+= 2.6.9 =
+- Exported data now contains the phone number of an affiliate.
+
+= 2.6.8 =
+- Made some improvements to the affiliate registration form.
+
+= 2.6.7 =
+- Made some improvements to form checks in the plugin.
+
+= 2.6.6 =
+- Affiliate Registration notification email can now be sent to a different email address.
+- Updated the security checks in the plugin settings.
+
+= 2.6.5 =
+- Added a new text area in the settings to customize the content of the affiliate homepage (shown to a user who is logged in but not an affiliate).
+
+= 2.6.4 =
+- Updated the translations of some strings.
+
+= 2.6.3 =
+- The plugin will now reverse an affiliate commission when the WooCommerce order associated with it is cancelled.
+- Added a new "Admin Functions" menu that will allow an administrator to delete clicks data.
+
+= 2.6.2 =
+- Added an option to generate a payout file that can be used to pay multiple affiliates with the PayPal Payouts API.
+- Added an option to generate a payout file that can used to pay multiple affiliates manually.
+- The plugin is now compatible with WordPress 5.0.
+
+= 2.6.1 =
+- Added an option that will prevent affiliates from earning a commission on their own purchases.
+- Fixed a bug where an affiliate's Payment Method would be shown as "Check" when no payout option was selected.
+
+= 2.6.0 =
+- Fixed an issue where the affiliate "approve" button would cause an error for Italian translation.
+- Fixed an issue that was causing this warning on some servers: count() Parameter must be an array or an object that implements Countable in /affiliates-manager/source/Validation/ValidatorResult.php on line 7.
+- Added an option for affiliates to generate referral URLs from their dashboard.
+- Integrated LifterLMS with affiliates manager plugin: https://wpaffiliatemanager.com/affiliates-manager-lifterlms-integration/
+- Integrated ActiveCampaign with affiliates manager plugin: https://wpaffiliatemanager.com/signup-affiliates-activecampaign-list/
+
+= 2.5.9 =
+- Made some CSS specific changes to improve the appearance of the "Edit Creative" interface.
+- Made the affiliate register fields translatable in the "Affiliate Registration" tab.
+- Made the country names translatable.
+- Fixed the "Undefined index" warning notice when saving an email address.
+- Fixed an issue where submitting a social security number would cause a formatting error.
+
+= 2.5.8 =
+- Fixed a bug where WordPress wasn't sending an email after a new affiliate registered.
+
+= 2.5.7 =
+- Made some improvements to the creative media uploader to make adding/editing an image easier.
+- Plugin action hooks and shortcodes are now registered as soon as the main plugin file loads.
+- Updated the Dutch language translation. The translation file was submitted by Mitchell van Honk.
+- Made all the strings in the "Messaging" tab translatable.
+- Fixed a bug where the user's first and last names were not getting set when a new affiliate registered.
+
+= 2.5.6 =
+- Added Hungarian language translation to the plugin. The translation was submitted by Peter Nyiri.
+- Fixed a bug where the PayPal email address field didn't appear when both PayPal and Manual payout methods were enabled.
+
+= 2.5.5 =
+- The registration form is no longer shown to an affiliate when logged in.
+- Made some improvements to the registration form submission process.
+
+= 2.5.4 =
+- Added support for Chinese language translation. The translation file was submitted by Nicolas Laurent
+- Fixed a tab issue in the My Affiliates menu
+- Added more email tags in the plugin
+
+= 2.5.3 =
+- Updated the Portuguese(Brazil), Italian and German language files
+- Made some improvements to the affiliate commission notification email
+
+= 2.5.2 =
+- Made some improvements to the WooCommerce integration code.
+
+= 2.5.1 =
+- Fixed a bug which was preventing PayPal Mass Pay from working properly.
+
+= 2.5.0 =
+- Made some security related improvements.
+
+= 2.4.9 =
+- Updated the WooCommerce integration code so it can correctly determine a new subscription payment.
+- Created a new addon to integrate AppThemes with affiliates manager plugin. See details below:
+  https://wpaffiliatemanager.com/affiliates-manager-appthemes-integration/
+
+= 2.4.8 =
+- Added a new option to send a notification email to the affiliate immediately after earning a commission.
+
+= 2.4.7 =
+- Made some improvements to the WooCommerce integration code.
+- Added a "Log Out" button to the affiliate dashboard.
 
 = 2.4.6 =
 - Added a new option to export the affiliates data to a CSV file.

@@ -10,42 +10,46 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-add_filter('amp_post_template_metadata', 'schema_wp_amp');
+add_filter( 'amp_post_template_metadata', 'schema_wp_amp_modify_json_output', 99, 2 );
 /**
- * Override schema json-ld for AMP plugin
+ * Modify AMP json-ld output
  *
- * @since 1.3
- * @return schema json-ld final output
+ * @since 1.6.9.5
  */
-function schema_wp_amp( $jason_array ) {
+function schema_wp_amp_modify_json_output( $metadata, $post ) {
 	
-	global $post;
+	// Get AMP plugin settings
+	$options = get_option('amp-options');
 	
-	// Check if AMP plugin is active
-	if ( ! defined( 'AMP__FILE__' ) ) return;
+	// Get schema markup json		
+	$json = schema_wp_get_jsonld( $post->ID );
 	
-	// Check if AMP function exists
-	if ( ! function_exists('is_amp_endpoint') ) return;
+	// Check if this is the About or Contact page
+	// If so, override the $json array
+	if ( is_array($options['supported_post_types']) ) {
+		
+		if ( in_array("page", $options['supported_post_types']) ) {
+		
+			$about_page_id 	 = schema_wp_get_option( 'about_page' );
+			$contact_page_id = schema_wp_get_option( 'contact_page' );
 	
-	// Check if an AMP version of a post is being viewed
-	if ( is_amp_endpoint() && is_single() ) {
-		$json = array();
-		// Get ref of Schema type in post meta 
-		// @since 1.5.3
-		$ref = get_post_meta( $post->ID, '_schema_ref', true );
-		if ( $ref != '' ) {
-			$schema_type 		= get_post_meta( (int)$ref, '_schema_type', true );
-			$schema_sub_type 	= get_post_meta( (int)$ref, '_schema_article_type', true );
-			$type = ($schema_sub_type != '') ? $schema_sub_type : $schema_type;
-			$json = schema_wp_get_schema_json( $type );
-			return $json;
-		}
+			if ( isset($about_page_id) && $post->ID == $about_page_id ) {
+		
+				$json = schema_wp_get_page_about_json( 'AboutPage' );
+			}  
+			
+			if ( isset($contact_page_id) && $post->ID == $contact_page_id) {
+		
+				$json = schema_wp_get_page_contact_json( 'ContactPage' );
+			}	
+		} // end if
+	} // end if
+	
+	// Return markup array
+	if ( ! empty($json) ) {
+		return $json;
 	}
 	
-	// Return the un-filtered array
-	return $jason_array;
+	// Return the un-filtered markup array
+	return $metadata;
 }
-
-
-
-

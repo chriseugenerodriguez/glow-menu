@@ -1,0 +1,238 @@
+// - - - - - - - - - - - - - - - - - - -
+// - - settings
+// global maps and variables
+.text-center {
+    text-align: center;
+}
+.text-right {
+    text-align: right;
+}
+.text-left {
+    text-align: left;
+}
+.center {
+    margin: 0px auto;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.absolute.left {
+    left: 0px;
+}
+
+.right {
+    float: right !important;
+}
+
+.littlemargintop {
+    margin-top: 50px;
+   
+    @media (max-width: $screen-md-max) {
+    	margin-top:25px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        margin-top:20px !important;
+    }    
+}
+
+.margintop {
+    margin-top: 100px;
+   
+    @media (max-width: $screen-md-max) {
+    	margin-top:50px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        margin-top:25px !important;
+    }    
+}
+
+.largemargintop {
+    margin-top: 200px !important;
+   
+    @media (max-width: $screen-md-max) {
+    	margin-top:100px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        margin-top:50px !important;
+    }  
+}
+
+.nomargin {
+    margin: 0px !important;
+}
+
+.marginbottom {
+    margin-bottom: 100px;
+   
+    @media (max-width: $screen-md-max) {
+    	margin-bottom:50px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        margin-bottom:25px !important;
+    }  
+}
+
+.littlemarginbottom {
+    margin-bottom: 50px;
+   
+    @media (max-width: $screen-md-max) {
+    	margin-bottom:25px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        margin-bottom:20px !important;
+    }  
+}
+
+.marginleft {
+    margin-left: 100px;
+   
+    @media (max-width: $screen-md-max) {
+    	margin-left:50px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        margin-left:25px !important;
+    }
+}
+
+.marginright {
+    margin-right: 100px !important;
+
+    @media (max-width: $screen-md-max) {
+    	margin-right:50px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        margin-right:25px !important;
+    }  
+}
+
+.littlemarginleft {
+    margin-left: 50px;
+   
+    @media (max-width: $screen-md-max) {
+        margin-left:25px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        margin-left:20px !important;
+    }
+}
+
+.littlemarginright {
+    margin-right: 50px !important;
+
+    @media (max-width: $screen-md-max) {
+        margin-right:25px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        margin-right:20px !important;
+    }  
+}
+
+
+.margintop {
+    margin-top: 100px !important;
+    
+    @media (max-width: $screen-md-max) {
+    	margin-top:50px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        margin-top:25px !important;
+    }  
+}
+
+.paddingtop {
+    padding-top: 100px;
+   
+    @media (max-width: $screen-md-max) {
+    	padding-top:50px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        padding-top:25px !important;
+    }  
+}
+
+.paddingbottom {
+    padding-bottom: 100px;
+   
+    @media (max-width: $screen-md-max) {
+    	padding-bottom:50px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        padding-bottom:25px !important;
+    }  
+}
+
+.paddingleft {
+    padding-left: 100px;
+   
+    @media (max-width: $screen-md-max) {
+    	padding-left:50px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        padding-left:25px !important;
+    }  
+}
+
+.paddingright {
+    padding-right: 100px;
+   
+    @media (max-width: $screen-md-max) {
+    	padding-right:50px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        padding-right:25px !important;
+    }  
+}
+
+.littlepaddingbottom {
+    padding-bottom: 50px;
+   
+    @media (max-width: $screen-md-max) {
+    	padding-bottom:25px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        padding-bottom:20px !important;
+    }
+}
+
+.littlepaddingtop {
+    padding-top: 50px;
+   
+    @media (max-width: $screen-md-max) {
+    	padding-top:50px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        padding-top:25px !important;
+    }
+}
+
+.littlepaddingleft {
+    padding-left: 50px;
+   
+    @media (max-width: $screen-md-max) {
+    	padding-left:25px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        padding-left:20px !important;
+    }
+}
+
+.littlepaddingright {
+    padding-right: 50px;
+   
+    @media (max-width: $screen-md-max) {
+    	padding-right:25px !important;
+    }
+    @media (max-width: $screen-xs-max) {
+        padding-right:20px !important;
+    }
+}
+
+.nomargin {
+    margin: 0px;
+}

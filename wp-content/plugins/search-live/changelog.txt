@@ -1,5 +1,50 @@
 == Search Live by itthinx - Changelog ==
 
+= 1.14.0 =
+* WordPress 6.0 compatible.
+* Requires at least WordPress 5.6.
+* Updated the plugin's menu position to use a plain integer for WordPress 6.x compatibility.
+* Revised admin settings.
+* Translation template updated.
+* Included translations updated.
+
+= 1.13.0 =
+* WordPress 5.7 compatible.
+
+= 1.12.0 =
+* WordPress 5.6 compatible.
+* Fixed issue related to script loading order which could fail to attach live search field event handler.
+* Revised plugin information and tags in the readme.
+* Updated URLs to use https.
+
+= 1.11.0 =
+* WordPress 5.4 compatible.
+* Fixed trailing spaces in code.
+* Minimum WordPress 5.0 required.
+* Improved code documentation formatting.
+* Added missing code documentation.
+* Added initializations for extracted variables.
+
+= 1.10.0 =
+* WordPress 5.2 compatible.
+* Revised the search field container and made it more resilient to too generic CSS rules in themes.
+* Restructured and improved the search field containers and removed the now unnecessary autoAdjust script and options.
+* Improved handling of requested search string.
+* Improved the performance of search queries.
+* Added the search_live_post_types filter that allows to modify the post types included in search.
+* Added the search_live_max_search_terms filter that allows to modify the default (10) maximum number of search terms attended to.
+
+= 1.9.0 =
+* WordPress 5.1. compatible.
+
+= 1.8.2 =
+* Modified for backwards compatibility with PHP < 5.5 due to an issue with empty
+  Fatal error: Can’t use method return value in write context ...
+
+= 1.8.1 =
+* Fixed all posts are shown as results when there are no matches.
+* Added our icon to the review notice.
+
 = 1.8.0 =
 * Tested with WordPress 4.8.
 
