@@ -27,17 +27,15 @@ npm run lint
 npm run build
 ```
 
-Select the existing Firebase project, if it is not already active locally, then
-deploy from this directory:
+The repository is connected to the existing `glowmenu-1efe4` Firebase project.
+Deploy from this directory:
 
 ```bash
-firebase use YOUR_FIREBASE_PROJECT_ID
 firebase deploy --only hosting
 ```
 
 For CI, build before running `firebase deploy --only hosting` and provide the
-project ID through Firebase CLI or CI configuration. Do not add a guessed project
-ID to `.firebaserc`.
+project ID through Firebase CLI or CI configuration.
 
 After deployment, verify all routes and an unknown URL, direct route refreshes,
 inquiry delivery, carousel controls and touch drag, redirects, canonical URLs,
