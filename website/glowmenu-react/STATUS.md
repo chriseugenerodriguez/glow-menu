@@ -7,7 +7,7 @@
 - eight legacy menu collections
 - interactive estimate and EmailJS-enabled inquiry form
 - basic SEO metadata, structured data, sitemap, robots, and canonical URLs
-- Vercel SPA routing and principal legacy commerce redirects
+- Firebase Hosting SPA routing, cache headers, and legacy commerce redirects
 - optional environment-driven Google Analytics
 
 ## Required before launch

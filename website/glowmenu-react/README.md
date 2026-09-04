@@ -34,5 +34,5 @@ npm run preview
 
 This site intentionally uses an inquiry flow. It does not recreate the old
 WooCommerce checkout, customer accounts, or Fancy Product Designer. Review
-`MIGRATION_AUDIT.md` before changing DNS or retiring WordPress. Deployment
-instructions are in `DEPLOYMENT.md`.
+`MIGRATION_AUDIT.md` before changing DNS or retiring WordPress. Firebase Hosting
+deployment instructions are in `DEPLOYMENT.md`.

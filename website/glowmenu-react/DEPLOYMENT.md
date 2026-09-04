@@ -1,12 +1,13 @@
 # Deployment Guide
 
-## Vercel
+## Firebase Hosting
 
-Import the repository in Vercel and set the root directory to
-`website/glowmenu-react`. The included `vercel.json` builds `dist`, serves React
-Router paths through `index.html`, and redirects principal legacy commerce URLs.
+The included `firebase.json` publishes `dist`, serves React Router paths through
+`index.html`, sets asset cache headers, and redirects the principal legacy
+commerce URLs.
 
-Configure these project environment variables before the production build:
+Create `.env.local` from `.env.example` and configure these variables before the
+production build:
 
 ```text
 VITE_EMAILJS_SERVICE_ID=
@@ -25,6 +26,18 @@ npm ci
 npm run lint
 npm run build
 ```
+
+Select the existing Firebase project, if it is not already active locally, then
+deploy from this directory:
+
+```bash
+firebase use YOUR_FIREBASE_PROJECT_ID
+firebase deploy --only hosting
+```
+
+For CI, build before running `firebase deploy --only hosting` and provide the
+project ID through Firebase CLI or CI configuration. Do not add a guessed project
+ID to `.firebaserc`.
 
 After deployment, verify all routes and an unknown URL, direct route refreshes,
 inquiry delivery, carousel controls and touch drag, redirects, canonical URLs,

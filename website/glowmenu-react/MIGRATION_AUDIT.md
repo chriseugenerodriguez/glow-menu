@@ -83,8 +83,8 @@ accident when DNS is switched.
 - Collections gallery with six visible collection styles and real menu artwork.
 - Interactive pricing estimate UI.
 - Contact page with EmailJS integration and mail-client fallback.
-- Basic structured data, robots file, sitemap, manifest, Vercel SPA rewrites, and
-  static production build configuration.
+- Basic structured data, robots file, sitemap, manifest, Firebase Hosting SPA
+  rewrites, cache headers, and static production build configuration.
 
 ## Repository audit
 
