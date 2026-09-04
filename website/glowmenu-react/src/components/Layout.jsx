@@ -23,9 +23,7 @@ function Layout() {
         </NavLink>
 
         <div className="header-actions">
-          <span className="cart-label">Bag &nbsp; $0.00</span>
-          <img className="cart-preview" src="/collections/cb_b_glow.jpg" alt="Selected menu preview" />
-          <NavLink className="nav-cta" to="/contact">My account</NavLink>
+          <NavLink className="nav-cta" to="/contact">Start a project</NavLink>
         </div>
       </header>
 
@@ -35,7 +33,10 @@ function Layout() {
 
       <footer className="footer">
         <img src="/glow-menu-logo.png" alt="Glow Menu" />
-        <span>Hospitality design for memorable guest experiences. &copy; {new Date().getFullYear()}</span>
+        <div className="footer-meta">
+          <span>Hospitality design for memorable guest experiences. &copy; {new Date().getFullYear()}</span>
+          <nav aria-label="Footer navigation"><NavLink to="/collections">Menus</NavLink><NavLink to="/pricing">Pricing</NavLink><NavLink to="/contact">Contact</NavLink></nav>
+        </div>
       </footer>
     </div>
   )

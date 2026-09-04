@@ -3,11 +3,14 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "env": {
-    "VITE_EMAILJS_SERVICE_ID": "@vite_emailjs_service_id",
-    "VITE_EMAILJS_TEMPLATE_ID": "@vite_emailjs_template_id",
-    "VITE_EMAILJS_PUBLIC_KEY": "@vite_emailjs_public_key"
-  },
+  "redirects": [
+    { "source": "/menus", "destination": "/collections", "permanent": true },
+    { "source": "/shop", "destination": "/collections", "permanent": true },
+    { "source": "/custom-menus", "destination": "/contact", "permanent": true },
+    { "source": "/my-account", "destination": "/contact", "permanent": false },
+    { "source": "/cart", "destination": "/contact", "permanent": false },
+    { "source": "/checkout", "destination": "/contact", "permanent": false }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",

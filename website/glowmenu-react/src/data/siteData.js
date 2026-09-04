@@ -62,6 +62,20 @@ export const collections = [
     frontImage: '/collections/special_occasion_front.png',
     backImage: '/collections/special_occasion_back.png',
   },
+  {
+    name: 'Chill Brew',
+    tone: 'card-7',
+    description: 'Relaxed layouts for breweries, taprooms, and casual gathering places.',
+    frontImage: '/collections/chill_brew_front.jpg',
+    backImage: '/collections/chill_brew_back.jpg',
+  },
+  {
+    name: 'Random Order',
+    tone: 'card-8',
+    description: 'Expressive menu artwork for playful, unconventional hospitality brands.',
+    frontImage: '/collections/random_order_front.jpg',
+    backImage: '/collections/random_order_back.jpg',
+  },
 ]
 
 export const pricingOptions = [

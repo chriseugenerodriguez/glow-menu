@@ -24,12 +24,7 @@ export const organizationSchema = {
   email: 'hello@glowmenu.co',
   areaServed: ['US', 'CA'],
   serviceType: 'Menu Design',
-  priceRange: '$$$',
-  sameAs: [
-    'https://instagram.com/glowmenu',
-    'https://twitter.com/glowmenu',
-  ],
-  image: 'https://glowmenu.co/og-image.jpg',
+  image: 'https://glowmenu.co/hero-reference.png',
 }
 
 export const localBusinessSchema = {
@@ -37,37 +32,8 @@ export const localBusinessSchema = {
   '@type': 'ProfessionalService',
   name: 'Glow Menu',
   description: 'Custom menu design for hospitality brands',
-  image: 'https://glowmenu.co/og-image.jpg',
+  image: 'https://glowmenu.co/hero-reference.png',
   url: 'https://glowmenu.co',
-  telephone: '+1-XXX-XXX-XXXX',
   email: 'hello@glowmenu.co',
-  priceRange: '$49-$249',
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    ratingCount: '120',
-  },
-  offers: [
-    {
-      '@type': 'Offer',
-      name: 'Starter Menu',
-      description: 'Single layout option with print-ready export',
-      price: '49',
-      priceCurrency: 'USD',
-    },
-    {
-      '@type': 'Offer',
-      name: 'Signature Collection',
-      description: 'Multi-page concept set with brand styling',
-      price: '129',
-      priceCurrency: 'USD',
-    },
-    {
-      '@type': 'Offer',
-      name: 'Custom Hospitality Suite',
-      description: 'Full branded package with inserts and launch-ready files',
-      price: '249',
-      priceCurrency: 'USD',
-    },
-  ],
+  serviceType: 'Menu Design',
 }
