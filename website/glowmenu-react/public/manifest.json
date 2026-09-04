@@ -1,0 +1,43 @@
+{
+  "name": "Glow Menu - Premium Custom Menu Design",
+  "short_name": "Glow Menu",
+  "description": "Elegant custom menus and hospitality branding for restaurants, bars, and events",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fffaf5",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "form_factor": "wide"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "View Collections",
+      "short_name": "Collections",
+      "description": "Browse our menu design styles",
+      "url": "/collections",
+      "icons": []
+    },
+    {
+      "name": "Contact Us",
+      "short_name": "Contact",
+      "description": "Get a quote for your custom menu",
+      "url": "/contact",
+      "icons": []
+    }
+  ]
+}
