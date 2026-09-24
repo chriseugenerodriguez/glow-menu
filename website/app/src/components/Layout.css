@@ -1,0 +1,23 @@
+.page-shell .topbar {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  min-height: 88px;
+  padding: 16px max(24px, calc((100vw - 1280px) / 2));
+  border-bottom: 1px solid #eeede9;
+  background: #fff;
+}
+.page-shell .topbar .brand { position: static; grid-column: 1; grid-row: 1; justify-content: flex-start; transform: none; gap: 12px; }
+.page-shell .brand img { width: 38px; height: 42px; }
+.page-shell .brand span { font-family: 'Questrial', sans-serif; font-size: 21px; font-weight: 400; letter-spacing: -.5px; text-transform: none; }
+.page-shell .topbar .nav { position: static; grid-column: 2; grid-row: 1; gap: 32px; }
+.page-shell .topbar .nav a { font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.page-shell .topbar .header-actions { position: static; grid-column: 3; grid-row: 1; transform: none; }
+.page-shell .nav-cta { padding: 12px 22px; font-size: 12px; text-transform: none; background: #242d29; }
+@media (max-width: 768px) {
+  .page-shell .topbar { grid-template-columns: 1fr auto; min-height: 78px; padding: 16px 24px; }
+  .page-shell .topbar .nav { grid-column: 1 / -1; grid-row: 2; gap: 0; margin-top: 8px; }
+  .page-shell .topbar .nav a { padding: 14px 0; }
+  .page-shell .topbar .header-actions { display: none; }
+  .page-shell button.menu-toggle { top: 18px; right: 24px; border-radius: 50%; }
+}

@@ -1,0 +1,30 @@
+@layer theme, base, components, utilities;
+@import '../node_modules/tailwindcss/theme.css' layer(theme);
+@import '../node_modules/tailwindcss/utilities.css' layer(utilities);
+@import '../node_modules/tw-animate-css/dist/tw-animate.css';
+@source "./components/ui";
+@custom-variant dark (&:is(.dark *));
+@theme inline {
+  --color-background: #0c130e;
+  --color-foreground: #eef5e9;
+  --color-primary: #c5f78b;
+  --color-primary-foreground: #16230e;
+  --color-secondary: #23301e;
+  --color-secondary-foreground: #e1ecd9;
+  --color-muted: #1a251b;
+  --color-muted-foreground: #a1b197;
+  --color-accent: #2c3c25;
+  --color-accent-foreground: #e9f6e0;
+  --color-destructive: #ef7e7e;
+  --color-border: #34472e;
+  --color-input: #34472e;
+  --color-ring: #b3df85;
+  --color-popover: #142017;
+  --color-popover-foreground: #eef5e9;
+  --color-card: #142017;
+  --color-card-foreground: #eef5e9;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}

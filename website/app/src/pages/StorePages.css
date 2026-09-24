@@ -1,0 +1,91 @@
+/* Shared storefront rhythm for the supporting pages. */
+.collections-page, .pricing-page, .contact-page {
+  --store-ink: #242d29;
+  --store-muted: #687069;
+  color: var(--store-ink);
+}
+.collections-page, .contact-page { max-width: 1280px; margin: 0 auto; padding: 64px 0 80px; }
+.collections-page > .section-header { max-width: 660px; margin-bottom: 40px; }
+.collections-page > .section-header h1, .pricing-hero h1, .contact-intro h1 { font-family: 'Questrial', sans-serif; font-size: clamp(38px, 4vw, 56px); font-weight: 400; line-height: 1.08; letter-spacing: -1.5px; color: var(--store-ink); margin: 0 0 20px; }
+.collections-page .eyebrow, .pricing-page .eyebrow, .contact-page .eyebrow { color: #69745b; font-size: 10px; letter-spacing: 1.5px; }
+.collections-page > .section-header > p:last-child { max-width: 510px; color: var(--store-muted); font-size: 15px; line-height: 1.75; }
+.collections-page .collection-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 28px; }
+.collections-page .collection-feature { display: block; padding: 0; border: 0; }
+.collections-page .collection-gallery { min-height: 0; height: 380px; padding: 30px; gap: 20px; background: #f1f2ec; border-radius: 14px; }
+.collections-page .collection-feature:nth-child(3n + 2) .collection-gallery { background: #f3eee1; }
+.collections-page .collection-feature:nth-child(3n) .collection-gallery { background: #eee8ed; }
+.collections-page .collection-preview { background: transparent; padding-bottom: 26px; }
+.collections-page .collection-preview img { min-height: 0; height: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: normal; }
+.collections-page .collection-preview span { left: 50%; bottom: 0; transform: translateX(-50%); background: #ffffffd9; color: #485143; border-radius: 20px; padding: 4px 12px; font-size: 10px; }
+.collections-page .collection-copy { position: relative; padding: 22px 0 0; }
+.collections-page .collection-number { position: absolute; right: 0; top: 26px; color: #737c6b; }
+.collections-page .collection-copy h2 { font-family: 'Questrial', sans-serif; font-size: 25px; font-weight: 400; margin-bottom: 8px; }
+.collections-page .collection-copy p { color: var(--store-muted); margin-bottom: 14px; }
+.collections-page .text-link { text-transform: none; letter-spacing: 0; font-weight: 400; border-color: #bfc8b2; }
+dialog.image-modal { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; border: 0; background: #17221cf0; }
+dialog.image-modal:not([open]) { display: none; }
+dialog.image-modal::backdrop { background: #17221c; }
+dialog.image-modal img { max-height: calc(100dvh - 96px); }
+.pricing-page { max-width: 1280px; margin: 28px auto 0; }
+.pricing-page .pricing-hero { padding: 48px; border-radius: 16px 16px 0 0; background: #f1f3eb; color: var(--store-ink); }
+.pricing-page .pricing-hero > p:last-child { color: var(--store-muted); font-size: 15px; line-height: 1.75; }
+.pricing-page .estimate-bar { padding: 20px 48px; min-height: 84px; background: #e5e9dd; border-radius: 0 0 16px 16px; box-shadow: none; }
+.pricing-page .estimate-bar > span { margin-right: auto; color: #515c4b; font-size: 11px; }
+.pricing-page .estimate-bar strong { color: var(--store-ink); font-family: 'Questrial', sans-serif; font-size: 30px; }
+.pricing-page .primary-btn, .contact-page .primary-btn { background: #242d29; font-family: 'Arimo', sans-serif; text-transform: none; font-size: 13px; letter-spacing: 0; padding: 14px 24px; }
+.pricing-page .pricing-builder { max-width: none; padding: 12px 48px 64px; }
+.pricing-page .builder-section { grid-template-columns: 260px minmax(0, 1fr); gap: 40px; padding: 40px 0; }
+.pricing-page .builder-heading h2 { font-family: 'Questrial', sans-serif; font-size: 26px; }
+.pricing-page .builder-heading p { color: var(--store-muted); font-size: 13px; }
+.pricing-page .builder-heading > span { color: #738066; }
+.pricing-page .option-button { border-radius: 12px; padding: 20px; transition: border-color .2s, background .2s; }
+.pricing-page .option-button.selected { background: #f1f4eb; border-color: #778565; box-shadow: inset 0 0 0 1px #778565; }
+.pricing-page .option-button:hover { border-color: #778565; }
+.pricing-page .option-button span { color: var(--store-muted); }
+.pricing-page .quantity-control button:first-child { border-radius: 10px 0 0 10px; }
+.pricing-page .quantity-control button:last-child { border-radius: 0 10px 10px 0; }
+.pricing-page button:disabled { opacity: .4; cursor: not-allowed; }
+.pricing-page .finish-list input { accent-color: #657650; }
+.pricing-page .finish-list small { color: #606b58; }
+.contact-page { grid-template-columns: 1fr 1.15fr; gap: 80px; padding-top: 72px; }
+.contact-page .contact-intro { padding-top: 30px; }
+.contact-page .contact-intro > p:not(.eyebrow) { max-width: 390px; font-size: 15px; color: var(--store-muted); line-height: 1.8; }
+.contact-page .contact-details { border-top: 1px solid #e3e6db; padding-top: 26px; margin-top: 36px; }
+.contact-page .contact-details span { font-size: 10px; color: var(--store-muted); }
+.contact-page .contact-form { border: 1px solid #e6e8e0; background: #f5f6f1; border-radius: 16px; gap: 24px; padding: 36px; }
+.contact-form-heading h2 { font-family: 'Questrial', sans-serif; font-weight: 400; font-size: 25px; margin: 0 0 8px; }
+.contact-form-heading p { font-size: 13px; color: #687069; margin: 0; }
+.contact-page .contact-form label { text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 400; }
+.contact-page .contact-form input, .contact-page .contact-form textarea { border-radius: 8px; border-color: #d9ded1; padding: 13px 14px; }
+.contact-page .contact-form input:focus, .contact-page .contact-form textarea:focus { border-color: #778565; box-shadow: 0 0 0 3px #77856520; }
+.contact-page .contact-submit:disabled { opacity: .55; cursor: wait; }
+.page-shell .topbar .nav a.active { color: #34492b; text-decoration: underline; text-decoration-color: #9dab8a; text-underline-offset: 7px; }
+@media (max-width: 1330px) {
+  .collections-page, .contact-page { margin: 0 24px; }
+  .pricing-page { margin: 28px 24px 0; }
+}
+@media (max-width: 1000px) {
+  .contact-page { grid-template-columns: 1fr 1.2fr; gap: 36px; }
+  .pricing-page .builder-section { grid-template-columns: 1fr; gap: 24px; }
+  .collections-page .collection-gallery { height: 320px; padding: 20px; }
+}
+@media (max-width: 700px) {
+  .collections-page, .contact-page { width: auto; margin: 0 20px; padding: 40px 0 56px; }
+  .collections-page > .section-header { width: auto; margin-bottom: 28px; }
+  .collections-page > .section-header h1 { font-size: 38px; }
+  .collections-page .collection-list { grid-template-columns: 1fr; gap: 36px; }
+  .collections-page .collection-gallery { height: 340px; }
+  .pricing-page { margin: 18px 20px 0; }
+  .pricing-page .pricing-hero { padding: 28px 24px; }
+  .pricing-page .estimate-bar { position: static; padding: 20px 24px; gap: 16px; }
+  .pricing-page .estimate-bar > span { max-width: 110px; }
+  .pricing-page .estimate-bar strong { min-width: 0; }
+  .pricing-page .pricing-builder { padding: 0 4px 40px; }
+  .pricing-page .option-grid { grid-template-columns: 1fr; }
+  .pricing-page .option-button { min-height: 0; }
+  .pricing-page .option-button span { min-height: 0; }
+  .contact-page { grid-template-columns: 1fr; gap: 32px; }
+  .contact-page .contact-intro { padding: 0; }
+  .contact-page .contact-form { padding: 24px; }
+  .contact-page .field-row { grid-template-columns: 1fr; }
+}

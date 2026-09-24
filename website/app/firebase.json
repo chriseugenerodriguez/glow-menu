@@ -1,0 +1,32 @@
+{
+  "hosting": {
+    "public": "dist",
+    "trailingSlash": false,
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "redirects": [
+      { "source": "/menus", "destination": "/collections", "type": 301 },
+      { "source": "/shop", "destination": "/collections", "type": 301 },
+      { "source": "/custom-menus", "destination": "/custom", "type": 301 },
+      { "source": "/my-account", "destination": "/contact", "type": 302 },
+      { "source": "/cart", "destination": "/contact", "type": 302 },
+      { "source": "/checkout", "destination": "/contact", "type": 302 }
+    ],
+    "rewrites": [
+      { "source": "**", "destination": "/index.html" }
+    ],
+    "headers": [
+      {
+        "source": "**/*.{js,css,png,jpg,jpeg,svg,webp,woff,woff2}",
+        "headers": [
+          { "key": "Cache-Control", "value": "public,max-age=31536000,immutable" }
+        ]
+      },
+      {
+        "source": "/index.html",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache" }
+        ]
+      }
+    ]
+  }
+}

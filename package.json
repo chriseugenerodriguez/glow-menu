@@ -1,0 +1,12 @@
+{
+  "name": "glow-menu",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm --prefix website/app install",
+    "dev": "npm --prefix website/app run dev --",
+    "build": "npm --prefix website/app run build",
+    "lint": "npm --prefix website/app run lint",
+    "preview": "npm --prefix website/app run preview --"
+  }
+}

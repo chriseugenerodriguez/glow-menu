@@ -1,0 +1,8 @@
+.ftpquota
+*.gitignore
+*.htaccess
+.vscode/*
+.well-known/*
+apple-developer-merchantid-domain-association
+error_log
+firebase-debug.log
