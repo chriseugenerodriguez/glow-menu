@@ -6,7 +6,7 @@ import CollectionsPage from './pages/CollectionsPage.jsx'
 import PricingPage from './pages/PricingPage.jsx'
 import ContactPage from './pages/ContactPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
-import { useStructuredData, localBusinessSchema } from './utils/structuredData.js'
+import { pageUrl, siteUrl } from './data/siteUrl'
 import './App.css'
 import './shadcn.css'
 import './pages/StorePages.css'
@@ -18,14 +18,13 @@ import ContentPage from './pages/ContentPage'
 import { contentPages, pageMeta } from './data/contentPages'
 
 function App() {
-  useStructuredData(localBusinessSchema)
   const location = useLocation()
 
   // Update page title and meta tags on route change
   useEffect(() => {
     const meta = pageMeta[location.pathname] || { title: 'Page Not Found | Glow Menu', description: 'This page could not be found. Explore Glow Menu collections or start a custom menu project.' }
     document.title = meta.title
-    const url = new URL(location.pathname, 'https://glowmenu.co').href
+    const url = pageUrl(location.pathname)
     document.querySelector('link[rel="canonical"]')?.setAttribute('href', url)
     for (const [selector, content] of [
       ['meta[name="description"]', meta.description],
@@ -41,7 +40,7 @@ function App() {
     robots.content = pageMeta[location.pathname] ? 'index,follow' : 'noindex,follow'
     let schema = document.getElementById('page-schema')
     if (!schema) { schema = document.createElement('script'); schema.id = 'page-schema'; schema.type = 'application/ld+json'; document.head.appendChild(schema) }
-    schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', name: meta.title, description: meta.description, url, isPartOf: { '@type': 'WebSite', name: 'Glow Menu', url: 'https://glowmenu.co/' } })
+    schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', name: meta.title, description: meta.description, url, isPartOf: { '@type': 'WebSite', name: 'Glow Menu', url: `${siteUrl}/` } })
 
   }, [location.pathname])
 

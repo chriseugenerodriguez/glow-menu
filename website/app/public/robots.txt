@@ -4,7 +4,7 @@ Disallow: /admin
 Disallow: /.env
 Disallow: /dist
 
-Sitemap: https://glowmenu.co/sitemap.xml
+Sitemap: https://glowmenu-1efe4.web.app/sitemap.xml
 
 User-agent: GPTBot
 Disallow: /

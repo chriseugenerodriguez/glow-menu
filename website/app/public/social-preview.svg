@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="glow"><stop stop-color="#a9ed74" stop-opacity=".26"/><stop offset="1" stop-color="#a9ed74" stop-opacity="0"/></radialGradient>
+    <linearGradient id="card" x2="1" y2="1"><stop stop-color="#213325"/><stop offset="1" stop-color="#101b18"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="34"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="#0d130f"/>
+  <circle cx="918" cy="275" r="440" fill="url(#glow)"/>
+  <circle cx="1150" cy="545" r="150" fill="#79d06d" opacity=".12" filter="url(#blur)"/>
+  <rect x="45" y="45" width="1110" height="540" rx="28" fill="none" stroke="#42583c"/>
+  <g transform="translate(82 71)">
+    <rect width="56" height="56" rx="14" fill="#d1fca6"/>
+    <path fill="#111b13" d="M11 16 28 25 45 16v11l-17 10-17-10zm0 13 17 10 7-4 10 6-17 10-17-10zm24-2 10-6v11l-10-6z"/>
+  </g>
+  <text x="154" y="108" fill="#e9f3df" font-family="Arial,sans-serif" font-size="25" font-weight="700" letter-spacing="3">GLOW MENU</text>
+  <text x="86" y="235" fill="#c5f78b" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="3">MENUS MADE TO STAND OUT</text>
+  <text x="82" y="320" fill="#f4f7ef" font-family="Arial,sans-serif" font-size="70" letter-spacing="-3">Set the mood.</text>
+  <text x="82" y="402" fill="#c5f78b" font-family="Arial,sans-serif" font-size="70" letter-spacing="-3">Make it glow.</text>
+  <text x="86" y="479" fill="#b4c4ad" font-family="Arial,sans-serif" font-size="23">Custom menus for restaurants, bars &amp; events.</text>
+  <g transform="translate(738 112) rotate(8 155 205)">
+    <rect width="312" height="410" rx="14" fill="url(#card)" stroke="#719361" stroke-width="2"/>
+    <rect x="22" y="22" width="268" height="366" rx="4" fill="none" stroke="#567047"/>
+    <text x="156" y="89" text-anchor="middle" fill="#d5f7b2" font-family="Georgia,serif" font-size="27" letter-spacing="5">THE MENU</text>
+    <path d="M83 112h146M68 164h176M68 191h176M68 218h176M68 245h176M68 272h176M68 299h176M91 345h130" stroke="#71856b" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="156" cy="134" r="4" fill="#c5f78b"/>
+  </g>
+  <g transform="translate(638 182) rotate(-9 115 180)">
+    <rect width="235" height="342" rx="13" fill="#172521" stroke="#829575" stroke-width="2"/>
+    <rect x="17" y="17" width="201" height="308" rx="3" fill="none" stroke="#54715a"/>
+    <text x="117" y="78" text-anchor="middle" fill="#f4f7ef" font-family="Georgia,serif" font-size="22" letter-spacing="3">AFTER DARK</text>
+    <path d="M55 105h125M41 153h153M41 179h153M41 205h153M41 231h153M41 257h153M64 292h108" stroke="#849580" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="117" cy="128" r="3" fill="#c5f78b"/>
+  </g>
+</svg>
