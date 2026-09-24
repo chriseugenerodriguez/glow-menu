@@ -659,3 +659,15 @@ dialog.image-modal .lightbox-art img { position:static; transform:none; width:au
 .pricing-v2 .quote-navigation [data-slot='button']:focus-visible { outline-color:#c5f78b; outline-offset:4px; }
 .pricing-v2 .quote-steps [data-slot='tabs-trigger']:focus-visible { border-radius:8px; }
 @media(max-width:600px) { .pricing-v2 .quote-receipt h2 { flex-wrap:wrap; }.pricing-v2 .quote-preview-label { font-size:8px; }.pricing-v2 .spec-sheet.finish-laminated { outline-offset:2px; } }
+
+@media(min-width:701px) and (max-width:768px) {
+  .collections-page { width:auto; max-width:none; margin-inline:24px; padding:52px 0 80px; overflow:visible; }
+  .collections-page > .section-header { width:auto; }
+}
+@media(max-width:360px) {
+  .dark-theme .home-page .hero-copy { gap:15px; padding:26px 20px; }
+  .home-page .hero-copy h1 { font-size:38px; letter-spacing:-1.6px; }
+  .home-page .hero-panel { height:280px; }
+  .collections-page .collection-style-tabs[data-slot='toggle-group'] { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; gap:8px; }
+  .collections-page .collection-style-tabs [data-slot='toggle-group-item'] { width:100%; justify-content:center; }
+}
