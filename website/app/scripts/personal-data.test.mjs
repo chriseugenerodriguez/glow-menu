@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import{connectPersonal}from'../src/lib/personal-data.js';
+import * as site from '../src/data/siteData.js';import * as pages from '../src/data/contentPages.js';import * as options from '../src/data/menuOptions.js';
+const snapshot=()=>Object.entries({site,pages,options}).map(([id,module])=>({id,payload:JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(module).filter(([,v])=>typeof v!=='function'))))}));
+test('applies saved Personal content before rendering',async()=>{const rows=snapshot();const original=site.collections[0].name;rows[0].payload.collections[0].name='Personal test collection';try{await connectPersonal(async(url,opts)=>url==='/personal-demo.json'?{ok:true,json:async()=>({url:'https://personal.example',anonKey:'public'})}:{ok:true,json:async()=>{assert.equal(opts.headers['Accept-Profile'],'glowmenu');return rows;}});assert.equal(site.collections[0].name,'Personal test collection');}finally{site.collections[0].name=original;}});
+test('missing documents leave the packaged content intact',async()=>{const before=snapshot();await assert.rejects(connectPersonal(async url=>({ok:true,json:async()=>url==='/personal-demo.json'?{url:'https://personal.example',anonKey:'public'}:[]})),/Missing demo content/);assert.deepEqual(snapshot(),before);});

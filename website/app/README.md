@@ -47,3 +47,7 @@ WooCommerce checkout, customer accounts, or Fancy Product Designer. Review
 deployment instructions are in `DEPLOYMENT.md`.
 
 Builder recovery and public pricing benchmarks are documented in `BUILDER_RESEARCH.md`. Current production prices require a quote; standard-print benchmark prices do not include glow treatment.
+
+## Personal Supabase connection
+
+The demo is hosted at https://chriseugenerodriguez-glowmenu.web.app. Public content reads from `glowmenu.demo_content` in Personal (`ojofbckfasftdhrthabs`) before React renders. Three documents preserve the existing site collections/features, content pages, and builder options; packaged versions provide an outage fallback. The contact form saves private demo inquiries through `glowmenu-demo-inquiry`, with validation, rate limits and retry deduplication. No email, purchase, or authentication operation occurs. Builder drafts remain browser-local. `public/personal-demo.json` is public client configuration. Test with `node --test scripts/personal-data.test.mjs`; build and prerender with `npm run build`.
